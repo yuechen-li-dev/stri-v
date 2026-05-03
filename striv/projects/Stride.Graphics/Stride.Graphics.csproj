@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../build/StriV.Core.Profile.props" />
+  <PropertyGroup>
+    <AssemblyName>Stride.Graphics</AssemblyName>
+    <RootNamespace>Stride</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../..//sources/engine/Stride.Graphics/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
+      <Link>Properties/SharedAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Stride/Stride.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MSDF-Sharp.Core" />
+    <PackageReference Include="Remora.MSDFGen" />
+    <PackageReference Include="System.Memory" />
+    <PackageReference Include="Vortice.Vulkan" />
+    <PackageReference Include="Silk.NET.Sdl" />
+  </ItemGroup>
+  <Import Project="../../build/StriV.AssemblyProcessor.targets" />
+</Project>

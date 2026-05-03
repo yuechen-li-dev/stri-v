@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/projects/">
+    <Project Path="projects/Stride.BepuPhysics/Stride.BepuPhysics.csproj" />
+    <Project Path="projects/Stride.Core.AssemblyProcessor/Stride.Core.AssemblyProcessor.csproj" />
+    <Project Path="projects/Stride.Core.IO/Stride.Core.IO.csproj" />
+    <Project Path="projects/Stride.Core.Mathematics/Stride.Core.Mathematics.csproj" />
+    <Project Path="projects/Stride.Core.MicroThreading/Stride.Core.MicroThreading.csproj" />
+    <Project Path="projects/Stride.Core.Reflection/Stride.Core.Reflection.csproj" />
+    <Project Path="projects/Stride.Core.Serialization/Stride.Core.Serialization.csproj" />
+    <Project Path="projects/Stride.Core/Stride.Core.csproj" />
+    <Project Path="projects/Stride.Engine/Stride.Engine.csproj" />
+    <Project Path="projects/Stride.Games/Stride.Games.csproj" />
+    <Project Path="projects/Stride.Graphics/Stride.Graphics.csproj" />
+    <Project Path="projects/Stride.Input/Stride.Input.csproj" />
+    <Project Path="projects/Stride/Stride.csproj" />
+    <Project Path="projects/StriV.CoreSmoke/StriV.CoreSmoke.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../build/StriV.Core.Profile.props" />
+  <PropertyGroup>
+    <AssemblyName>StriV.CoreSmoke</AssemblyName>
+    <RootNamespace>StriV.CoreSmoke</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../..//samples/StriV/CoreSmoke/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Stride.Engine/Stride.Engine.csproj" />
+  </ItemGroup>
+</Project>

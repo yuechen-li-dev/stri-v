@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../build/StriV.Core.Profile.props" />
+  <PropertyGroup>
+    <AssemblyName>Stride.Core.AssemblyProcessor</AssemblyName>
+    <RootNamespace>Stride.Core.AssemblyProcessor</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../..//sources/core/Stride.Core.AssemblyProcessor/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mono.Cecil" />
+    <PackageReference Include="Mono.Options" />
+    <PackageReference Include="Microsoft.Build.Framework" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" />
+    <PackageReference Include="Microsoft.NET.StringTools" />
+    <PackageReference Include="Polysharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../../sources/core/Stride.Core/DataMemberMode.cs" Link="Core/DataMemberMode.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/DataContractAttribute.cs" Link="Core/DataContractAttribute.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/DataMemberAttribute.cs" Link="Core/DataMemberAttribute.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/DataContractIgnoreAttribute.cs" Link="Core/DataContractIgnoreAttribute.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/DataContractMetadataTypeAttribute.cs" Link="Core/DataContractMetadataTypeAttribute.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/DataMemberCustomSerializerAttribute.cs" Link="Core/DataMemberCustomSerializerAttribute.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/DataMemberIgnoreAttribute.cs" Link="Core/DataMemberIgnoreAttribute.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/PlatformType.cs" Link="Core/PlatformType.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/Reflection/AssemblyCommonCategories.cs" Link="Core/AssemblyCommonCategories.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/Serialization/ArchiveMode.cs" Link="Core/ArchiveMode.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/Serialization/DataSerializer.BinaryFormatVersion.cs" Link="Core/DataSerializer.BinaryFormatVersion.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/Serialization/DataSerializerGenericMode.cs" Link="Core/DataSerializerGenericMode.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/Storage/ObjectId.cs" Link="Core/ObjectId.cs" />
+    <Compile Include="../../../sources/core/Stride.Core/Storage/ObjectIdBuilder.cs" Link="Core/ObjectIdBuilder.cs" />
+  </ItemGroup>
+</Project>
