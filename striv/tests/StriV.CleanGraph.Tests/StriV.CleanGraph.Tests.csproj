@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../build/StriV.Core.Profile.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../projects/Stride.Core/Stride.Core.csproj" />
+    <ProjectReference Include="../../projects/Stride.Core.Mathematics/Stride.Core.Mathematics.csproj" />
+    <ProjectReference Include="../../projects/Stride.Engine/Stride.Engine.csproj" />
+    <ProjectReference Include="../../projects/Stride.BepuPhysics/Stride.BepuPhysics.csproj" />
+  </ItemGroup>
+</Project>
