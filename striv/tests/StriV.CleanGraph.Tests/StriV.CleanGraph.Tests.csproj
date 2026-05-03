@@ -14,5 +14,6 @@
     <ProjectReference Include="../../projects/Stride.Core.Mathematics/Stride.Core.Mathematics.csproj" />
     <ProjectReference Include="../../projects/Stride.Engine/Stride.Engine.csproj" />
     <ProjectReference Include="../../projects/Stride.BepuPhysics/Stride.BepuPhysics.csproj" />
+    <ProjectReference Include="../../projects/Stride.Shaders/Stride.Shaders.csproj" />
   </ItemGroup>
 </Project>

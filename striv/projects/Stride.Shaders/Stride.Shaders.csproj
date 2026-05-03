@@ -4,6 +4,7 @@
     <AssemblyName>Stride.Shaders</AssemblyName>
     <RootNamespace>Stride.Shaders</RootNamespace>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <StriVAssemblyProcessorOptions>--serialization --parameter-key --auto-module-initializer</StriVAssemblyProcessorOptions>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../../sources/engine/Stride.Shaders/**/*.cs" Exclude="**/bin/**;**/obj/**" />
