@@ -8,6 +8,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../..//sources/core/Stride.Core.IO/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <!-- Android expansion ZIP helper is mobile-only and excluded from the Linux desktop clean profile. -->
+    <Compile Remove="../../../sources/core/Stride.Core.IO/System.IO.Compression.Zip/ApkExpansionSupport.cs" />
     <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
       <Link>Properties/SharedAssemblyInfo.cs</Link>
     </Compile>
