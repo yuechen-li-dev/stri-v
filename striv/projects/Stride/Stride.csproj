@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="../Stride.Core.Serialization/Stride.Core.Serialization.csproj" />
     <ProjectReference Include="../Stride.Core.Mathematics/Stride.Core.Mathematics.csproj" />
+    <ProjectReference Include="../Stride.FreeImage/Stride.FreeImage.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" />

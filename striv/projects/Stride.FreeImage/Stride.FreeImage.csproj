@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../build/StriV.Core.Profile.props" />
+  <PropertyGroup>
+    <AssemblyName>Stride.FreeImage</AssemblyName>
+    <RootNamespace>FreeImageAPI</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../../sources/tools/Stride.FreeImage/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Stride.Core/Stride.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" />
+  </ItemGroup>
+</Project>
