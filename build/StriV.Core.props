@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <StridePlatforms Condition="'$(StridePlatforms)' == ''">Linux</StridePlatforms>
+    <StrideGraphicsApis Condition="'$(StrideGraphicsApis)' == ''">Vulkan</StrideGraphicsApis>
+    <StrideIncludeShaderCompiler Condition="'$(StrideIncludeShaderCompiler)' == ''">false</StrideIncludeShaderCompiler>
+    <StrideIncludeAudio Condition="'$(StrideIncludeAudio)' == ''">false</StrideIncludeAudio>
+    <StrideIncludeVirtualReality Condition="'$(StrideIncludeVirtualReality)' == ''">false</StrideIncludeVirtualReality>
+    <StrideAssemblyProcessorFramework Condition="'$(StrideAssemblyProcessorFramework)' == ''">net10.0</StrideAssemblyProcessorFramework>
+    <StrideAssemblyProcessorHash Condition="'$(StrideAssemblyProcessorHash)' == ''">sourcebuild</StrideAssemblyProcessorHash>
+  </PropertyGroup>
+</Project>
