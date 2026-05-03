@@ -15,7 +15,9 @@ using Stride.Rendering.Images;
 using Stride.Rendering.Lights;
 using Stride.Rendering.Shadows;
 using Stride.Rendering.SubsurfaceScattering;
+#if !STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY
 using Stride.VirtualReality;
+#endif
 
 namespace Stride.Rendering.Compositing
 {
@@ -34,7 +36,9 @@ namespace Stride.Rendering.Compositing
         private IShadowMapRenderer shadowMapRenderer;
         private Texture depthStencilROCached;
         private MultisampleCount actualMultisampleCount = MultisampleCount.None;
+#if !STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY
         private VRDeviceSystem vrSystem;
+#endif
 
         private readonly Logger logger = GlobalLogger.GetLogger(nameof(ForwardRenderer));
 
@@ -91,7 +95,9 @@ namespace Stride.Rendering.Compositing
         /// <summary>
         /// Virtual Reality related settings
         /// </summary>
+#if !STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY
         public VRRendererSettings VRSettings { get; set; } = new VRRendererSettings();
+#endif
 
         /// <summary>
         /// Separable subsurface scattering effect
@@ -160,6 +166,7 @@ namespace Stride.Rendering.Compositing
 
             var camera = Context.GetCurrentCamera();
 
+#if !STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY
             vrSystem = Services.GetService<VRDeviceSystem>();
             if (vrSystem != null)
             {
@@ -217,6 +224,7 @@ namespace Stride.Rendering.Compositing
                     }
                 }
             }
+#endif
         }
 
         protected virtual void CollectStages(RenderContext context)
@@ -309,6 +317,7 @@ namespace Stride.Rendering.Compositing
 
                 CollectStages(context);
 
+#if !STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY
                 if (VRSettings.Enabled && VRSettings.VRDevice != null)
                 {
                     Vector3 cameraPos, cameraScale;
@@ -401,6 +410,7 @@ namespace Stride.Rendering.Compositing
                     }
                 }
                 else
+#endif
                 {
                     //write params to view
                     SceneCameraRenderer.UpdateCameraToRenderView(context, context.RenderView, camera);
@@ -625,6 +635,7 @@ namespace Stride.Rendering.Compositing
                 // Render Shadow maps
                 shadowMapRenderer?.Draw(drawContext);
 
+#if !STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY
                 if (VRSettings.Enabled && VRSettings.VRDevice != null)
                 {
                     var isFullViewport = (int)viewport.X == 0 && (int)viewport.Y == 0
@@ -733,6 +744,7 @@ namespace Stride.Rendering.Compositing
                     }
                 }
                 else
+#endif
                 {
                     PrepareRenderTargets(drawContext, new Size2((int)viewport.Width, (int)viewport.Height));
 
@@ -764,9 +776,13 @@ namespace Stride.Rendering.Compositing
         {
             if (input.Size != output.Size)
             {
+#if !STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY
                 VRSettings.MirrorScaler.SetInput(0, input);
                 VRSettings.MirrorScaler.SetOutput(output);
                 VRSettings.MirrorScaler.Draw(drawContext);
+#else
+                drawContext.CommandList.Copy(input, output);
+#endif
             }
             else
             {

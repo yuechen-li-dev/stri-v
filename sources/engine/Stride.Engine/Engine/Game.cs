@@ -27,7 +27,9 @@ using Stride.Rendering.Sprites;
 using Stride.Shaders.Compiler;
 #endif
 using Stride.Streaming;
+#if !STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY
 using Stride.VirtualReality;
+#endif
 
 namespace Stride.Engine
 {
@@ -122,7 +124,9 @@ namespace Stride.Engine
         /// <summary>
         /// Gets the VR Device System.
         /// </summary>
+#if !STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY
         public VRDeviceSystem VRDeviceSystem { get; }
+#endif
 
         /// <summary>
         /// Gets the font system.
@@ -231,8 +235,10 @@ namespace Stride.Engine
             ProfilingSystem = new GameProfilingSystem(Services);
             Services.AddService(ProfilingSystem);
 
+#if !STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY
             VRDeviceSystem = new VRDeviceSystem(Services);
             Services.AddService(VRDeviceSystem);
+#endif
 
             // Creates the graphics device manager
             GraphicsDeviceManager = new GraphicsDeviceManager(this);
@@ -402,7 +408,9 @@ namespace Stride.Engine
 #endif
 
             // Add the VR System
+#if !STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY
             GameSystems.Add(VRDeviceSystem);
+#endif
 
             // TODO: data-driven?
             Content.Serializer.RegisterSerializer(new ImageSerializer());
