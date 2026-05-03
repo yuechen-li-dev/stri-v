@@ -548,6 +548,29 @@ Windows:
 .\build\striv-run-coresmoke-m1h.ps1 -Configuration Release
 ```
 
+### M1h headless/offscreen probe
+
+The official runtime smoke expects a real desktop display + Vulkan runtime. In headless containers, the Linux run script supports experimental SDL video-driver probes:
+
+```bash
+./build/striv-run-coresmoke-m1h.sh --sdl-video-driver dummy
+./build/striv-run-coresmoke-m1h.sh --sdl-video-driver offscreen
+```
+
+You can combine configuration + probe mode:
+
+```bash
+./build/striv-run-coresmoke-m1h.sh Release --sdl-video-driver dummy
+```
+
+PowerShell exposes a matching optional parameter:
+
+```powershell
+.\build\striv-run-coresmoke-m1h.ps1 -SdlVideoDriver dummy
+```
+
+These probes are diagnostic only. Failure under dummy/offscreen does not necessarily indicate a Stri-V runtime bug; local desktop validation remains authoritative.
+
 ### M1h troubleshooting
 
 - **SDL display unavailable**
