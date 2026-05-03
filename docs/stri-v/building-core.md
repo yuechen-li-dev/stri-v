@@ -370,3 +370,14 @@ and platform VR stacks such as OpenVR/OpenXR. It is not part of the core runtime
 spine and should be restored later only as an optional extension module after a
 dedicated VR/native dependency audit.
 
+
+## Stri-V Engine M1e (current no-VR guard path)
+
+M1e introduces `sources/engine/Stride.Engine/Stride.Engine.csproj` with optional integrations:
+- `StrideIncludeShaderCompiler=false`
+- `StrideIncludeAudio=false`
+- `StrideIncludeVirtualReality=false`
+
+When `StrideIncludeVirtualReality=false`, Stri-V now excludes VR-only compositor source files from `Stride.Engine` compilation in addition to conditioning out the `Stride.VirtualReality` project reference. This is a source-level compile isolation step only.
+
+**TODO (VR):** Stri-V Core still does **not** include or validate VR runtime support (OpenVR/OpenXR/device/native paths).

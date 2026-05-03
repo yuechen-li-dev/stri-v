@@ -31,6 +31,11 @@
   <ItemGroup Condition="'$(StrideIncludeAudio)' == 'false'">
     <Compile Remove="Audio\*.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(StrideIncludeVirtualReality)' == 'false'">
+    <Compile Remove="Rendering\Compositing\VRDeviceDescription.cs" />
+    <Compile Remove="Rendering\Compositing\VROverlayRenderer.cs" />
+    <Compile Remove="Rendering\Compositing\VRRendererSettings.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.ValueTuple" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" />
