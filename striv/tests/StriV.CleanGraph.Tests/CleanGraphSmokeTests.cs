@@ -2,6 +2,8 @@ using Stride.BepuPhysics;
 using Stride.Engine;
 using Stride.Core;
 using Stride.Core.Mathematics;
+using Stride.Core.Serialization;
+using Stride.Shaders;
 using Xunit;
 
 namespace StriV.CleanGraph.Tests;
@@ -30,5 +32,12 @@ public class CleanGraphSmokeTests
     {
         Assert.Equal("Stride.Engine.Game", typeof(Game).FullName);
         Assert.Equal("Stride.BepuPhysics.BepuSimulation", typeof(BepuSimulation).FullName);
+    }
+
+    [Fact]
+    public void EffectBytecodeSerializer_IsAvailable_InCleanProfile()
+    {
+        var serializer = SerializerSelector.Default.GetSerializer<EffectBytecode>();
+        Assert.NotNull(serializer);
     }
 }

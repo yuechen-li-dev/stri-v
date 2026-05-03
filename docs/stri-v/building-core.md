@@ -699,3 +699,10 @@ Notes:
 - `StriV.CoreSmoke` is intentionally minimal and self-exiting.
 - `xvfb-run` uses a software/Mesa Vulkan path in sandbox-style Linux environments.
 - Local GPU runtime validation is still useful beyond sandbox/Xvfb coverage.
+
+## TODO: Serialization modernization
+
+The clean graph currently preserves the minimum legacy serializer registration behavior needed
+for runtime startup. Stri-V should later replace or reduce broad reflection/AP-dependent
+serialization with explicit registrations/source generation where practical, especially once
+the TOML asset manifest and shader artifact pipeline are designed.
