@@ -19,9 +19,9 @@ public class AssemblyProcessorDiagnosticsTests
     [Fact]
     public void AssemblyProcessorModernPayload_net10_CanLoadTaskType()
     {
-        var probe = AssemblyProcessorProbe.ProbeByTfm("net10.0");
+        var probe = AssemblyProcessorProbe.SelectPreferredProbe("net10.0");
         Assert.NotNull(probe);
-        Assert.True(probe!.Exists, "Expected net10.0 payload to exist.");
+        Assert.True(probe!.Exists, "Expected net10.0 payload candidate to exist.");
         Assert.True(probe.LoadSuccess, probe.ToMultilineString());
         Assert.True(probe.AssemblyProcessorTaskFound, probe.ToMultilineString());
     }
@@ -58,6 +58,9 @@ internal static class AssemblyProcessorProbe
 
     public static IEnumerable<(string Tfm, string Path)> PayloadPaths()
     {
+        foreach (var candidate in SourceBuiltCandidatePaths())
+            yield return candidate;
+
         var depsRoot = Path.Combine(RepoRoot, "deps/AssemblyProcessor");
         if (Directory.Exists(depsRoot))
         {
@@ -73,6 +76,27 @@ internal static class AssemblyProcessorProbe
         yield return ("net10.0", Path.Combine(RepoRoot, "deps/AssemblyProcessor/net10.0/Stride.Core.AssemblyProcessor.dll"));
     }
 
+    private static IEnumerable<(string Tfm, string Path)> SourceBuiltCandidatePaths()
+    {
+        var explicitAssemblyPath = Environment.GetEnvironmentVariable("STRIV_ASSEMBLY_PROCESSOR_PATH");
+        if (!string.IsNullOrWhiteSpace(explicitAssemblyPath))
+            yield return ("source-env-path", NormalizeAssemblyPath(explicitAssemblyPath!));
+
+        var explicitBasePath = Environment.GetEnvironmentVariable("STRIV_ASSEMBLY_PROCESSOR_BASE_PATH");
+        if (!string.IsNullOrWhiteSpace(explicitBasePath))
+            yield return ("source-env-base", Path.Combine(explicitBasePath!, "Stride.Core.AssemblyProcessor.dll"));
+
+        yield return ("source-default-net10", Path.Combine(RepoRoot, "sources/core/Stride.Core.AssemblyProcessor/bin/Debug/net10.0/Stride.Core.AssemblyProcessor.dll"));
+    }
+
+    private static string NormalizeAssemblyPath(string path)
+    {
+        if (path.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+            return path;
+
+        return Path.Combine(path, "Stride.Core.AssemblyProcessor.dll");
+    }
+
     public static List<ProbeResult> ProbeAllPayloads() =>
         PayloadPaths()
             .GroupBy(p => p.Path, StringComparer.OrdinalIgnoreCase)
@@ -82,6 +106,17 @@ internal static class AssemblyProcessorProbe
 
     public static ProbeResult? ProbeByTfm(string tfm) =>
         ProbeAllPayloads().FirstOrDefault(p => string.Equals(p.Tfm, tfm, StringComparison.OrdinalIgnoreCase));
+
+    public static ProbeResult? SelectPreferredProbe(string preferredTfm)
+    {
+        var probes = ProbeAllPayloads();
+        var preferred = probes.FirstOrDefault(p => p.Exists && (p.Tfm.Equals("source-env-path", StringComparison.OrdinalIgnoreCase) || p.Tfm.Equals("source-env-base", StringComparison.OrdinalIgnoreCase) || p.Tfm.Equals("source-default-net10", StringComparison.OrdinalIgnoreCase)));
+        if (preferred != null)
+            return preferred;
+
+        return probes.FirstOrDefault(p => p.Exists && p.Tfm.Equals(preferredTfm, StringComparison.OrdinalIgnoreCase))
+               ?? probes.FirstOrDefault(p => p.Exists);
+    }
 
     public static ProbeResult ProbePath(string path, string tfm)
     {
@@ -126,6 +161,19 @@ internal static class AssemblyProcessorProbe
     public static (bool Success, bool TaskTypeFound, string Message) TryLoadAndFindTaskType(string path)
     {
         var loadContext = new AssemblyLoadContext("APDiag", isCollectible: true);
+        var resolver = new AssemblyDependencyResolver(path);
+        loadContext.Resolving += (_, assemblyName) =>
+        {
+            var resolvedPath = resolver.ResolveAssemblyToPath(assemblyName);
+            if (!string.IsNullOrWhiteSpace(resolvedPath) && File.Exists(resolvedPath))
+                return loadContext.LoadFromAssemblyPath(resolvedPath);
+
+            var localCandidate = Path.Combine(Path.GetDirectoryName(path)!, $"{assemblyName.Name}.dll");
+            if (File.Exists(localCandidate))
+                return loadContext.LoadFromAssemblyPath(localCandidate);
+
+            return null;
+        };
         try
         {
             var asm = loadContext.LoadFromAssemblyPath(path);
