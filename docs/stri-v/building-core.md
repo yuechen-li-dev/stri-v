@@ -195,3 +195,69 @@ Both scripts also forward additional arguments to the M1c `dotnet build` invocat
 - Add engine foundation slice.
 - Add SDL/window/input slice.
 - Add Vulkan graphics slice.
+
+## Stri-V Input M1d
+
+M1d extends M1c by adding:
+- `sources/engine/Stride.Input/Stride.Input.csproj`
+
+This is an input compile-validation slice via `build/StriV.Input.M1d.slnf`.
+
+What M1d intentionally defers/excludes:
+- `sources/engine/Stride.Engine/Stride.Engine.csproj` remains intentionally excluded.
+- Rendering runtime, audio, physics, editor/tooling, and asset compiler flows are still not proven in M1d.
+- M1d validates compile/build graph only; it does not validate runtime input devices.
+
+### Linux (Debug default)
+
+```bash
+./build/striv-build-input-m1d.sh
+```
+
+### Windows PowerShell (Debug default)
+
+```powershell
+.\build\striv-build-input-m1d.ps1
+```
+
+### Optional Release builds
+
+Linux:
+
+```bash
+./build/striv-build-input-m1d.sh Release
+```
+
+Windows:
+
+```powershell
+.\build\striv-build-input-m1d.ps1 -Configuration Release
+```
+
+Both scripts also forward additional arguments to the M1d `dotnet build` invocation.
+
+### M1d troubleshooting
+
+- **Accidental `net10.0-windows` activation**
+  - Ensure effective target framework/platform properties stay Linux-first.
+
+- **Windows-only input packages active on Linux**
+  - Inspect conditional package references and effective MSBuild conditions.
+
+- **`STRIDE_UI_SDL` not selected**
+  - Verify platform symbol routing for Linux/SDL code paths.
+
+- **WinForms/UWP/mobile files compiling unexpectedly**
+  - Re-check target conditions and include/exclude item logic.
+
+- **SDL/gamepad/native dependency issues**
+  - Validate native/input dependency availability and compatibility for Linux.
+
+- **Transitive project not included in `.slnf`**
+  - If restore/build reports a missing filtered project, add only the required transitive project and rerun.
+
+- **AssemblyProcessor routing/property issues**
+  - Ensure:
+    - `StrideAssemblyProcessorFramework=net10.0`
+    - `StrideAssemblyProcessorBasePath=<absolute path with trailing slash>`
+    - `StrideAssemblyProcessorHash=sourcebuild`
