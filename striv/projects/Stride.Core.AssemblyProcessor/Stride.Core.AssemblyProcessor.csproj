@@ -4,7 +4,7 @@
     <AssemblyName>Stride.Core.AssemblyProcessor</AssemblyName>
     <RootNamespace>Stride.Core.AssemblyProcessor</RootNamespace>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../..//sources/core/Stride.Core.AssemblyProcessor/**/*.cs" Exclude="**/bin/**;**/obj/**" />
