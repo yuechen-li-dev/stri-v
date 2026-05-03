@@ -21,7 +21,9 @@ using Stride.Profiling;
 using Stride.Rendering;
 using Stride.Rendering.Fonts;
 using Stride.Rendering.Sprites;
+#if !STRIDE_ENGINE_WITHOUT_SHADER_COMPILER
 using Stride.Shaders.Compiler;
+#endif
 using Stride.Streaming;
 using Stride.VirtualReality;
 
@@ -372,7 +374,9 @@ namespace Stride.Engine
             Services.AddService(EffectSystem);
 
             // If requested in game settings, compile effects remotely and/or notify new shader requests
+#if !STRIDE_ENGINE_WITHOUT_SHADER_COMPILER
             EffectSystem.Compiler = EffectCompilerFactory.CreateEffectCompiler(Content.FileProvider, EffectSystem, Settings?.PackageName, Settings?.EffectCompilation ?? EffectCompilationMode.Local, Settings?.RecordUsedEffects ?? false);
+#endif
 
             // Setup shader compiler settings from a compilation mode.
             // TODO: We might want to provide overrides on the GameSettings to specify debug and/or optim level specifically.

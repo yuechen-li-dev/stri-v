@@ -328,3 +328,21 @@ Both scripts also forward additional arguments to the M1e `dotnet build` invocat
     - `StrideAssemblyProcessorFramework=net10.0`
     - `StrideAssemblyProcessorBasePath=<absolute path with trailing slash>`
     - `StrideAssemblyProcessorHash=sourcebuild`
+
+## Stri-V Engine M1e
+
+M1e admits `sources/engine/Stride.Engine/Stride.Engine.csproj` through `build/StriV.Engine.M1e.slnf` and keeps shader source compiler integration optional.
+
+For Stri-V Core builds, M1e passes:
+
+- `-p:StrideIncludeShaderCompiler=false`
+
+This excludes the legacy shader source compiler integration path from `Stride.Engine` so M1e compile validation is not blocked by the legacy CppNet/SDSL source shader compiler dependency.
+
+This is compile-slice isolation only; it does not claim runtime shader compilation behavior is solved.
+
+## TODO: Shader pipeline modernization
+
+CppNet and the legacy SDSL shader preprocessing/compiler path are not part of Stri-V Core.
+They remain legacy tooling for now and should eventually be removed, replaced, or quarantined
+behind optional compatibility tooling once the runtime shader/effect artifact boundary is defined.

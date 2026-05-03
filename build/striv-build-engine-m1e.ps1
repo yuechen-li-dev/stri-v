@@ -60,7 +60,8 @@ $buildArgs = @(
     "-p:StrideGraphicsApis=Vulkan",
     "-p:StrideAssemblyProcessorFramework=net10.0",
     "-p:StrideAssemblyProcessorBasePath=$ApOutputDir",
-    "-p:StrideAssemblyProcessorHash=sourcebuild"
+    "-p:StrideAssemblyProcessorHash=sourcebuild",
+    "-p:StrideIncludeShaderCompiler=false"
 ) + $ExtraArgs
 
 & dotnet @buildArgs
