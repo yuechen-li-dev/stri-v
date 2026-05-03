@@ -337,7 +337,7 @@ For Stri-V Core builds, M1e passes:
 
 - `-p:StrideIncludeShaderCompiler=false`
 
-This excludes the legacy shader source compiler integration path from `Stride.Engine` so M1e compile validation is not blocked by the legacy CppNet/SDSL source shader compiler dependency.
+This excludes the legacy shader source compiler integration path from `Stride.Engine` so M1e compile validation is not blocked by the legacy CppNet/SDSL source shader compiler dependency. In addition to excluding the external `Stride.Shaders.Compiler` project reference, M1e now also conditionally excludes `Stride.Engine/Shaders.Compiler/*.cs` engine-local integration sources when `StrideIncludeShaderCompiler=false`.
 
 This is compile-slice isolation only; it does not claim runtime shader compilation behavior is solved.
 

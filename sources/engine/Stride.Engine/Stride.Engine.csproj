@@ -28,6 +28,10 @@
   <PropertyGroup Condition="'$(StrideIncludeVirtualReality)' == 'false'">
     <DefineConstants>$(DefineConstants);STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY</DefineConstants>
   </PropertyGroup>
+  <ItemGroup Condition="'$(StrideIncludeShaderCompiler)' == 'false'">
+    <Compile Remove="Shaders.Compiler\*.cs" />
+    <Compile Remove="Shaders.Compiler\Internals\*.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(StrideIncludeAudio)' == 'false'">
     <Compile Remove="Audio\*.cs" />
     <Compile Remove="Engine\AudioEmitterComponent.cs" />
