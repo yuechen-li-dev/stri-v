@@ -4,6 +4,7 @@
     <AssemblyName>Stride.Graphics</AssemblyName>
     <RootNamespace>Stride</RootNamespace>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <DefineConstants>$(DefineConstants);STRIDE_GRAPHICS_NO_DESCRIPTOR_COPIES</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../..//sources/engine/Stride.Graphics/**/*.cs" Exclude="**/bin/**;**/obj/**" />
