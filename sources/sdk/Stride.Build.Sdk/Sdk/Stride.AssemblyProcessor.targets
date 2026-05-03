@@ -33,7 +33,7 @@
   <!-- ================================================================ -->
   <PropertyGroup>
     <!-- Framework selection -->
-    <StrideAssemblyProcessorFramework Condition="'$(StrideAssemblyProcessorFramework)' == ''">netstandard2.0</StrideAssemblyProcessorFramework>
+    <StrideAssemblyProcessorFramework Condition="'$(StrideAssemblyProcessorFramework)' == ''">net10.0</StrideAssemblyProcessorFramework>
     <StrideAssemblyProcessorExt Condition="'$(StrideAssemblyProcessorExt)' == ''">.dll</StrideAssemblyProcessorExt>
 
     <!-- Path detection: SDK package vs source build -->

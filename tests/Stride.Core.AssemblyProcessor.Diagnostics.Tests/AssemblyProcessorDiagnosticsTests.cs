@@ -9,49 +9,27 @@ namespace Stride.Core.AssemblyProcessor.Diagnostics.Tests;
 public class AssemblyProcessorDiagnosticsTests
 {
     [Fact]
-    public void AssemblyProcessorDependencyPayload_IsPresentOrReportsUsefulMissingPath()
+    public void AssemblyProcessorPayloadInventory_IsComprehensiveAndActionable()
     {
-        var report = AssemblyProcessorProbe.ProbeAllCandidates();
-        var hasSourceProject = File.Exists(AssemblyProcessorProbe.SourceProjectPath);
-        var hasAnyCandidate = report.Any(r => r.Exists);
-
-        var summary = AssemblyProcessorProbe.FormatReport(report);
-        Assert.True(hasAnyCandidate || hasSourceProject,
-            $"No candidate AssemblyProcessor binaries found and source project missing.\n{summary}");
+        var report = AssemblyProcessorProbe.ProbeAllPayloads();
+        var hasAnyPayload = report.Any(r => r.Exists);
+        Assert.True(hasAnyPayload, $"No payloads found under deps/AssemblyProcessor.\n{AssemblyProcessorProbe.FormatReport(report)}");
     }
 
     [Fact]
-    public void AssemblyProcessorBinary_HasValidManagedAssemblyMetadata()
+    public void AssemblyProcessorModernPayload_net10_CanLoadTaskType()
     {
-        var candidate = AssemblyProcessorProbe.SelectLikelyBuildCandidate();
-        Assert.NotNull(candidate);
-        Assert.True(File.Exists(candidate!), $"Candidate does not exist: {candidate}");
-
-        try
-        {
-            _ = AssemblyName.GetAssemblyName(candidate!);
-        }
-        catch (Exception ex)
-        {
-            var details = AssemblyProcessorProbe.ProbePath(candidate!);
-            Assert.Fail($"Invalid managed assembly metadata: {ex.GetType().Name}: {ex.Message}\n{details.ToMultilineString()}");
-        }
-    }
-
-    [Fact]
-    public void AssemblyProcessorTask_TypeCanBeLocated()
-    {
-        var candidate = AssemblyProcessorProbe.SelectLikelyBuildCandidate();
-        Assert.NotNull(candidate);
-
-        var result = AssemblyProcessorProbe.TryLoadAndFindTaskType(candidate!);
-        Assert.True(result.Success, result.Message);
+        var probe = AssemblyProcessorProbe.ProbeByTfm("net10.0");
+        Assert.NotNull(probe);
+        Assert.True(probe!.Exists, "Expected net10.0 payload to exist.");
+        Assert.True(probe.LoadSuccess, probe.ToMultilineString());
+        Assert.True(probe.AssemblyProcessorTaskFound, probe.ToMultilineString());
     }
 
     [Fact]
     public void AssemblyProcessorProgram_CanBeInvokedForHelpOrNoArgs()
     {
-        var candidate = AssemblyProcessorProbe.SelectLikelyBuildCandidate();
+        var candidate = AssemblyProcessorProbe.SelectPreferredCandidate("net10.0");
         Assert.NotNull(candidate);
 
         var psi = new ProcessStartInfo("dotnet", $"\"{candidate}\" --help")
@@ -77,30 +55,37 @@ public class AssemblyProcessorDiagnosticsTests
 internal static class AssemblyProcessorProbe
 {
     public static string RepoRoot => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../"));
-    public static string SourceProjectPath => Path.Combine(RepoRoot, "sources/core/Stride.Core.AssemblyProcessor/Stride.Core.AssemblyProcessor.csproj");
 
-    public static List<string> CandidatePaths()
+    public static IEnumerable<(string Tfm, string Path)> PayloadPaths()
     {
-        var list = new List<string>
+        var depsRoot = Path.Combine(RepoRoot, "deps/AssemblyProcessor");
+        if (Directory.Exists(depsRoot))
         {
-            Path.Combine(RepoRoot, "deps/AssemblyProcessor/netstandard2.0/Stride.Core.AssemblyProcessor.dll"),
-            Path.Combine(RepoRoot, "sources/core/Stride.Core.AssemblyProcessor/bin/Debug/netstandard2.0/Stride.Core.AssemblyProcessor.dll")
-        };
-
-        var tmp = "/tmp/Stride/AssemblyProcessor";
-        if (Directory.Exists(tmp))
-        {
-            list.AddRange(Directory.GetFiles(tmp, "Stride.Core.AssemblyProcessor.dll", SearchOption.AllDirectories));
+            foreach (var dir in Directory.GetDirectories(depsRoot).OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
+            {
+                var tfm = Path.GetFileName(dir);
+                yield return (tfm, Path.Combine(dir, "Stride.Core.AssemblyProcessor.dll"));
+            }
         }
 
-        return list.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        // Explicit required checks
+        yield return ("netstandard2.0", Path.Combine(RepoRoot, "deps/AssemblyProcessor/netstandard2.0/Stride.Core.AssemblyProcessor.dll"));
+        yield return ("net10.0", Path.Combine(RepoRoot, "deps/AssemblyProcessor/net10.0/Stride.Core.AssemblyProcessor.dll"));
     }
 
-    public static List<ProbeResult> ProbeAllCandidates() => CandidatePaths().Select(ProbePath).ToList();
+    public static List<ProbeResult> ProbeAllPayloads() =>
+        PayloadPaths()
+            .GroupBy(p => p.Path, StringComparer.OrdinalIgnoreCase)
+            .Select(g => ProbePath(g.First().Path, g.First().Tfm))
+            .OrderBy(r => r.Tfm, StringComparer.OrdinalIgnoreCase)
+            .ToList();
 
-    public static ProbeResult ProbePath(string path)
+    public static ProbeResult? ProbeByTfm(string tfm) =>
+        ProbeAllPayloads().FirstOrDefault(p => string.Equals(p.Tfm, tfm, StringComparison.OrdinalIgnoreCase));
+
+    public static ProbeResult ProbePath(string path, string tfm)
     {
-        var result = new ProbeResult { Path = path, Exists = File.Exists(path) };
+        var result = new ProbeResult { Tfm = tfm, Path = path, Exists = File.Exists(path) };
         if (!result.Exists) return result;
 
         var bytes = File.ReadAllBytes(path);
@@ -108,6 +93,9 @@ internal static class AssemblyProcessorProbe
         result.Sha256 = Convert.ToHexString(SHA256.HashData(bytes));
         result.FirstBytesHex = Convert.ToHexString(bytes.Take(32).ToArray());
         result.HasMZHeader = bytes.Length >= 2 && bytes[0] == 'M' && bytes[1] == 'Z';
+
+        var textPrefix = System.Text.Encoding.UTF8.GetString(bytes.Take(Math.Min(bytes.Length, 300)).ToArray());
+        result.IsLikelyGitLfsPointer = textPrefix.Contains("version https://git-lfs.github.com/spec/v1", StringComparison.Ordinal);
 
         try
         {
@@ -120,17 +108,22 @@ internal static class AssemblyProcessorProbe
             result.GetAssemblyNameException = $"{ex.GetType().Name}: {ex.Message}";
         }
 
+        var loadResult = TryLoadAndFindTaskType(path);
+        result.LoadSuccess = loadResult.Success;
+        result.LoadMessage = loadResult.Message;
+        result.AssemblyProcessorTaskFound = loadResult.TaskTypeFound;
+
         return result;
     }
 
-    public static string? SelectLikelyBuildCandidate()
+    public static string? SelectPreferredCandidate(string preferredTfm)
     {
-        var probes = ProbeAllCandidates();
-        var tmpCandidate = probes.FirstOrDefault(p => p.Exists && p.Path.StartsWith("/tmp/Stride/AssemblyProcessor", StringComparison.OrdinalIgnoreCase));
-        return tmpCandidate?.Path ?? probes.FirstOrDefault(p => p.Exists)?.Path;
+        var probes = ProbeAllPayloads();
+        var preferred = probes.FirstOrDefault(p => p.Exists && p.Tfm.Equals(preferredTfm, StringComparison.OrdinalIgnoreCase));
+        return preferred?.Path ?? probes.FirstOrDefault(p => p.Exists)?.Path;
     }
 
-    public static (bool Success, string Message) TryLoadAndFindTaskType(string path)
+    public static (bool Success, bool TaskTypeFound, string Message) TryLoadAndFindTaskType(string path)
     {
         var loadContext = new AssemblyLoadContext("APDiag", isCollectible: true);
         try
@@ -138,19 +131,19 @@ internal static class AssemblyProcessorProbe
             var asm = loadContext.LoadFromAssemblyPath(path);
             var type = asm.GetTypes().FirstOrDefault(t => t.Name == "AssemblyProcessorTask" || t.FullName?.Contains("AssemblyProcessorTask") == true);
             if (type != null)
-                return (true, $"Found task type: {type.FullName}");
+                return (true, true, $"Found task type: {type.FullName}");
 
             var nearby = string.Join(", ", asm.GetTypes().Where(t => t.Name.Contains("AssemblyProcessor") || t.Name.Contains("Task")).Take(20).Select(t => t.FullName));
-            return (false, $"Assembly loaded but task type not found. Nearby types: {nearby}");
+            return (true, false, $"Assembly loaded but task type not found. Nearby types: {nearby}");
         }
         catch (ReflectionTypeLoadException rtle)
         {
             var loaderErrors = string.Join(" | ", rtle.LoaderExceptions.Where(e => e is not null).Select(e => $"{e!.GetType().Name}: {e.Message}"));
-            return (false, $"ReflectionTypeLoadException while loading task type: {loaderErrors}");
+            return (false, false, $"ReflectionTypeLoadException while loading task type: {loaderErrors}");
         }
         catch (Exception ex)
         {
-            return (false, $"Load failure: {ex.GetType().Name}: {ex.Message}");
+            return (false, false, $"Load failure: {ex.GetType().Name}: {ex.Message}");
         }
         finally
         {
@@ -158,21 +151,26 @@ internal static class AssemblyProcessorProbe
         }
     }
 
-    public static string FormatReport(IEnumerable<ProbeResult> results) => string.Join("\n", results.Select(r => r.ToMultilineString()));
+    public static string FormatReport(IEnumerable<ProbeResult> results) => string.Join("\n\n", results.Select(r => r.ToMultilineString()));
 }
 
 internal sealed class ProbeResult
 {
+    public string Tfm { get; set; } = string.Empty;
     public string Path { get; set; } = string.Empty;
     public bool Exists { get; set; }
     public long? Size { get; set; }
     public string? Sha256 { get; set; }
     public string? FirstBytesHex { get; set; }
     public bool HasMZHeader { get; set; }
+    public bool IsLikelyGitLfsPointer { get; set; }
     public bool GetAssemblyNameSuccess { get; set; }
     public string? AssemblyName { get; set; }
     public string? GetAssemblyNameException { get; set; }
+    public bool LoadSuccess { get; set; }
+    public bool AssemblyProcessorTaskFound { get; set; }
+    public string? LoadMessage { get; set; }
 
     public string ToMultilineString() =>
-        $"Path: {Path}\nExists: {Exists}\nSize: {Size}\nSHA256: {Sha256}\nFirstBytesHex: {FirstBytesHex}\nHasMZHeader: {HasMZHeader}\nGetAssemblyNameSuccess: {GetAssemblyNameSuccess}\nAssemblyName: {AssemblyName}\nGetAssemblyNameException: {GetAssemblyNameException}";
+        $"TFM: {Tfm}\nPath: {Path}\nExists: {Exists}\nSize: {Size}\nSHA256: {Sha256}\nFirstBytesHex: {FirstBytesHex}\nHasMZHeader: {HasMZHeader}\nIsLikelyGitLfsPointer: {IsLikelyGitLfsPointer}\nGetAssemblyNameSuccess: {GetAssemblyNameSuccess}\nAssemblyName: {AssemblyName}\nGetAssemblyNameException: {GetAssemblyNameException}\nLoadSuccess: {LoadSuccess}\nLoadMessage: {LoadMessage}\nAssemblyProcessorTaskFound: {AssemblyProcessorTaskFound}";
 }
