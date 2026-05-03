@@ -666,3 +666,36 @@ Key artifacts:
 Notes:
 - The clean graph uses explicit source globs into existing `sources/` and `samples/` trees.
 - `Stride.Core.AssemblyProcessor` is source-built in-graph and no `deps/AssemblyProcessor` payload is consumed.
+
+## Clean graph runtime smoke
+
+Build clean graph:
+
+```bash
+./striv/build/striv-build-core.sh
+```
+
+Run CoreSmoke normally:
+
+```bash
+./striv/build/striv-run-coresmoke.sh
+```
+
+Run in headless sandbox:
+
+```bash
+xvfb-run -a ./striv/build/striv-run-coresmoke.sh
+```
+
+Release:
+
+```bash
+xvfb-run -a ./striv/build/striv-run-coresmoke.sh Release
+```
+
+Notes:
+- The clean graph under `striv/` is the preferred M3+ path.
+- Shader compiler, audio, and VR remain excluded in this runtime validation path.
+- `StriV.CoreSmoke` is intentionally minimal and self-exiting.
+- `xvfb-run` uses a software/Mesa Vulkan path in sandbox-style Linux environments.
+- Local GPU runtime validation is still useful beyond sandbox/Xvfb coverage.
