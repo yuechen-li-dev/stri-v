@@ -1,5 +1,20 @@
 <Project>
-  <Target Name="StriVRunAssemblyProcessor" AfterTargets="Build" Condition="'$(DesignTimeBuild)' != 'true' and '$(StriVAssemblyProcessorPath)' != '' and '$(StriVAssemblyProcessorOptions)' != ''">
-    <Exec Command="dotnet &quot;$(StriVAssemblyProcessorPath)&quot; $(TargetPath) $(StriVAssemblyProcessorOptions)" />
+  <Target Name="StriVRunAssemblyProcessor" AfterTargets="Build" Condition="'$(DesignTimeBuild)' != 'true' and '$(StriVAssemblyProcessorPath)' != '' and '$(StriVAssemblyProcessorOptions)' != '' and Exists('$(TargetPath)')">
+    <WriteLinesToFile File="$(IntermediateOutputPath)StriV.AP.references.cache" Lines="@(ReferencePath)" Overwrite="true" />
+    <PropertyGroup>
+      <_StriVAssemblyProcessorOptions>$(StriVAssemblyProcessorOptions) --references-file=&quot;$(IntermediateOutputPath)StriV.AP.references.cache&quot;</_StriVAssemblyProcessorOptions>
+      <_StriVAssemblyProcessorCommand>dotnet &quot;$(StriVAssemblyProcessorPath)&quot; &quot;$(TargetPath)&quot; $(_StriVAssemblyProcessorOptions)</_StriVAssemblyProcessorCommand>
+    </PropertyGroup>
+
+    <Message Importance="High" Text="[StriV AP] Project=$(MSBuildProjectName) TFM=$(TargetFramework) Configuration=$(Configuration)" />
+    <Message Importance="High" Text="[StriV AP] AP DLL=$(StriVAssemblyProcessorPath)" />
+    <Message Importance="High" Text="[StriV AP] Target Assembly=$(TargetPath)" />
+    <Message Importance="High" Text="[StriV AP] Options=$(_StriVAssemblyProcessorOptions)" />
+    <Message Importance="High" Text="[StriV AP] WorkingDirectory=$(MSBuildProjectDirectory)" />
+    <Message Importance="High" Text="[StriV AP] ReferencesFile=$(IntermediateOutputPath)StriV.AP.references.cache" />
+    <Message Importance="Normal" Text="[StriV AP] ReferencePath=@(ReferencePath, ' | ')" Condition="'@(ReferencePath)' != ''" />
+    <Message Importance="High" Text="[StriV AP] Command=$(_StriVAssemblyProcessorCommand)" />
+
+    <Exec Command="$(_StriVAssemblyProcessorCommand)" WorkingDirectory="$(MSBuildProjectDirectory)" />
   </Target>
 </Project>
