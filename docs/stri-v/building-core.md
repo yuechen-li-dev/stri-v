@@ -105,6 +105,70 @@ Both scripts also forward additional arguments to the M1b `dotnet build` invocat
 - **AssemblyProcessor routing/property issues**
   - Ensure `StrideAssemblyProcessorFramework=net10.0`, `StrideAssemblyProcessorBasePath=<absolute path with trailing slash>`, and `StrideAssemblyProcessorHash=sourcebuild` are being passed.
 
+## Stri-V Platform + Graphics Basics M1c
+
+M1c extends M1b by adding:
+- `sources/engine/Stride.Games/Stride.Games.csproj`
+- `sources/engine/Stride.Graphics/Stride.Graphics.csproj`
+
+This is the first platform + graphics basics compile slice, validated through `build/StriV.PlatformGraphicsBasics.M1c.slnf`.
+
+What M1c intentionally defers/excludes:
+- `sources/engine/Stride.Input/Stride.Input.csproj` is intentionally deferred.
+- `sources/engine/Stride.Engine/Stride.Engine.csproj` is intentionally excluded.
+- This slice still does **not** prove rendering runtime behavior, shader compilation pipelines, input, audio, physics, editor/tooling, or asset compiler readiness.
+
+### Linux (Debug default)
+
+```bash
+./build/striv-build-platform-graphics-basics-m1c.sh
+```
+
+### Windows PowerShell (Debug default)
+
+```powershell
+.\build\striv-build-platform-graphics-basics-m1c.ps1
+```
+
+### Optional Release builds
+
+Linux:
+
+```bash
+./build/striv-build-platform-graphics-basics-m1c.sh Release
+```
+
+Windows:
+
+```powershell
+.\build\striv-build-platform-graphics-basics-m1c.ps1 -Configuration Release
+```
+
+Both scripts also forward additional arguments to the M1c `dotnet build` invocation.
+
+### M1c troubleshooting
+
+- **SDL symbol / `STRIDE_UI_SDL` issues**
+  - If SDL-backed code paths are unexpectedly activated or undefined symbols appear, verify platform/symbol conditions for Linux-only M1c routing.
+
+- **Vulkan package/native dependency issues**
+  - M1c uses `StrideGraphicsApis=Vulkan`; missing/incompatible Vulkan packages or native dependencies can fail restore/build.
+
+- **freetype/native payload issues**
+  - `Stride.Graphics` transitive native payload requirements can fail if freetype-related artifacts are missing or incompatible.
+
+- **D3D package conditions accidentally firing**
+  - If D3D/Windows-only package conditions activate under Linux M1c, inspect effective properties and target conditions.
+
+- **Transitive project not included in `.slnf`**
+  - If restore/build reports a missing filtered project, add only the required transitive project and rerun.
+
+- **AssemblyProcessor routing/property issues**
+  - Ensure:
+    - `StrideAssemblyProcessorFramework=net10.0`
+    - `StrideAssemblyProcessorBasePath=<absolute path with trailing slash>`
+    - `StrideAssemblyProcessorHash=sourcebuild`
+
 ## Current limitations
 
 - M1a is foundational core only, not a full engine build.
