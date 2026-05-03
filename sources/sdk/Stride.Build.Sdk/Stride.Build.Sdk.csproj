@@ -8,16 +8,16 @@
   <ItemGroup>
     <!-- Include SDK files in Sdk/ folder (required for MSBuild SDK resolution) -->
     <None Include="$(MSBuildThisFileDirectory)Sdk/**/*.props"
-          Pack="true" PackagePath="Sdk/" />
+          Pack="true" PackagePath="Sdk/" Visible="false" />
     <None Include="$(MSBuildThisFileDirectory)Sdk/**/*.targets"
-          Pack="true" PackagePath="Sdk/" />
+          Pack="true" PackagePath="Sdk/" Visible="false" />
 
     <!-- Include Code Analysis ruleset -->
     <None Include="$(MSBuildThisFileDirectory)Sdk/Stride.ruleset"
-          Pack="true" PackagePath="Sdk/" />
+          Pack="true" PackagePath="Sdk/" Visible="false" />
 
     <!-- Package Assembly Processor binaries with SDK (interim until standalone package) -->
     <None Include="$(MSBuildThisFileDirectory)../../../deps\AssemblyProcessor/**"
-          Pack="true" PackagePath="tools/AssemblyProcessor/" />
+          Pack="true" PackagePath="tools/AssemblyProcessor/" Visible="false" />
   </ItemGroup>
 </Project>
