@@ -30,6 +30,8 @@
   </PropertyGroup>
   <ItemGroup Condition="'$(StrideIncludeAudio)' == 'false'">
     <Compile Remove="Audio\*.cs" />
+    <Compile Remove="Engine\AudioEmitterComponent.cs" />
+    <Compile Remove="Engine\AudioListenerComponent.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(StrideIncludeVirtualReality)' == 'false'">
     <Compile Remove="Rendering\Compositing\VRDeviceDescription.cs" />

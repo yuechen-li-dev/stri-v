@@ -381,3 +381,5 @@ M1e introduces `sources/engine/Stride.Engine/Stride.Engine.csproj` with optional
 When `StrideIncludeVirtualReality=false`, Stri-V now excludes VR-only compositor source files from `Stride.Engine` compilation in addition to conditioning out the `Stride.VirtualReality` project reference. This is a source-level compile isolation step only.
 
 **TODO (VR):** Stri-V Core still does **not** include or validate VR runtime support (OpenVR/OpenXR/device/native paths).
+
+When `StrideIncludeAudio=false`, Stri-V also excludes engine-level audio component source files (`Engine/AudioEmitterComponent.cs` and `Engine/AudioListenerComponent.cs`) in addition to conditioning out audio project references/systems.
