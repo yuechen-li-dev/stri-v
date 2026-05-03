@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+#if !STRIDE_ENGINE_WITHOUT_AUDIO
 using Stride.Audio;
+#endif
 using Stride.Core;
 using Stride.Core.Diagnostics;
 using Stride.Core.Serialization.Contents;
@@ -194,6 +196,7 @@ namespace Stride.Engine
         }
         private DebugTextSystem debugTextSystem;
 
+#if !STRIDE_ENGINE_WITHOUT_AUDIO
         [DataMemberIgnore]
         public AudioSystem Audio
         {
@@ -208,6 +211,7 @@ namespace Stride.Engine
             }
         }
         private AudioSystem audioSystem;
+#endif
 
         [DataMemberIgnore]
         public SpriteAnimationSystem SpriteAnimation

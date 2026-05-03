@@ -40,6 +40,7 @@
     <PackageReference Include="System.ValueTuple" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" />
     <ProjectReference Include="..\Stride.Audio\Stride.Audio.csproj" Condition="'$(StrideIncludeAudio)' != 'false'" />
+    <ProjectReference Include="..\Stride.Input\Stride.Input.csproj" />
     <ProjectReference Include="..\Stride.Rendering\Stride.Rendering.csproj" />
     <ProjectReference Include="..\Stride.VirtualReality\Stride.VirtualReality.csproj" Condition="'$(StrideIncludeVirtualReality)' != 'false'" />
     <ProjectReference Include="..\Stride.Shaders.Compiler\Stride.Shaders.Compiler.csproj" Condition="'$(StrideIncludeShaderCompiler)' != 'false'" />
