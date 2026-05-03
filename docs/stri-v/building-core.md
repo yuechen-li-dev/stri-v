@@ -48,6 +48,63 @@ Windows:
 
 Both scripts also forward additional arguments to the M1a `dotnet build` invocation.
 
+## Stri-V Engine Foundation M1b
+
+M1b extends M1a by adding `sources/engine/Stride/Stride.csproj` to the validated slice via `build/StriV.EngineFoundation.M1b.slnf`.
+
+What M1b proves:
+- The six foundational managed core projects from M1a still build with source-built AssemblyProcessor routing.
+- The base `Stride` engine project can be built in the same bootstrap flow.
+
+What M1b intentionally excludes:
+- `sources/engine/Stride.Engine/Stride.Engine.csproj`.
+- Explicit rendering, graphics, windowing, input, audio, physics, shader compiler/parser, and editor/tooling stacks.
+
+### Linux (Debug default)
+
+```bash
+./build/striv-build-engine-foundation-m1b.sh
+```
+
+### Windows PowerShell (Debug default)
+
+```powershell
+.\build\striv-build-engine-foundation-m1b.ps1
+```
+
+### Optional Release builds
+
+Linux:
+
+```bash
+./build/striv-build-engine-foundation-m1b.sh Release
+```
+
+Windows:
+
+```powershell
+.\build\striv-build-engine-foundation-m1b.ps1 -Configuration Release
+```
+
+Both scripts also forward additional arguments to the M1b `dotnet build` invocation.
+
+### M1b limitations
+
+- M1b is an engine-foundation slice only, not a full engine runtime validation.
+- It does **not** prove graphics/window/input/rendering/audio/physics/editor readiness.
+- Native/tooling transitive dependencies (for example through FreeImage) may still produce platform-specific issues.
+
+### M1b troubleshooting
+
+- **FreeImage/native dependency issues**
+  - `Stride` references `Stride.FreeImage`; if native payloads are missing or incompatible, restore/build can fail.
+
+- **Transitive project not included in `.slnf`**
+  - If restore/build reports a missing project in the filtered graph, add only the required transitive project and rerun.
+
+- **AssemblyProcessor routing/property issues**
+  - Ensure `StrideAssemblyProcessorFramework=net10.0`, `StrideAssemblyProcessorBasePath=<absolute path with trailing slash>`, and `StrideAssemblyProcessorHash=sourcebuild` are being passed.
+
 ## Current limitations
 
 - M1a is foundational core only, not a full engine build.
