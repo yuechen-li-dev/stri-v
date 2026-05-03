@@ -9,6 +9,7 @@
     <Project Path="projects/Stride.Core.Serialization/Stride.Core.Serialization.csproj" />
     <Project Path="projects/Stride.Core/Stride.Core.csproj" />
     <Project Path="projects/Stride.Engine/Stride.Engine.csproj" />
+    <Project Path="projects/Stride.FreeImage/Stride.FreeImage.csproj" />
     <Project Path="projects/Stride.Games/Stride.Games.csproj" />
     <Project Path="projects/Stride.Graphics/Stride.Graphics.csproj" />
     <Project Path="projects/Stride.Input/Stride.Input.csproj" />
