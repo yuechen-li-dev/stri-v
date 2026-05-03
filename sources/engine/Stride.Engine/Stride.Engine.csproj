@@ -9,6 +9,7 @@
     <StrideCodeAnalysis>true</StrideCodeAnalysis>
     <StridePackAssets>true</StridePackAssets>
     <StrideIncludeShaderCompiler Condition="'$(StrideIncludeShaderCompiler)' == ''">true</StrideIncludeShaderCompiler>
+    <StrideIncludeAudio Condition="'$(StrideIncludeAudio)' == ''">true</StrideIncludeAudio>
     <!-- force generate Resource.designer.cs to namespace Stride.Engine to fix issue #553 -->
     <AndroidResgenNamespace>Stride.Engine</AndroidResgenNamespace>
   </PropertyGroup>
@@ -20,10 +21,16 @@
   <PropertyGroup Condition="'$(StrideIncludeShaderCompiler)' == 'false'">
     <DefineConstants>$(DefineConstants);STRIDE_ENGINE_WITHOUT_SHADER_COMPILER</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(StrideIncludeAudio)' == 'false'">
+    <DefineConstants>$(DefineConstants);STRIDE_ENGINE_WITHOUT_AUDIO</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(StrideIncludeAudio)' == 'false'">
+    <Compile Remove="Audio\*.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.ValueTuple" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" />
-    <ProjectReference Include="..\Stride.Audio\Stride.Audio.csproj" />
+    <ProjectReference Include="..\Stride.Audio\Stride.Audio.csproj" Condition="'$(StrideIncludeAudio)' != 'false'" />
     <ProjectReference Include="..\Stride.Rendering\Stride.Rendering.csproj" />
     <ProjectReference Include="..\Stride.VirtualReality\Stride.VirtualReality.csproj" />
     <ProjectReference Include="..\Stride.Shaders.Compiler\Stride.Shaders.Compiler.csproj" Condition="'$(StrideIncludeShaderCompiler)' != 'false'" />

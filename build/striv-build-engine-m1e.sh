@@ -60,6 +60,7 @@ dotnet build "$M1E_SLNF" -c "$CONFIGURATION" -v minimal \
   "-p:StrideAssemblyProcessorBasePath=$AP_OUTPUT_DIR" \
   -p:StrideAssemblyProcessorHash=sourcebuild \
   -p:StrideIncludeShaderCompiler=false \
+  -p:StrideIncludeAudio=false \
   "${EXTRA_ARGS[@]}"
 
 echo "[striv-engine-m1e] Build completed successfully."
