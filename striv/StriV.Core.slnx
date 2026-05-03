@@ -14,5 +14,6 @@
     <Project Path="projects/Stride.Input/Stride.Input.csproj" />
     <Project Path="projects/Stride/Stride.csproj" />
     <Project Path="projects/StriV.CoreSmoke/StriV.CoreSmoke.csproj" />
+    <Project Path="tests/StriV.CleanGraph.Tests/StriV.CleanGraph.Tests.csproj" />
   </Folder>
 </Solution>
