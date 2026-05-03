@@ -261,3 +261,70 @@ Both scripts also forward additional arguments to the M1d `dotnet build` invocat
     - `StrideAssemblyProcessorFramework=net10.0`
     - `StrideAssemblyProcessorBasePath=<absolute path with trailing slash>`
     - `StrideAssemblyProcessorHash=sourcebuild`
+
+## Stri-V Engine M1e
+
+M1e extends M1d by adding:
+- `sources/engine/Stride.Engine/Stride.Engine.csproj`
+
+This is the next engine-admission compile-validation slice via `build/StriV.Engine.M1e.slnf`.
+
+What M1e intentionally defers/excludes:
+- `sources/engine/Stride.BepuPhysics/**` is intentionally deferred until after `Stride.Engine` admission.
+- Legacy `Stride.Physics` is intentionally excluded.
+- VR is not considered part of Stri-V Core; if `Stride.VirtualReality` blocks this slice, that blocker should be isolated and handled through a minimal later Stri-V-specific exclusion/condition.
+- M1e is compile validation only; it does not validate runtime scene/game behavior.
+
+### Linux (Debug default)
+
+```bash
+./build/striv-build-engine-m1e.sh
+```
+
+### Windows PowerShell (Debug default)
+
+```powershell
+.\build\striv-build-engine-m1e.ps1
+```
+
+### Optional Release builds
+
+Linux:
+
+```bash
+./build/striv-build-engine-m1e.sh Release
+```
+
+Windows:
+
+```powershell
+.\build\striv-build-engine-m1e.ps1 -Configuration Release
+```
+
+Both scripts also forward additional arguments to the M1e `dotnet build` invocation.
+
+### M1e troubleshooting
+
+- **`Stride.VirtualReality` native/package blockers**
+  - If VR-specific restore/build blockers appear, isolate and report the exact first blocker rather than repairing VR in M1e.
+
+- **Shader compiler/parser/toolchain blockers**
+  - If shader compiler/parser toolchain dependencies fail, capture the first meaningful error and isolate for follow-up.
+
+- **Audio native dependency blockers**
+  - If `Stride.Audio` transitive native dependencies fail, report exact package/project/target failure details.
+
+- **Rendering dependency blockers**
+  - If `Stride.Rendering` transitive dependencies block build, report the first meaningful rendering-related error.
+
+- **`StridePackAssets` or asset-related leakage**
+  - If asset packing/compiler targets leak into M1e, report the triggering target/project and condition.
+
+- **Transitive project not included in `.slnf`**
+  - If restore/build reports a missing filtered project, add only the required transitive project and rerun.
+
+- **AssemblyProcessor routing/property issues**
+  - Ensure:
+    - `StrideAssemblyProcessorFramework=net10.0`
+    - `StrideAssemblyProcessorBasePath=<absolute path with trailing slash>`
+    - `StrideAssemblyProcessorHash=sourcebuild`
