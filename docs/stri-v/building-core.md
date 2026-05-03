@@ -507,3 +507,64 @@ Both scripts forward additional arguments to the M1g `dotnet build` invocation.
 
 - **SDL/Vulkan runtime issues**
   - SDL/Vulkan environment/runtime execution concerns are deferred to a later runtime-smoke milestone.
+
+## Stri-V CoreSmoke Runtime Smoke M1h
+
+M1h adds an **opt-in runtime smoke** on top of the M1g compile slice. M1g remains build-only validation; M1h adds a tiny code-first runtime attempt that uses `Stride.Engine.Game`, enters the game loop, and self-exits on the first update frame.
+
+M1h runtime smoke characteristics:
+- Build-first flow: runtime script calls the M1g build script before launch.
+- Self-exiting game loop (first-frame `Exit()`), to avoid indefinite run behavior.
+- Opt-in only; it is intentionally separate from the M1g build script.
+- No assets, no `.sdpkg`, `.sdscene`, `.sdproj`, and no Game Studio/editor YAML content paths.
+- Shader compiler remains disabled.
+- Audio remains disabled.
+- VR remains disabled.
+- Runtime smoke is environment-sensitive (display server, SDL, Vulkan loader/device/native runtime availability).
+
+### Linux (Debug default)
+
+```bash
+./build/striv-run-coresmoke-m1h.sh
+```
+
+### Windows PowerShell (Debug default)
+
+```powershell
+.\build\striv-run-coresmoke-m1h.ps1
+```
+
+### Optional Release usage
+
+Linux:
+
+```bash
+./build/striv-run-coresmoke-m1h.sh Release
+```
+
+Windows:
+
+```powershell
+.\build\striv-run-coresmoke-m1h.ps1 -Configuration Release
+```
+
+### M1h troubleshooting
+
+- **SDL display unavailable**
+  - Example: `Cannot allocate SDL Window: x11 not available`.
+  - Classify as environment limitation (headless/sandbox display stack).
+
+- **Vulkan loader/ICD/device unavailable**
+  - Classify as environment limitation when loader/ICD/device creation cannot be established.
+
+- **Missing native libraries**
+  - Classify as environment/native packaging blocker.
+
+- **Sandbox/headless container limitations**
+  - Runtime smoke can fail in CI/sandbox even when it succeeds on a local developer machine.
+
+- **Runtime graphics device creation failure**
+  - Usually environment-dependent first (display/driver/ICD); verify locally on a graphics-capable machine.
+
+- **Run succeeds locally but not in sandbox**
+  - Treat sandbox runtime result as non-authoritative for graphics/device readiness.
