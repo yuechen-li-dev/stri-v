@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../build/StriV.Core.Profile.props" />
+  <PropertyGroup>
+    <AssemblyName>Stride</AssemblyName>
+    <RootNamespace>Stride</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <StriVAssemblyProcessorOptions>--auto-module-initializer --serialization</StriVAssemblyProcessorOptions>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../..//sources/engine/Stride/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
+      <Link>Properties/SharedAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Stride.Core.Serialization/Stride.Core.Serialization.csproj" />
+    <ProjectReference Include="../Stride.Core.Mathematics/Stride.Core.Mathematics.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" />
+  </ItemGroup>
+  <Import Project="../../build/StriV.AssemblyProcessor.targets" />
+</Project>

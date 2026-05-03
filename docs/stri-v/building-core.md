@@ -648,3 +648,21 @@ Notes:
 - Validate final Visual Studio behavior locally on Windows.
 - Do not rely on `deps/AssemblyProcessor/*` payloads for Stri-V Core development.
 - The CLI golden path remains authoritative even though the Stri-V Core profile is now repo-visible for local development.
+
+## Clean M3 Core graph (striv/)
+
+Use the clean SDK-style graph without Stride custom SDK imports:
+
+```bash
+./striv/build/striv-build-core.sh
+```
+
+Key artifacts:
+- `striv/StriV.Core.slnx`
+- `striv/build/StriV.Core.Profile.props`
+- `striv/build/StriV.AssemblyProcessor.targets`
+- `striv/projects/*/*.csproj`
+
+Notes:
+- The clean graph uses explicit source globs into existing `sources/` and `samples/` trees.
+- `Stride.Core.AssemblyProcessor` is source-built in-graph and no `deps/AssemblyProcessor` payload is consumed.

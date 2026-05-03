@@ -1,0 +1,5 @@
+<Project>
+  <Target Name="StriVRunAssemblyProcessor" AfterTargets="Build" Condition="'$(DesignTimeBuild)' != 'true' and '$(StriVAssemblyProcessorPath)' != '' and '$(StriVAssemblyProcessorOptions)' != ''">
+    <Exec Command="dotnet &quot;$(StriVAssemblyProcessorPath)&quot; $(TargetPath) $(StriVAssemblyProcessorOptions)" />
+  </Target>
+</Project>

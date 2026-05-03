@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../build/StriV.Core.Profile.props" />
+  <PropertyGroup>
+    <AssemblyName>Stride.Engine</AssemblyName>
+    <RootNamespace>Stride</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <StriVAssemblyProcessorOptions>--parameter-key --auto-module-initializer --serialization</StriVAssemblyProcessorOptions>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../..//sources/engine/Stride.Engine/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
+      <Link>Properties/SharedAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Stride.Input/Stride.Input.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.ValueTuple" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="../../../sources/engine/Stride.Engine/Shaders.Compiler/**/*.cs" />
+    <Compile Remove="../../../sources/engine/Stride.Engine/Audio/*.cs" />
+    <Compile Remove="../../../sources/engine/Stride.Engine/Engine/AudioEmitterComponent.cs" />
+    <Compile Remove="../../../sources/engine/Stride.Engine/Engine/AudioListenerComponent.cs" />
+    <Compile Remove="../../../sources/engine/Stride.Engine/Rendering/Compositing/VRDeviceDescription.cs" />
+    <Compile Remove="../../../sources/engine/Stride.Engine/Rendering/Compositing/VROverlayRenderer.cs" />
+    <Compile Remove="../../../sources/engine/Stride.Engine/Rendering/Compositing/VRRendererSettings.cs" />
+  </ItemGroup>
+  <Import Project="../../build/StriV.AssemblyProcessor.targets" />
+</Project>

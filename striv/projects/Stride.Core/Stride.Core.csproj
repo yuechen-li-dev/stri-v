@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../build/StriV.Core.Profile.props" />
+  <PropertyGroup>
+    <AssemblyName>Stride.Core</AssemblyName>
+    <RootNamespace>Stride.Core</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <StriVAssemblyProcessorOptions>--auto-module-initializer --serialization</StriVAssemblyProcessorOptions>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../..//sources/core/Stride.Core/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
+      <Link>Properties/SharedAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ServiceWire" />
+    <PackageReference Include="System.ValueTuple" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" />
+  </ItemGroup>
+  <Import Project="../../build/StriV.AssemblyProcessor.targets" />
+</Project>
