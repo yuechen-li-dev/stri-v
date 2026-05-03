@@ -49,6 +49,24 @@
   </PropertyGroup>
 
   <!-- ================================================================ -->
+  <!-- Visual Studio design-time outer-build source visibility -->
+  <!-- ================================================================ -->
+  <!-- CPS does not reliably surface source files when they are added from
+       repo-level Directory.Build.targets after the SDK project tree is formed.
+       Inject the default C# glob earlier, once TargetFrameworks has been
+       expanded for Stride runtime projects but before Microsoft.NET.Sdk
+       imports the rest of its targets. -->
+  <ItemGroup Condition="'$(DesignTimeBuild)' == 'true'
+                    And '$(BuildingInsideVisualStudio)' == 'true'
+                    And '$(TargetFramework)' == ''
+                    And '$(TargetFrameworks)' != ''
+                    And '$(MSBuildProjectExtension)' == '.csproj'">
+    <Compile Include="**\*.cs"
+             Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+    <None Remove="**\*.cs" />
+  </ItemGroup>
+
+  <!-- ================================================================ -->
   <!-- Import base Microsoft.NET.Sdk targets -->
   <!-- ================================================================ -->
   <!-- This gives us all standard .NET SDK functionality -->

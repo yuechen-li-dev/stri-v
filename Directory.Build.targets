@@ -1,7 +1,1 @@
-<Project>
-  <ItemGroup Condition="'$(DesignTimeBuild)' == 'true' and '$(TargetFramework)' == '' and '$(TargetFrameworks)' != '' and '$(MSBuildProjectExtension)' == '.csproj'">
-    <Compile Include="**\*.cs"
-             Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
-    <None Remove="**\*.cs" />
-  </ItemGroup>
-</Project>
+<Project />
