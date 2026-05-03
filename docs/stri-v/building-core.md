@@ -383,3 +383,69 @@ When `StrideIncludeVirtualReality=false`, Stri-V now excludes VR-only compositor
 **TODO (VR):** Stri-V Core still does **not** include or validate VR runtime support (OpenVR/OpenXR/device/native paths).
 
 When `StrideIncludeAudio=false`, Stri-V also excludes engine-level audio component source files (`Engine/AudioEmitterComponent.cs` and `Engine/AudioListenerComponent.cs`) in addition to conditioning out audio project references/systems.
+
+## Stri-V Engine Bepu M1f
+
+M1f extends M1e by adding:
+- `sources/engine/Stride.BepuPhysics/Stride.BepuPhysics/Stride.BepuPhysics.csproj`
+
+This is the first BepuPhysics admission compile-validation slice via `build/StriV.Engine.Bepu.M1f.slnf`.
+
+What M1f intentionally defers/excludes:
+- Legacy `sources/engine/Stride.Physics*` is intentionally excluded.
+- Bepu companion modules are intentionally deferred:
+  - `Stride.BepuPhysics.Debug`
+  - `Stride.BepuPhysics.Navigation`
+  - `Stride.BepuPhysics.Soft`
+  - `Stride.BepuPhysics._2D`
+  - `Stride.BepuPhysics.Tests`
+- Bepu samples/tests are intentionally deferred.
+- M1f is compile validation only; it does not validate physics runtime behavior.
+
+### Linux (Debug default)
+
+```bash
+./build/striv-build-engine-bepu-m1f.sh
+```
+
+### Windows PowerShell (Debug default)
+
+```powershell
+.\build\striv-build-engine-bepu-m1f.ps1
+```
+
+### Optional Release builds
+
+Linux:
+
+```bash
+./build/striv-build-engine-bepu-m1f.sh Release
+```
+
+Windows:
+
+```powershell
+.\build\striv-build-engine-bepu-m1f.ps1 -Configuration Release
+```
+
+Both scripts also forward additional arguments to the M1f `dotnet build` invocation.
+
+### M1f troubleshooting
+
+- **Old `Stride.Physics` accidentally pulled**
+  - If restore/build logs include `sources/engine/Stride.Physics*`, report the first introducing project/target and isolate that dependency edge.
+
+- **Bepu companion module accidentally pulled**
+  - If restore/build logs include `Stride.BepuPhysics.Debug`, `Navigation`, `Soft`, `_2D`, or `Tests`, isolate the first introducing project/target.
+
+- **Rendering/gizmo API compile blockers**
+  - If `Stride.BepuPhysics` fails in gizmo/debug rendering integration code, capture the first meaningful compile error and isolate for follow-up.
+
+- **Bepu package restore issues**
+  - If `BepuPhysics` NuGet restore fails or warns on incompatible versions, capture package/version/error details and isolate.
+
+- **AssemblyProcessor routing/property issues**
+  - Ensure:
+    - `StrideAssemblyProcessorFramework=net10.0`
+    - `StrideAssemblyProcessorBasePath=<absolute path with trailing slash>`
+    - `StrideAssemblyProcessorHash=sourcebuild`
