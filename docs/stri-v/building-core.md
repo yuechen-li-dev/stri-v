@@ -360,3 +360,13 @@ Future work should evaluate:
 - whether to hydrate/rebuild the existing native payloads,
 - whether to replace legacy Celt/custom Opus usage with a system Opus/OpenAL path,
 - how audio components/systems should be modularized outside the engine core.
+
+
+## TODO: VirtualReality/native stack
+
+**VirtualReality is intentionally excluded from Stri-V Core M1e.**
+The current Stride VR path depends on native/runtime payloads through `NativePath`
+and platform VR stacks such as OpenVR/OpenXR. It is not part of the core runtime
+spine and should be restored later only as an optional extension module after a
+dedicated VR/native dependency audit.
+

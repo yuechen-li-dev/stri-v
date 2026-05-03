@@ -62,7 +62,8 @@ $buildArgs = @(
     "-p:StrideAssemblyProcessorBasePath=$ApOutputDir",
     "-p:StrideAssemblyProcessorHash=sourcebuild",
     "-p:StrideIncludeShaderCompiler=false",
-    "-p:StrideIncludeAudio=false"
+    "-p:StrideIncludeAudio=false",
+    "-p:StrideIncludeVirtualReality=false"
 ) + $ExtraArgs
 
 & dotnet @buildArgs
