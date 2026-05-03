@@ -1,0 +1,20 @@
+{
+  "solution": {
+    "path": "Stride.sln",
+    "projects": [
+      "..\\sources\\core\\Stride.Core\\Stride.Core.csproj",
+      "..\\sources\\core\\Stride.Core.Mathematics\\Stride.Core.Mathematics.csproj",
+      "..\\sources\\core\\Stride.Core.IO\\Stride.Core.IO.csproj",
+      "..\\sources\\core\\Stride.Core.MicroThreading\\Stride.Core.MicroThreading.csproj",
+      "..\\sources\\core\\Stride.Core.Serialization\\Stride.Core.Serialization.csproj",
+      "..\\sources\\core\\Stride.Core.Reflection\\Stride.Core.Reflection.csproj",
+      "..\\sources\\engine\\Stride\\Stride.csproj",
+      "..\\sources\\engine\\Stride.Games\\Stride.Games.csproj",
+      "..\\sources\\engine\\Stride.Graphics\\Stride.Graphics.csproj",
+      "..\\sources\\engine\\Stride.Input\\Stride.Input.csproj",
+      "..\\sources\\engine\\Stride.Engine\\Stride.Engine.csproj",
+      "..\\sources\\engine\\Stride.BepuPhysics\\Stride.BepuPhysics\\Stride.BepuPhysics.csproj",
+      "..\\samples\\StriV\\CoreSmoke\\StriV.CoreSmoke.csproj"
+    ]
+  }
+}
