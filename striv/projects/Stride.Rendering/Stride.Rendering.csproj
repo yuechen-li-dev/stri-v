@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../build/StriV.Core.Profile.props" />
+  <PropertyGroup>
+    <AssemblyName>Stride.Rendering</AssemblyName>
+    <RootNamespace>Stride.Rendering</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <StriVAssemblyProcessorOptions>--parameter-key --auto-module-initializer --serialization</StriVAssemblyProcessorOptions>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../../sources/engine/Stride.Rendering/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
+      <Link>Properties/SharedAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Stride.Games/Stride.Games.csproj" />
+  </ItemGroup>
+  <Import Project="../../build/StriV.AssemblyProcessor.targets" />
+</Project>

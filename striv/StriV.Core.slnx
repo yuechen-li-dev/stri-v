@@ -13,6 +13,7 @@
     <Project Path="projects/Stride.Games/Stride.Games.csproj" />
     <Project Path="projects/Stride.Graphics/Stride.Graphics.csproj" />
     <Project Path="projects/Stride.Input/Stride.Input.csproj" />
+    <Project Path="projects/Stride.Rendering/Stride.Rendering.csproj" />
     <Project Path="projects/Stride.Shaders/Stride.Shaders.csproj" />
     <Project Path="projects/Stride/Stride.csproj" />
     <Project Path="projects/StriV.CoreSmoke/StriV.CoreSmoke.csproj" />

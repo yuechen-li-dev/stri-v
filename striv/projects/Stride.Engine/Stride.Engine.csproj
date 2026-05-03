@@ -14,6 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Stride.Input/Stride.Input.csproj" />
+    <ProjectReference Include="../Stride.Rendering/Stride.Rendering.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.ValueTuple" />
