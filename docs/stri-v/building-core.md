@@ -599,3 +599,43 @@ For the M1 closeout summary and curated project spine, see:
 - `build/StriV.Core.slnx`
 
 These are the forward-looking Stri-V Core organizational artifacts; legacy `Stride.sln` and historical `.slnf` slices remain in place.
+
+## Visual Studio / local development
+
+`build/StriV.Core.slnx` is the primary Stri-V Core developer solution.
+
+Before opening it in Visual Studio, run:
+
+```powershell
+.\build\striv-vs-prepare-core.ps1
+```
+
+This source-builds AssemblyProcessor and restores the solution with the Stri-V Core profile:
+
+- Linux
+- Vulkan
+- shader compiler disabled
+- audio disabled
+- VR disabled
+- source-built AssemblyProcessor
+
+Options:
+
+- Release prep:
+
+  ```powershell
+  .\build\striv-vs-prepare-core.ps1 -Configuration Release
+  ```
+
+- Optional CLI build after restore:
+
+  ```powershell
+  .\build\striv-vs-prepare-core.ps1 -Build
+  ```
+
+Notes:
+
+- Validate final Visual Studio behavior locally on Windows.
+- Design-time state can still be stale; close VS, reload, or restore again if needed.
+- Do not rely on `deps/AssemblyProcessor/*` payloads for Stri-V Core development.
+- `build/Stride.sln` remains legacy/reference terrain and is not the authoritative Stri-V Core development solution.
