@@ -449,3 +449,61 @@ Both scripts also forward additional arguments to the M1f `dotnet build` invocat
     - `StrideAssemblyProcessorFramework=net10.0`
     - `StrideAssemblyProcessorBasePath=<absolute path with trailing slash>`
     - `StrideAssemblyProcessorHash=sourcebuild`
+
+## Stri-V CoreSmoke M1g
+
+M1g extends the validated M1f Engine+Bepu compile spine by adding a tiny code-first executable smoke project at `samples/StriV/CoreSmoke/StriV.CoreSmoke.csproj`.
+
+What M1g adds over M1f:
+- A compile-only executable entry point that references runtime engine code.
+- A focused smoke slice for executable graph closure without introducing content pipelines.
+
+What M1g intentionally excludes:
+- No assets (`.sdpkg`, `.sdscene`, `.sdproj`) and no source YAML/package sessions.
+- No Game Studio/editor/presentation or asset compiler/project metadata.
+- No shader source compiler path (`StrideIncludeShaderCompiler=false`).
+- No audio/native audio stack (`StrideIncludeAudio=false`).
+- No VR/native VR stack (`StrideIncludeVirtualReality=false`).
+- Runtime execution is not validated by default in this milestone (build-only validation).
+
+### Linux (Debug default)
+
+```bash
+./build/striv-build-coresmoke-m1g.sh
+```
+
+### Windows PowerShell (Debug default)
+
+```powershell
+.\build\striv-build-coresmoke-m1g.ps1
+```
+
+### Optional Release builds
+
+Linux:
+
+```bash
+./build/striv-build-coresmoke-m1g.sh Release
+```
+
+Windows:
+
+```powershell
+.\build\striv-build-coresmoke-m1g.ps1 -Configuration Release
+```
+
+Both scripts forward additional arguments to the M1g `dotnet build` invocation.
+
+### M1g troubleshooting
+
+- **Executable accidentally pulls assets/editor packages**
+  - Ensure the smoke project references runtime projects only (for example `Stride.Engine`) and does not reference asset/editor packages.
+
+- **`net10.0-windows` accidentally used**
+  - Keep the smoke project target framework at `net10.0` for Linux-first compile validation.
+
+- **Build-only M1g is not runtime proof**
+  - A successful M1g build does not prove runtime/window execution behavior.
+
+- **SDL/Vulkan runtime issues**
+  - SDL/Vulkan environment/runtime execution concerns are deferred to a later runtime-smoke milestone.
