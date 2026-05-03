@@ -1,0 +1,8 @@
+{
+  "solution": {
+    "path": "Stride.sln",
+    "projects": [
+      "..\\tests\\Stride.Core.AssemblyProcessor.Diagnostics.Tests\\Stride.Core.AssemblyProcessor.Diagnostics.Tests.csproj"
+    ]
+  }
+}
