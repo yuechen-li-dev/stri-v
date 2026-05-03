@@ -13,6 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Stride/Stride.csproj" />
+    <ProjectReference Include="../Stride.Shaders/Stride.Shaders.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MSDF-Sharp.Core" />
