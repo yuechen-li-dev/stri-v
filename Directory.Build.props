@@ -1,0 +1,4 @@
+<Project>
+  <Import Project="build\StriV.Core.props"
+          Condition="Exists('build\StriV.Core.props')" />
+</Project>

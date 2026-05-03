@@ -31,7 +31,7 @@ if ($fileInfo.Length -le 1024) {
     throw "AssemblyProcessor output is too small ($($fileInfo.Length) bytes): $ApDll"
 }
 
-$firstText = Get-Content -LiteralPath $ApDll -Raw -Encoding UTF8 -TotalCount 1 -ErrorAction SilentlyContinue
+$firstText = Get-Content -LiteralPath $ApDll -Encoding UTF8 -TotalCount 1 -ErrorAction SilentlyContinue
 if ($firstText -like 'version https://git-lfs.github*') {
     throw "AssemblyProcessor output appears to be a Git LFS pointer: $ApDll"
 }
@@ -41,26 +41,22 @@ if ($bytes.Length -lt 2 -or $bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) {
     throw "AssemblyProcessor output is not a valid PE/MZ binary: $ApDll"
 }
 
-$props = @(
-    '-p:StridePlatforms=Linux',
-    '-p:StrideGraphicsApis=Vulkan',
-    '-p:StrideIncludeShaderCompiler=false',
-    '-p:StrideIncludeAudio=false',
-    '-p:StrideIncludeVirtualReality=false',
-    '-p:StrideAssemblyProcessorFramework=net10.0',
-    "-p:StrideAssemblyProcessorBasePath=$ApOutput",
-    '-p:StrideAssemblyProcessorHash=sourcebuild'
+$restoreArgs = @(
+    $Solution,
+    "-p:Configuration=$Configuration",
+    "-p:StrideAssemblyProcessorBasePath=$ApOutput"
 )
 
-Write-Host "[striv] Restoring StriV.Core.slnx with Stri-V Core profile..."
-& dotnet restore $Solution @props
+Write-Host "[striv] Restoring StriV.Core.slnx with repo-visible Stri-V Core profile..."
+& dotnet restore @restoreArgs
 
 if ($Build) {
     Write-Host "[striv] Building StriV.Core.slnx with same profile properties..."
-    & dotnet build $Solution -c $Configuration @props
+    & dotnet build $Solution -c $Configuration "-p:StrideAssemblyProcessorBasePath=$ApOutput"
 }
 
 Write-Host ''
 Write-Host 'Open build/StriV.Core.slnx in Visual Studio now.'
-Write-Host 'If VS still shows stale errors, close VS, delete affected obj folders or run restore again.'
+Write-Host 'Close and reopen Visual Studio after prep so design-time restore re-evaluates the imported profile.'
+Write-Host 'If VS still shows stale errors, close VS, delete affected obj/bin folders for the affected Stri-V projects, rerun prep, and reopen.'
 Write-Host 'Use Stri-V scripts for authoritative CLI validation.'

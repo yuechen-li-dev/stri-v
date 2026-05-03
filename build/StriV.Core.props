@@ -8,4 +8,13 @@
     <StrideAssemblyProcessorFramework Condition="'$(StrideAssemblyProcessorFramework)' == ''">net10.0</StrideAssemblyProcessorFramework>
     <StrideAssemblyProcessorHash Condition="'$(StrideAssemblyProcessorHash)' == ''">sourcebuild</StrideAssemblyProcessorHash>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <_StriVConfiguration Condition="'$(Configuration)' != ''">$(Configuration)</_StriVConfiguration>
+    <_StriVConfiguration Condition="'$(_StriVConfiguration)' == ''">Debug</_StriVConfiguration>
+
+    <_StriVAssemblyProcessorBasePath>$(MSBuildThisFileDirectory)..\sources\core\Stride.Core.AssemblyProcessor\bin\$(_StriVConfiguration)\$(StrideAssemblyProcessorFramework)\</_StriVAssemblyProcessorBasePath>
+    <StrideAssemblyProcessorBasePath
+      Condition="'$(StrideAssemblyProcessorBasePath)' == '' and Exists('$(_StriVAssemblyProcessorBasePath)Stride.Core.AssemblyProcessor.dll')">$(_StriVAssemblyProcessorBasePath)</StrideAssemblyProcessorBasePath>
+  </PropertyGroup>
 </Project>

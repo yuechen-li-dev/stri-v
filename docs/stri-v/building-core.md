@@ -603,6 +603,7 @@ These are the forward-looking Stri-V Core organizational artifacts; legacy `Stri
 ## Visual Studio / local development
 
 `build/StriV.Core.slnx` is the primary Stri-V Core developer solution.
+`build/Stride.sln` remains legacy/reference terrain in this hardfork and is no longer the build-authoritative local-dev entry point for Stri-V Core work.
 
 Before opening it in Visual Studio, run:
 
@@ -633,9 +634,17 @@ Options:
   .\build\striv-vs-prepare-core.ps1 -Build
   ```
 
+- Print the effective repo-visible Stri-V profile on a project:
+
+  ```powershell
+  .\build\striv-print-core-profile.ps1
+  ```
+
 Notes:
 
+- The Stri-V Core profile is now imported repo-wide during normal project evaluation via root `Directory.Build.props`, so Visual Studio design-time restore/build sees the same Linux/Vulkan/no-shader-compiler/no-audio/no-VR defaults as the CLI unless you explicitly override them.
+- Run the prep script before opening Visual Studio so the source-built AssemblyProcessor output exists for the imported profile to consume.
+- If Visual Studio still shows stale errors, close it fully, delete affected `obj`/`bin` folders for the impacted Stri-V projects, rerun prep, and reopen the solution.
 - Validate final Visual Studio behavior locally on Windows.
-- Design-time state can still be stale; close VS, reload, or restore again if needed.
 - Do not rely on `deps/AssemblyProcessor/*` payloads for Stri-V Core development.
-- `build/Stride.sln` remains legacy/reference terrain and is not the authoritative Stri-V Core development solution.
+- The CLI golden path remains authoritative even though the Stri-V Core profile is now repo-visible for local development.
