@@ -346,3 +346,17 @@ This is compile-slice isolation only; it does not claim runtime shader compilati
 CppNet and the legacy SDSL shader preprocessing/compiler path are not part of Stri-V Core.
 They remain legacy tooling for now and should eventually be removed, replaced, or quarantined
 behind optional compatibility tooling once the runtime shader/effect artifact boundary is defined.
+
+
+## TODO: Audio/native stack
+
+**Audio is intentionally excluded from Stri-V Core M1e.**
+The current Stride audio path depends on native payloads such as `libCelt.a`
+through `NativePath`; in this checkout that artifact appears as a Git LFS
+pointer rather than a valid static library. Audio should be restored later
+as its own optional module slice after a dedicated native audio audit.
+
+Future work should evaluate:
+- whether to hydrate/rebuild the existing native payloads,
+- whether to replace legacy Celt/custom Opus usage with a system Opus/OpenAL path,
+- how audio components/systems should be modularized outside the engine core.

@@ -5,7 +5,9 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+#if !STRIDE_ENGINE_WITHOUT_AUDIO
 using Stride.Audio;
+#endif
 using Stride.Core;
 using Stride.Core.Diagnostics;
 using Stride.Core.IO;
@@ -97,7 +99,9 @@ namespace Stride.Engine
         /// Gets the audio system.
         /// </summary>
         /// <value>The audio.</value>
+#if !STRIDE_ENGINE_WITHOUT_AUDIO
         public AudioSystem Audio { get; }
+#endif
 
         /// <summary>
         /// Gets the sprite animation system.
@@ -208,9 +212,11 @@ namespace Stride.Engine
 
             Streaming = new StreamingManager(Services);
 
+#if !STRIDE_ENGINE_WITHOUT_AUDIO
             Audio = new AudioSystem(Services);
             Services.AddService(Audio);
             Services.AddService<IAudioEngineProvider>(Audio);
+#endif
 
             gameFontSystem = new GameFontSystem(Services);
             Services.AddService(gameFontSystem.FontSystem);
@@ -390,8 +396,10 @@ namespace Stride.Engine
             GameSystems.Add(Streaming);
             GameSystems.Add(SceneSystem);
 
+#if !STRIDE_ENGINE_WITHOUT_AUDIO
             // Add the Audio System
             GameSystems.Add(Audio);
+#endif
 
             // Add the VR System
             GameSystems.Add(VRDeviceSystem);
