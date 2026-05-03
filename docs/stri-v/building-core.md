@@ -591,3 +591,11 @@ These probes are diagnostic only. Failure under dummy/offscreen does not necessa
 
 - **Run succeeds locally but not in sandbox**
   - Treat sandbox runtime result as non-authoritative for graphics/device readiness.
+
+## M1 golden path closeout
+
+For the M1 closeout summary and curated project spine, see:
+- `docs/stri-v/audits/350-m1-golden-path-summary.md`
+- `build/StriV.Core.slnx`
+
+These are the forward-looking Stri-V Core organizational artifacts; legacy `Stride.sln` and historical `.slnf` slices remain in place.
