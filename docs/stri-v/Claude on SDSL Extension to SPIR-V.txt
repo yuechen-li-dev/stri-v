@@ -1,0 +1,77 @@
+
+**The complete set of SDSL extensions over HLSL:**
+
+**New top-level constructs:**
+
+`shader` keyword replacing HLSL's implicit global scope — `shader MyShader : BaseA, BaseB { }`. This is the mixin declaration. Everything lives inside a named shader class.
+
+`namespace` + `partial effect` block for the effect composition DSL — as seen in `SpriteAlphaCutoff.sdsl` at the bottom:
+```hlsl
+namespace Stride.Rendering {
+    partial effect SpriteAlphaCutoffEffect {
+        using params SpriteBaseKeys;
+        mixin SpriteAlphaCutoff<SpriteBaseKeys.ColorIsSRgb>;
+    };
+}
+```
+This is the C#-side effect system expressed inline in SDSL. `partial effect`, `using params`, `mixin` as a verb — these are unique to SDSL.
+
+**New keywords on methods and members:**
+
+`stage` — method/member modifier. Guarantees the method or member exists exactly once across all compositions. Prevents duplication when the same method appears in multiple inheritance paths. `stage override void VSMain()` means "this is the single canonical VSMain."
+
+`stream` — member modifier. The variable flows through all pipeline stages automatically — declared once, accessible in VS, GS, PS without explicit inter-stage struct plumbing. This is the automatic shader stage IO weaving system. `stage stream float4 Position : POSITION` is the whole declaration.
+
+`streams` — the implicit global struct that collects all `stream` variables. You read/write through `streams.MyVar` inside stage functions.
+
+`override` — mandatory on any method that overrides a parent's implementation. Missing `override` is a compile error, unlike HLSL where shadowing is silently implicit.
+
+`abstract` — method declaration without body. Unlike HLSL, you can inherit from a shader with unimplemented abstract methods and the compiler warns rather than errors — you only get a hard error if the final linked shader still has unresolved abstract methods.
+
+`clone` — method keyword for composition-specific duplication. When a method appears multiple times in the inheritance tree, `clone` forces separate instances at each inheritance level instead of collapsing them into one. Used primarily in composition scenarios to prevent the single-instance rule from flattening distinct behaviors.
+
+`base` — call the previous implementation in the inheritance chain. `base.VSMain()` calls the parent mixin's `VSMain`. Same semantics as C# `base.Method()`.
+
+**Generics/templates:**
+
+`shader MyShader<float TParam>` — type and value template parameters on shader classes. Resolved at effect compilation time, not runtime. As seen in `SpriteAlphaCutoff<bool TSRgb>` and `SpriteBatchShader<bool TSRgb>`.
+
+**Annotations (extended from HLSL):**
+
+`[Color]` — marks a `float4` as a color, changes the generated `ParameterKey` type to `Color4` and signals the editor to show a color picker.
+
+`[Link("ParameterKey.Name")]` — specifies which ParameterKey to bind this variable to.
+
+`[Map("ParameterKey.Name")]` — variant of Link.
+
+**Composition:**
+
+`compose ShaderClass MyComposition` — declares a member whose type is another shader class. This is the other half of the mixin system — rather than inheriting behavior you embed it. The embedded shader's methods are accessible on the composition member and can be called into the `clone`/`stage` system. From the actual `SpriteAlphaCutoff.sdsl` the `mixin` verb in the effect block is what instantiates compositions.
+
+**Static cross-shader calls:**
+
+`ShaderName.MethodName(args)` — call a method on another shader class without inheriting from it. Behaves like a static call. Only works for methods that don't touch instance shader state.
+
+---
+
+**How this maps to Slang:**
+
+The good news is Slang was essentially designed to solve this exact problem. It has:
+- Modules/interfaces that map cleanly to `shader` classes
+- `[shader("vertex")]` etc. attribute-based stage declaration
+- Generics that are resolved at specialization time
+- Interface inheritance
+
+The translation isn't 1:1 but it's closer than any other target. The two things Slang doesn't have natively that SDSL does are:
+
+**`stream` / `streams` automatic IO weaving** — the biggest semantic gap. Slang uses explicit `in`/`out` parameters between stages. The `stream` system in SDSL is genuinely novel — declaring a variable once and having the compiler wire it through all stages automatically is a significant authoring convenience. You'd need a preprocessing pass that collects all `stream` declarations, generates the inter-stage structs, and rewires the call sites. Doable in the AST merge pass.
+
+**`clone` semantics** — Slang doesn't have an exact equivalent. You'd need to handle this during the mixin merge pass on the AST by generating suffixed copies of cloned methods rather than collapsing them.
+
+Everything else — `stage`, `override`, `abstract`, `base`, generics, annotations — has clear Slang equivalents or can be handled as syntactic sugar in the merge pass before emission.
+
+**The pipeline then:**
+
+SDSL source → parser (recursive descent, HLSL grammar + above extensions) → AST → mixin merge pass (flattens inheritance, handles `clone`, resolves `base`, weaves `stream` vars into inter-stage structs) → clean HLSL/Slang output → DXC/Slang → SPIR-V/DXIL.
+
+The merge pass is the only genuinely novel part. Everything else is standard compiler work.
