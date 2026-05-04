@@ -82,7 +82,7 @@ namespace Stride.Rendering.Materials
             return Equals((object)other);
         }
 
-        public bool Equals(MaterialSpecularMicrofacetModelFeature other)
+        public bool Equals(MaterialSpecularMicrofacetModelFeature? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
