@@ -13,13 +13,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Stri-V clean core is Linux/Vulkan-first; mobile and UWP input backends are out of scope. -->
+    <!-- Stri-V clean core is Vulkan-first (Linux + minimal Windows desktop validation); mobile and UWP input backends are out of scope. -->
     <Compile Remove="../../../sources/engine/Stride.Input/Android/**/*.cs" />
     <Compile Remove="../../../sources/engine/Stride.Input/UWP/**/*.cs" />
 
-    <!-- Windows-only RawInput/DirectInput/XInput integrations are excluded from the clean Linux profile. -->
+    <!-- Keep minimal Windows desktop keyboard/mouse input (RawInput) for local Vulkan validation. -->
     <Compile Remove="../../../sources/engine/Stride.Input/InputSourceWindowsDirectInput.cs" />
-    <Compile Remove="../../../sources/engine/Stride.Input/InputSourceWindowsRawInput.cs" />
     <Compile Remove="../../../sources/engine/Stride.Input/InputSourceWindowsXInput.cs" />
   </ItemGroup>
   <ItemGroup>
