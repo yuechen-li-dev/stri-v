@@ -29,9 +29,50 @@ public class ShaderPipelineTests
         var result = new ShaderParser().ParseSdsl(source);
         Assert.True(result.Success);
         Assert.Equal("SimpleStreamShader", result.Document!.Name);
+        Assert.Null(result.Document.GenericParametersText);
+        Assert.Empty(result.Document.BaseShaders);
         Assert.Collection(result.Document.Streams,
             s => { Assert.Equal("Position", s.Name); Assert.Equal("float4", s.Type); Assert.Equal("SV_Position", s.Semantic); },
             s => { Assert.Equal("Color", s.Name); Assert.Equal("float4", s.Type); Assert.Equal("COLOR0", s.Semantic); });
+    }
+
+    [Fact]
+    public void SpriteBatchShader_Parse_RecognizesShaderHeader()
+    {
+        var source = ReadFixture("sdsl/SpriteBatchShader.sdsl");
+        var result = new ShaderParser().ParseSdsl(source);
+        Assert.NotNull(result.Document);
+        Assert.Equal("SpriteBatchShader", result.Document!.Name);
+        Assert.Equal("bool TSRgb", result.Document.GenericParametersText);
+        Assert.Contains("SpriteBase", result.Document.BaseShaders);
+    }
+
+    [Fact]
+    public void SpriteBatchShader_Parse_CapturesStreamsAndStageMethods()
+    {
+        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/SpriteBatchShader.sdsl")).Document!;
+        Assert.Equal(3, shader.Streams.Count);
+        Assert.Equal(2, shader.Methods.Count);
+        Assert.Contains(shader.Methods, m => m.Body.Contains("base.", StringComparison.Ordinal));
+        Assert.Contains(shader.Methods, m => m.Body.Contains("streams.", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void SpriteBatchShader_Parse_DetectsUnsupportedGenericAndInheritanceSemantics()
+    {
+        var result = new ShaderParser().ParseSdsl(ReadFixture("sdsl/SpriteBatchShader.sdsl"));
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD300");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD301");
+    }
+
+    [Fact]
+    public void SpriteBatchShader_Lowering_EmitsDeterministicDiagnosticsForBaseCalls()
+    {
+        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/SpriteBatchShader.sdsl")).Document!;
+        var result = new ShaderLowerer().LowerSdslToHlsl(shader);
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD302");
+        Assert.Contains("TODO(SD301)", result.Hlsl);
+        Assert.Contains("TODO(SD300)", result.Hlsl);
     }
 
     [Fact]
