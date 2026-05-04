@@ -8,6 +8,12 @@ public sealed record StreamBinding(string Type, string Name, string Semantic, in
 public sealed record StreamLayout(IReadOnlyList<StreamBinding> Bindings, IReadOnlyList<Diagnostic> Diagnostics);
 public sealed record LoweringResult(string Hlsl, IReadOnlyList<Diagnostic> Diagnostics);
 public sealed record ShaderSpecialization(IReadOnlyDictionary<string, bool> BoolValues);
+public enum StreamSemanticKind { VertexInput, VertexOutput, PixelInput, PixelOutput, Interpolant, Unknown }
+public sealed record StageIoLayout(
+    IReadOnlyList<SdslStream> VSInput,
+    IReadOnlyList<SdslStream> VSOutput,
+    IReadOnlyList<SdslStream> PSInput,
+    IReadOnlyList<SdslStream> PSOutput);
 
 public sealed class ShaderLowerer
 {
@@ -41,16 +47,18 @@ public sealed class ShaderLowerer
 
         var sb = new StringBuilder();
         sb.AppendLine($"// Lowered from {shader.Name}");
-        sb.AppendLine("struct StriVStageStreams"); sb.AppendLine("{");
-        foreach (var stream in mergedStreams) sb.AppendLine($"    {stream.Type} {stream.Name} : {stream.Semantic};");
-        sb.AppendLine("};"); sb.AppendLine();
+        var io = BuildStageIoLayout(mergedStreams, diags);
+        EmitStageStruct(sb, "StriVVSOutput", io.VSOutput);
+        EmitStageStruct(sb, "StriVPSInput", io.PSInput);
+        EmitStageStruct(sb, "StriVPSOutput", io.PSOutput);
 
         var neededHelpers = methods.Values.SelectMany(m => m.BaseCalls).Select(c => c.MethodName).ToHashSet(StringComparer.Ordinal);
         if (baseShader is not null)
         {
             foreach (var bm in baseShader.Methods.Where(m => neededHelpers.Contains(m.Name)))
             {
-                sb.AppendLine($"void __base_{baseShader.Name}_{bm.Name}(inout StriVStageStreams streams)");
+                var helperStreamType = bm.Name == "VSMain" ? "StriVVSOutput" : bm.Name == "PSMain" ? "StriVPSInput" : "StriVPSInput";
+                sb.AppendLine($"void __base_{baseShader.Name}_{bm.Name}(inout {helperStreamType} streams)");
                 sb.AppendLine("{");
                 foreach (var line in bm.Body.Split('\n')) sb.AppendLine($"    {line.TrimEnd()}");
                 sb.AppendLine("}"); sb.AppendLine();
@@ -61,8 +69,8 @@ public sealed class ShaderLowerer
         {
             var rewritten = RewriteBaseCalls(method, baseShader, methods, diags);
             rewritten = SubstituteIdentifiers(rewritten, genericSubstitutions);
-            if (method.Name == "VSMain") { sb.AppendLine("StriVStageStreams VSMain()"); sb.AppendLine("{"); sb.AppendLine("    StriVStageStreams streams;"); foreach (var l in rewritten.Split('\n')) sb.AppendLine($"    {l.TrimEnd()}"); sb.AppendLine("    return streams;"); sb.AppendLine("}"); }
-            else if (method.Name == "PSMain") { var suffix = method.ReturnType == "float4" ? " : SV_Target" : string.Empty; sb.AppendLine($"{method.ReturnType} PSMain(StriVStageStreams streams){suffix}"); sb.AppendLine("{"); foreach (var l in rewritten.Split('\n')) sb.AppendLine($"    {l.TrimEnd()}"); sb.AppendLine("}"); }
+            if (method.Name == "VSMain") { sb.AppendLine("StriVVSOutput VSMain()"); sb.AppendLine("{"); sb.AppendLine("    StriVVSOutput streams;"); foreach (var l in rewritten.Split('\n')) sb.AppendLine($"    {l.TrimEnd()}"); sb.AppendLine("    return streams;"); sb.AppendLine("}"); }
+            else if (method.Name == "PSMain") { var suffix = method.ReturnType == "float4" ? " : SV_Target" : string.Empty; sb.AppendLine($"{method.ReturnType} PSMain(StriVPSInput streams){suffix}"); sb.AppendLine("{"); foreach (var l in rewritten.Split('\n')) sb.AppendLine($"    {l.TrimEnd()}"); sb.AppendLine("}"); }
         }
 
         return new(sb.ToString(), diags);
@@ -198,5 +206,51 @@ public sealed class ShaderLowerer
             if (existing.Type != s.Type || existing.Semantic != s.Semantic) diags.Add(Diagnostic.Create("SD315", $"Conflicting stream '{s.Name}'.", s.Span.Line, s.Span.Column));
         }
         return outList;
+    }
+
+    private static void EmitStageStruct(StringBuilder sb, string typeName, IReadOnlyList<SdslStream> streams)
+    {
+        sb.AppendLine($"struct {typeName}");
+        sb.AppendLine("{");
+        foreach (var stream in streams) sb.AppendLine($"    {stream.Type} {stream.Name} : {stream.Semantic};");
+        sb.AppendLine("};");
+        sb.AppendLine();
+    }
+
+    private static StageIoLayout BuildStageIoLayout(IReadOnlyList<SdslStream> mergedStreams, List<Diagnostic> diags)
+    {
+        var vsOut = new List<SdslStream>();
+        var psIn = new List<SdslStream>();
+        var psOut = new List<SdslStream>();
+        foreach (var s in mergedStreams)
+        {
+            var kind = ClassifySemantic(s.Semantic);
+            if (kind is StreamSemanticKind.Unknown)
+                diags.Add(Diagnostic.Create("SD330", $"Unknown stream semantic '{s.Semantic}' classified as interpolant.", s.Span.Line, s.Span.Column));
+            if (kind is StreamSemanticKind.PixelOutput)
+            {
+                diags.Add(Diagnostic.Create("SD331", $"Pixel-output semantic '{s.Semantic}' is excluded from vertex output.", s.Span.Line, s.Span.Column));
+                psOut.Add(s);
+                continue;
+            }
+            // Conservative default: transit values through VS->PS.
+            vsOut.Add(s);
+            psIn.Add(s);
+        }
+        return new([], vsOut, psIn, psOut);
+    }
+
+    private static StreamSemanticKind ClassifySemantic(string semanticRaw)
+    {
+        var semantic = semanticRaw.Trim().ToUpperInvariant();
+        if (semantic is "SV_POSITION") return StreamSemanticKind.VertexOutput;
+        if (semantic.StartsWith("SV_TARGET", StringComparison.Ordinal)) return StreamSemanticKind.PixelOutput;
+        if (semantic.StartsWith("COLOR", StringComparison.Ordinal) ||
+            semantic.StartsWith("TEXCOORD", StringComparison.Ordinal) ||
+            semantic.StartsWith("NORMAL", StringComparison.Ordinal) ||
+            semantic.StartsWith("TANGENT", StringComparison.Ordinal) ||
+            semantic.StartsWith("BINORMAL", StringComparison.Ordinal)) return StreamSemanticKind.Interpolant;
+        if (semantic == "POSITION") return StreamSemanticKind.VertexInput;
+        return StreamSemanticKind.Unknown;
     }
 }

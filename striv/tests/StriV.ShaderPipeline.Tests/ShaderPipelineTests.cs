@@ -216,19 +216,64 @@ shader S {
     }
 
     [Fact]
-    public void Lowering_Emits_Deterministic_Stage_Stream_Model()
+    public void SimpleStreamShader_Lowering_UsesSeparateStageStructs()
     {
         var source = ReadFixture("sdsl/simple_stream_shader.sdsl");
         var shader = new ShaderParser().ParseSdsl(source).Document!;
         var lowered = new ShaderLowerer().LowerSdslToHlsl(shader).Hlsl;
-        Assert.Contains("struct StriVStageStreams", lowered);
+        Assert.Contains("struct StriVVSOutput", lowered);
+        Assert.Contains("struct StriVPSInput", lowered);
         Assert.Contains("float4 Position : SV_Position;", lowered);
-        Assert.Contains("StriVStageStreams VSMain()", lowered);
-        Assert.Contains("StriVStageStreams streams;", lowered);
+        Assert.Contains("StriVVSOutput VSMain()", lowered);
+        Assert.Contains("StriVVSOutput streams;", lowered);
         Assert.Contains("return streams;", lowered);
-        Assert.Contains("float4 PSMain(StriVStageStreams streams) : SV_Target", lowered);
+        Assert.Contains("float4 PSMain(StriVPSInput streams) : SV_Target", lowered);
+        Assert.DoesNotContain("struct StriVStageStreams", lowered);
         Assert.DoesNotContain("static StageStreams __streams", lowered);
         Assert.DoesNotContain("__streams.", lowered);
+    }
+
+    [Fact]
+    public void StreamLayout_ClassifiesSvTargetAsPixelOutputOnly()
+    {
+        const string source = """
+shader S {
+ stage stream float4 Color : SV_Target0;
+ stage override void VSMain(){ }
+ stage override float4 PSMain(){ return streams.Color; }
+}
+""";
+        var shader = new ShaderParser().ParseSdsl(source).Document!;
+        var result = new ShaderLowerer().LowerSdslToHlsl(shader);
+        var vsBlockStart = result.Hlsl.IndexOf("struct StriVVSOutput", StringComparison.Ordinal);
+        var vsBlockEnd = result.Hlsl.IndexOf("struct StriVPSInput", StringComparison.Ordinal);
+        Assert.True(vsBlockStart >= 0 && vsBlockEnd > vsBlockStart);
+        var vsBlock = result.Hlsl[vsBlockStart..vsBlockEnd];
+        Assert.DoesNotContain("SV_Target0", vsBlock, StringComparison.Ordinal);
+        Assert.Contains("struct StriVPSOutput", result.Hlsl);
+        Assert.Contains("float4 Color : SV_Target0;", result.Hlsl);
+    }
+
+    [Fact]
+    public void StreamLayout_ClassifiesSvPositionAsVsOutputAndPsInput()
+    {
+        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/simple_stream_shader.sdsl")).Document!;
+        var lowered = new ShaderLowerer().LowerSdslToHlsl(shader).Hlsl;
+        Assert.Contains("struct StriVVSOutput", lowered);
+        Assert.Contains("float4 Position : SV_Position;", lowered);
+        Assert.Contains("struct StriVPSInput", lowered);
+        Assert.DoesNotContain("struct StriVPSOutput\n{\n    float4 Position : SV_Position;", lowered, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StreamLayout_ClassifiesColorAsInterpolant()
+    {
+        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/simple_stream_shader.sdsl")).Document!;
+        var lowered = new ShaderLowerer().LowerSdslToHlsl(shader).Hlsl;
+        Assert.Contains("struct StriVVSOutput", lowered);
+        Assert.Contains("float4 Color : COLOR0;", lowered);
+        Assert.Contains("struct StriVPSInput", lowered);
+        Assert.DoesNotContain("float4 Color : SV_Target0;", lowered, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -386,7 +431,7 @@ shader D {
         var parser = new ShaderParser();
         var doc = parser.ParseSdslDocument(ReadFixture("sdsl/inheritance/simple_base_shader.sdsl")).Document!;
         var lowered = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "ChildSprite");
-        Assert.Contains("void __base_BaseSprite_VSMain(inout StriVStageStreams streams)", lowered.Hlsl);
+        Assert.Contains("void __base_BaseSprite_VSMain(inout StriVVSOutput streams)", lowered.Hlsl);
     }
 
     [Fact]
