@@ -1,0 +1,23 @@
+shader BaseSprite
+{
+    stage stream float4 Color : COLOR0;
+
+    stage override void VSMain()
+    {
+        streams.Color = float4(1.0, 1.0, 1.0, 1.0);
+    }
+}
+
+shader ChildSprite : BaseSprite
+{
+    stage override void VSMain()
+    {
+        base.VSMain();
+        streams.Color *= 0.5;
+    }
+
+    stage override float4 PSMain()
+    {
+        return streams.Color;
+    }
+}

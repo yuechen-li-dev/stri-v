@@ -1,9 +1,14 @@
+using StriV.ShaderPipeline.Diagnostics;
 using StriV.ShaderPipeline.Lexing;
 
 namespace StriV.ShaderPipeline.Ast;
 
 public sealed record HlslDocument(string Source, IReadOnlyList<HlslFunction> Functions);
 public sealed record HlslFunction(string Signature, string Body);
+
+public sealed record SdslDocument(
+    IReadOnlyList<SdslShader> Shaders,
+    IReadOnlyList<Diagnostic> Diagnostics);
 
 public sealed record SdslShader(
     string Name,
