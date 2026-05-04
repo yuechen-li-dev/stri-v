@@ -8,6 +8,7 @@ public sealed record HlslFunction(string Signature, string Body);
 
 public sealed record SdslDocument(
     IReadOnlyList<SdslShader> Shaders,
+    IReadOnlyList<SdslEffectBlock> EffectBlocks,
     IReadOnlyList<Diagnostic> Diagnostics);
 
 public sealed record ShaderGenericParameter(string TypeText, string Name, SourceSpan Span);
@@ -21,6 +22,15 @@ public sealed record SdslShader(
     IReadOnlyList<SdslStageMethod> Methods,
     IReadOnlyList<string> Modifiers);
 
+
+public sealed record SdslEffectBlock(
+    string? NamespaceName,
+    string EffectName,
+    IReadOnlyList<string> UsingParams,
+    IReadOnlyList<string> Mixins,
+    string RawBodyText,
+    SourceSpan BodySpan,
+    SourceSpan Span);
 public sealed record SdslStream(string Type, string Name, string Semantic, SourceSpan Span);
 
 public sealed record SdslStageMethod(

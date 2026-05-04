@@ -19,7 +19,7 @@ public sealed class ShaderLowerer
 {
     public string EmitHlsl(HlslDocument document) => document.Source;
 
-    public LoweringResult LowerSdslToHlsl(SdslShader shader, ShaderSpecialization? specialization = null) => LowerSdslDocumentToHlsl(new SdslDocument([shader], []), shader.Name, specialization);
+    public LoweringResult LowerSdslToHlsl(SdslShader shader, ShaderSpecialization? specialization = null) => LowerSdslDocumentToHlsl(new SdslDocument([shader], [], []), shader.Name, specialization);
 
     public LoweringResult LowerSdslDocumentToHlsl(SdslDocument doc, string entryShaderName, ShaderSpecialization? specialization = null)
     {
