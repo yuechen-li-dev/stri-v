@@ -6,8 +6,10 @@ using System.Text;
 namespace Stride.Core.IO;
 
 /// <summary>
-/// Exposes the whole file system through folder similar to Cygwin.
-/// As an example, "/c/Program Files/Test/Data.dat" would work.
+/// Exposes the full host file system through a virtual drive mount.
+/// As an example, <c>/c/Program Files/Test/Data.dat</c> resolves to a Windows drive path,
+/// while Linux paths are passed through.
+/// Stream lifetime follows <see cref="IVirtualFileProvider"/> rules: callers own the returned stream.
 /// </summary>
 public class DriveFileProvider : FileSystemProvider
 {

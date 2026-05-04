@@ -4,7 +4,8 @@
 namespace Stride.Core.IO;
 
 /// <summary>
-/// A file system implementation for IVirtualFileProvider.
+/// <see cref="IVirtualFileProvider"/> backed by the host operating system file system.
+/// This provider translates VFS-style paths to OS paths rooted at <c>localBasePath</c>.
 /// </summary>
 public partial class FileSystemProvider : VirtualFileProviderBase
 {
@@ -27,6 +28,10 @@ public partial class FileSystemProvider : VirtualFileProviderBase
         ChangeBasePath(localBasePath);
     }
 
+    /// <summary>
+    /// Rebinds the OS base path used for provider-local path resolution.
+    /// </summary>
+    /// <param name="basePath">Host path that becomes the root for provider-local URLs.</param>
     public void ChangeBasePath(string? basePath)
     {
         localBasePath = basePath?.Replace(AltDirectorySeparatorChar, DirectorySeparatorChar);

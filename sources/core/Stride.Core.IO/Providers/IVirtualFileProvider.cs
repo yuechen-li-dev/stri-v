@@ -4,7 +4,8 @@
 namespace Stride.Core.IO;
 
 /// <summary>
-/// A virtual file provider, that can returns a Stream for a given path.
+/// Contract for a mountable virtual file provider.
+/// Implementations map provider-local paths to a backing store (disk, archive, object database, etc.).
 /// </summary>
 public interface IVirtualFileProvider : IDisposable
 {
@@ -15,7 +16,8 @@ public interface IVirtualFileProvider : IDisposable
     /// The root path.
     /// </value>
     /// <remarks>
-    /// All path are relative to the root path.
+    /// All paths are provider-local and resolved relative to this mount point by <see cref="VirtualFileSystem"/>.
+    /// Public APIs should use VFS-style separators unless an implementation explicitly documents another expectation.
     /// </remarks>
     string? RootPath { get; }
 
@@ -45,6 +47,9 @@ public interface IVirtualFileProvider : IDisposable
     /// <param name="share">The process sharing mode.</param>
     /// <param name="streamFlags">The type of stream needed</param>
     /// <returns>The opened stream.</returns>
+    /// <remarks>
+    /// The returned stream is owned by the caller and must be disposed by the caller.
+    /// </remarks>
     Stream OpenStream(string path, VirtualFileMode mode, VirtualFileAccess access, VirtualFileShare share = VirtualFileShare.Read, StreamFlags streamFlags = StreamFlags.None);
 
     /// <summary>
@@ -59,7 +64,10 @@ public interface IVirtualFileProvider : IDisposable
     /// <param name="searchOption">
     /// One of the enumeration values that specifies whether the search operation should include all subdirectories or only the current directory.
     /// </param>
-    /// <returns>A list of files from the specified path</returns>
+    /// <returns>A list of files from the specified path.</returns>
+    /// <remarks>
+    /// Returned entries are expected to be provider-local paths, not host absolute paths.
+    /// </remarks>
     string[] ListFiles(string path, string searchPattern, VirtualSearchOption searchOption);
 
     /// <summary>
