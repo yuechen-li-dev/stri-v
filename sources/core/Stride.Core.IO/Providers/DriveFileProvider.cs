@@ -29,7 +29,7 @@ public class DriveFileProvider : FileSystemProvider
     {
         filePath = Path.GetFullPath(filePath);
 
-        var resolveProviderResult = VirtualFileSystem.ResolveProvider(RootPath, true);
+        var resolveProviderResult = VirtualFileSystem.ResolveProvider(RootPath!, true);
 
         if (resolveProviderResult.Provider is not DriveFileProvider provider)
             throw new InvalidOperationException();

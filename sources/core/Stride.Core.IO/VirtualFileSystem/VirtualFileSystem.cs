@@ -45,12 +45,12 @@ public static partial class VirtualFileSystem
     /// This provider is intentionally assigned by higher-level initialization code.
     /// Leaving it null/default creates a latent failure point for callers expecting object-database access.
     /// </summary>
-    public static IVirtualFileProvider ApplicationObjectDatabase;
+    public static IVirtualFileProvider ApplicationObjectDatabase = null!;
 
     /// <summary>
     /// The application database file provider (Index level).
     /// </summary>
-    public static readonly IVirtualFileProvider ApplicationDatabase;
+    public static readonly IVirtualFileProvider ApplicationDatabase = null!;
 
     /// <summary>
     /// The application cache folder.
