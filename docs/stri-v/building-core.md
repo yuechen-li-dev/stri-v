@@ -11,8 +11,25 @@ Build:
 
 Test:
 ```bash
-dotnet test striv/tests/StriV.CleanGraph.Tests/StriV.CleanGraph.Tests.csproj --no-build -v minimal
+dotnet test striv/tests/StriV.CleanGraph.Tests/StriV.CleanGraph.Tests.csproj -v minimal
 ```
+
+## Focused project warning lane
+
+Build one project with inactive warning noise suppressed:
+
+```bash
+./striv/build/striv-build-focused-project.sh Stride.BepuPhysics
+```
+
+Require the focused project to be warning-clean:
+
+```bash
+./striv/build/striv-check-focused-project.sh Stride.BepuPhysics
+```
+
+The focused warning lane is a 5S Shine/Sustain tool. It does not mark inactive project warnings as fixed.
+`Stride.BepuPhysics` is the first focused project held at zero warnings in this lane.
 
 Run smoke:
 ```bash
