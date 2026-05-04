@@ -1,0 +1,12 @@
+[[shader]]
+id = "shader.sprite_batch"
+source = "Shaders/SpriteBatchShader.sdsl"
+entry = "SpriteBatchShader"
+backend = "vulkan"
+profile = "default"
+
+[[shader.specialization]]
+shader = "shader.sprite_batch"
+name = "TSRgb"
+type = "bool"
+value = false

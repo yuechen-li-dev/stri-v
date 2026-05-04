@@ -39,6 +39,7 @@
     <PackageVersion Include="System.ValueTuple" Version="4.6.1" />
     <PackageVersion Include="Vortice.Vulkan" Version="3.0.3" />
     <PackageVersion Include="WinPixEventRuntime" Version="1.0.240308001" />
+    <PackageVersion Include="Tomlyn" Version="0.17.0" />
   </ItemGroup>
   <!-- Other dependencies -->
   <ItemGroup>
