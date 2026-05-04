@@ -48,8 +48,12 @@ using System.Drawing;
 namespace FreeImageAPI
 {
 	/// <summary>
-	/// Encapsulates a FreeImage-bitmap.
+	/// Encapsulates a FreeImage bitmap and acts as the primary managed runtime bridge object.
 	/// </summary>
+	/// <remarks>
+	/// In Stri-V this type remains on the active desktop image load/save path (via StandardImageHelper.Desktop).
+	/// Future replacements must preserve stream ownership semantics and native handle lifetime guarantees.
+	/// </remarks>
 	[Serializable, Guid("64a4c935-b757-499c-ab8c-6110316a9e51")]
 	public class FreeImageBitmap : MarshalByRefObject, ICloneable, IDisposable, IEnumerable, ISerializable
 	{
@@ -116,6 +120,10 @@ namespace FreeImageAPI
 		/// <summary>
 		/// Handle to the encapsulated FreeImage-bitmap.
 		/// </summary>
+		/// <remarks>
+		/// Ownership invariant: this <see cref="FIBITMAP"/> is released by current disposal paths;
+		/// do not alter lifecycle sequencing without explicit interop/runtime validation.
+		/// </remarks>
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private FIBITMAP dib;
 

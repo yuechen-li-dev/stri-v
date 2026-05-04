@@ -44,6 +44,10 @@ namespace FreeImageAPI.Metadata
 	/// <summary>
 	/// Class handling metadata of a FreeImage bitmap.
 	/// </summary>
+	/// <remarks>
+	/// This metadata facade is part of a broad compatibility surface retained in M9b.
+	/// Candidate reductions are deferred until usage proofs are collected in a dedicated phase.
+	/// </remarks>
 	public class ImageMetadata : IEnumerable, IComparable, IComparable<ImageMetadata>
 	{
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
