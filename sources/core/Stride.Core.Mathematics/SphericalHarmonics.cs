@@ -49,7 +49,8 @@ public abstract class SphericalHarmonics<TDataType>
     /// Get the coefficients defining the spherical harmonics (the spherical coordinates x{l,m} multiplying the spherical base Y{l,m}).
     /// </summary>
     [DataMember(1)]
-    public TDataType[] Coefficients { get; internal set; }
+    // Initialized by runtime construction, or by serializer materialization after the serialization constructor runs.
+    public TDataType[] Coefficients { get; internal set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SphericalHarmonics{TDataType}"/> class (null, for serialization).
@@ -122,7 +123,8 @@ public abstract class SphericalHarmonics<TDataType>
 [DataContract("SphericalHarmonics")]
 public class SphericalHarmonics : SphericalHarmonics<Color3>
 {
-    private readonly float[] baseValues;
+    // Initialized by runtime construction; the serialization constructor is only for materialization.
+    private readonly float[] baseValues = null!;
 
     private const float Pi4 = 4 * MathUtil.Pi;
     private const float Pi16 = 16 * MathUtil.Pi;
