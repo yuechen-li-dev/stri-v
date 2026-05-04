@@ -713,7 +713,7 @@ namespace FreeImageAPI
 		/// <returns><b>true</b> if <paramref name="obj"/> is a <see cref="MemoryArray&lt;T&gt;"/>
 		/// instance equivalent to this <see cref="MemoryArray&lt;T&gt;"/> structure; otherwise,
 		/// <b>false</b>.</returns>
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			EnsureNotDisposed();
 			return ((obj is MemoryArray<T>) && Equals((MemoryArray<T>)obj));
@@ -727,7 +727,7 @@ namespace FreeImageAPI
 		/// <returns><b>true</b> if <paramref name="other"/> is equivalent to this
 		/// <see cref="MemoryArray&lt;T&gt;"/> structure; otherwise,
 		/// <b>false</b>.</returns>
-		public bool Equals(MemoryArray<T> other)
+		public bool Equals(MemoryArray<T>? other)
 		{
 			EnsureNotDisposed();
 			return ((this.baseAddress == other.baseAddress) && (this.length == other.length));
