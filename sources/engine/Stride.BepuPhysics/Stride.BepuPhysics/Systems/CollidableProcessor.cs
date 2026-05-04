@@ -15,8 +15,13 @@ using Stride.Core.Threading;
 
 namespace Stride.BepuPhysics.Systems;
 
+/// <summary>
+/// Runtime processor that attaches/detaches <see cref="CollidableComponent"/> instances to simulations
+/// and keeps static collidables synchronized with entity transforms.
+/// </summary>
 public class CollidableProcessor : EntityProcessor<CollidableComponent>
 {
+    // Cached world matrices for statics to avoid unnecessary pose writes into Bepu every frame.
     internal readonly UnsortedO1List<StaticComponent, Matrix4x4> Statics = new();
 
     internal ShapeCacheSystem ShapeCache { get; private set; } = null!;
@@ -34,6 +39,7 @@ public class CollidableProcessor : EntityProcessor<CollidableComponent>
 
     protected override void OnSystemAdd()
     {
+        // These systems are shared per-service-registry and establish runtime ownership boundaries.
         BepuConfiguration = Services.GetOrCreate<BepuConfiguration>();
         ShapeCache = Services.GetOrCreate<ShapeCacheSystem>();
     }
@@ -56,6 +62,7 @@ public class CollidableProcessor : EntityProcessor<CollidableComponent>
 
                 if (collidable.StaticReference is { } sRef)
                 {
+                    // Static descriptions are updated in place to preserve existing handles/material allocations.
                     var description = sRef.GetDescription();
                     collidable.Entity.Transform.WorldMatrix.Decompose(out _, out Quaternion rotation, out Vector3 translation);
                     description.Pose.Position = (translation + collidable.CenterOfMass).ToNumeric();
