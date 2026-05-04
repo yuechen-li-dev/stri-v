@@ -11,7 +11,7 @@ public sealed class ShaderParser
     {
         var diags = new List<Diagnostic>();
         var funcs = new List<HlslFunction>();
-        var regex = new Regex(@"([A-Za-z_][\w<>\s\*]*\s+[A-Za-z_]\w*\s*\([^\)]*\)\s*(?::\s*[A-Za-z_]\w*)?)\s*\{", RegexOptions.Multiline);
+        var regex = new Regex(@"([A-Za-z_]\w[\w<>\s\*]*\s+[A-Za-z_]\w*\s*\([^\)]*\)\s*(?::\s*[A-Za-z_]\w*)?)\s*\{", RegexOptions.Multiline);
         foreach (Match m in regex.Matches(source))
         {
             var bodyStart = m.Index + m.Length - 1;
@@ -33,6 +33,7 @@ public sealed class ShaderParser
     {
         var diags = new List<Diagnostic>();
         var shaders = new List<SdslShader>();
+        var effects = new List<SdslEffectBlock>();
 
         var shaderHeader = new Regex(@"shader\s+([A-Za-z_]\w*)(\s*<([^>]+)>)?(\s*:\s*([^\{\r\n]+))?\s*\{", RegexOptions.Multiline);
         var matches = shaderHeader.Matches(source);
@@ -72,10 +73,53 @@ public sealed class ShaderParser
             shaders.Add(new(name, genericParametersText, genericParameters, baseShaders, streams, methods, new[] { "shader" }));
         }
 
+        ParseEffectBlocks(source, effects, diags);
+
         if (shaders.Count == 0)
             diags.Add(Diagnostic.Create("SD000", "Missing shader header"));
 
-        return new(new SdslDocument(shaders, diags), diags);
+        return new(new SdslDocument(shaders, effects, diags), diags);
+    }
+
+    private static void ParseEffectBlocks(string source, List<SdslEffectBlock> effects, List<Diagnostic> diags)
+    {
+        var nsRegex = new Regex(@"namespace\s+([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*\{", RegexOptions.Multiline);
+        foreach (Match nsMatch in nsRegex.Matches(source))
+        {
+            var nsName = nsMatch.Groups[1].Value;
+            var nsStart = nsMatch.Index + nsMatch.Length - 1;
+            var nsBlock = ReadBalancedBlock(source, nsStart, out _);
+            var nsInner = nsBlock[1..^1];
+            var baseIndex = nsMatch.Index + nsMatch.Length;
+
+            var effectRegex = new Regex(@"partial\s+effect\s+([A-Za-z_]\w*)\s*\{", RegexOptions.Multiline);
+            foreach (Match effectMatch in effectRegex.Matches(nsInner))
+            {
+                var effectName = effectMatch.Groups[1].Value;
+                var effectBraceStartInInner = effectMatch.Index + effectMatch.Length - 1;
+                var effectBlock = ReadBalancedBlock(nsInner, effectBraceStartInInner, out _);
+                var effectBody = effectBlock[1..^1].Trim();
+                var effectStartInSource = baseIndex + effectMatch.Index;
+                var effectSpan = GetSpan(source, effectStartInSource);
+                var bodySpan = GetSpan(source, baseIndex + effectBraceStartInInner + 1);
+
+                var usingParams = Regex.Matches(effectBody, @"using\s+params\s+([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*;", RegexOptions.Multiline)
+                    .Cast<Match>()
+                    .Select(m => m.Groups[1].Value)
+                    .ToList();
+                var mixins = Regex.Matches(effectBody, @"mixin\s+([^;]+);", RegexOptions.Multiline)
+                    .Cast<Match>()
+                    .Select(m => m.Groups[1].Value.Trim())
+                    .ToList();
+
+                effects.Add(new SdslEffectBlock(nsName, effectName, usingParams, mixins, effectBody, bodySpan, effectSpan));
+                diags.Add(Diagnostic.Create("SD400", $"Partial effect '{effectName}' parsed but effect lowering/artifact generation is not implemented.", effectSpan.Line, effectSpan.Column));
+                foreach (var p in usingParams)
+                    diags.Add(Diagnostic.Create("SD401", $"using params '{p}' parsed in effect '{effectName}', but parameter binding is not implemented.", effectSpan.Line, effectSpan.Column));
+                foreach (var mixin in mixins)
+                    diags.Add(Diagnostic.Create("SD402", $"mixin '{mixin}' parsed in effect '{effectName}', but effect composition is not implemented.", effectSpan.Line, effectSpan.Column));
+            }
+        }
     }
 
     private static IReadOnlyList<ShaderGenericParameter> ParseGenericParameters(string source, Group genericGroup, string? genericParametersText, List<Diagnostic> diags)
