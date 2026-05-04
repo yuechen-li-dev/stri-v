@@ -124,12 +124,12 @@ namespace Stride.Rendering.Materials
             return ScatteringWidth.Equals(other.ScatteringWidth) && Translucency.Equals(other.Translucency) && TranslucencyMap.Equals(other.TranslucencyMap) && ProfileFunction.Equals(other.ProfileFunction) && KernelFunction.Equals(other.KernelFunction);
         }
 
-        public bool Equals(IMaterialShadingModelFeature other)
+        public bool Equals(IMaterialShadingModelFeature? other)
         {
             return Equals(other as MaterialSubsurfaceScatteringFeature);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

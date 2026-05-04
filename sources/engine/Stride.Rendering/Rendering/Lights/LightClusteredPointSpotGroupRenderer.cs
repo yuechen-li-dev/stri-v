@@ -725,7 +725,7 @@ namespace Stride.Rendering.Lights
                     return LightType == other.LightType && LightIndex == other.LightIndex && NextNode == other.NextNode;
                 }
 
-                public override bool Equals(object obj)
+                public override bool Equals(object? obj)
                 {
                     if (ReferenceEquals(null, obj)) return false;
                     return obj is LightClusterLinkedNode && Equals((LightClusterLinkedNode)obj);
