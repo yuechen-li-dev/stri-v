@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using StriV.ShaderPipeline.Ast;
 using StriV.ShaderPipeline.Diagnostics;
+using StriV.ShaderPipeline.Lexing;
 
 namespace StriV.ShaderPipeline.Parsing;
 
@@ -24,18 +25,39 @@ public sealed class ShaderParser
     {
         var diags = new List<Diagnostic>();
         var header = Regex.Match(source, @"shader\s+([A-Za-z_]\w*)");
-        if (!header.Success) return new(null, [new("Missing shader header", 1, 1)]);
+        if (!header.Success) return new(null, [Diagnostic.Create("SD000", "Missing shader header")]);
         var name = header.Groups[1].Value;
-        var streams = Regex.Matches(source, @"stage\s+stream\s+([^\s]+)\s+([A-Za-z_]\w*)\s*:\s*([A-Za-z_]\w*)\s*;")
-            .Select(m => new SdslStream(m.Groups[1].Value, m.Groups[2].Value, m.Groups[3].Value)).ToList();
+
+        var streams = new List<SdslStream>();
+        var streamRegex = new Regex(@"stage\s+stream\s+([^\s]+)\s+([A-Za-z_]\w*)\s*:\s*([A-Za-z_]\w*)\s*;", RegexOptions.Multiline);
+        foreach (Match m in streamRegex.Matches(source))
+        {
+            var span = GetSpan(source, m.Index);
+            streams.Add(new(m.Groups[1].Value, m.Groups[2].Value, m.Groups[3].Value, span));
+        }
+
         var methods = new List<SdslStageMethod>();
-        var methodRegex = new Regex(@"stage\s+override\s+([^\s]+)\s+([A-Za-z_]\w*)\s*\(([^\)]*)\)\s*\{", RegexOptions.Multiline);
+        var methodRegex = new Regex(@"(stage\s+override)\s+([^\s]+)\s+([A-Za-z_]\w*)\s*\(([^\)]*)\)\s*\{", RegexOptions.Multiline);
         foreach (Match m in methodRegex.Matches(source))
         {
             var body = ReadBalancedBlock(source, m.Index + m.Length - 1, out _);
-            methods.Add(new(m.Groups[1].Value, m.Groups[2].Value, m.Groups[3].Value, body[1..^1].Trim()));
+            var span = GetSpan(source, m.Index);
+            methods.Add(new(m.Groups[2].Value, m.Groups[3].Value, m.Groups[4].Value, body[1..^1].Trim(), new[] { "stage", "override" }, span));
         }
-        return new(new(name, streams, methods), diags);
+
+        return new(new(name, streams, methods, new[] { "shader" }), diags);
+    }
+
+    private static SourceSpan GetSpan(string source, int index)
+    {
+        var line = 1;
+        var col = 1;
+        for (var i = 0; i < index; i++)
+        {
+            if (source[i] == '\n') { line++; col = 1; }
+            else col++;
+        }
+        return new(index, 1, line, col);
     }
 
     private static string ReadBalancedBlock(string source, int braceStart, out int end)
