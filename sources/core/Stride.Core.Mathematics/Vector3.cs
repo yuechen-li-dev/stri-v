@@ -42,7 +42,6 @@ namespace Stride.Core.Mathematics;
 /// <see cref="System.Numerics.Vector3"/>; do not reorder fields or replace bitcasts without an equivalence proof pass.
 /// </remarks>
 [DataContract("float3")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
 public struct Vector3 : IEquatable<Vector3>, ISpanFormattable
 {

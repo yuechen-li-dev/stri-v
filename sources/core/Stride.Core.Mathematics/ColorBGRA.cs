@@ -11,7 +11,6 @@ namespace Stride.Core.Mathematics;
 /// Represents a 32-bit color (4 bytes) in the form of BGRA (in byte order: B, G, R, A).
 /// </summary>
 [DataContract("ColorBGRA")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Size = 4)]
 public struct ColorBGRA : IEquatable<ColorBGRA>, ISpanFormattable
 {

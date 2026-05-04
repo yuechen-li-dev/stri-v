@@ -31,7 +31,6 @@ namespace Stride.Core.Mathematics;
 /// Define a RectangleF.
 /// </summary>
 [DataContract("RectangleF")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
 public struct RectangleF : IEquatable<RectangleF>, ISpanFormattable
 {

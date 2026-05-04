@@ -11,7 +11,6 @@ namespace Stride.Core.Mathematics;
 /// Represents a four dimensional mathematical vector with double-precision floats.
 /// </summary>
 [DataContract("double4")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
 public struct Double4 : IEquatable<Double4>, ISpanFormattable
 {

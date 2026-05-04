@@ -43,7 +43,6 @@ namespace Stride.Core.Mathematics;
 /// Preserve sequential layout and X/Y/Z/W field order unless a dedicated migration proves compatibility.
 /// </remarks>
 [DataContract("quaternion")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
 public struct Quaternion : IEquatable<Quaternion>, ISpanFormattable
 {

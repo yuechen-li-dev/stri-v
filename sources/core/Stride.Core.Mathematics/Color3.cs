@@ -37,7 +37,6 @@ namespace Stride.Core.Mathematics;
 /// Represents a color in the form of rgb.
 /// </summary>
 [DataContract("Color3")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
 public struct Color3 : IEquatable<Color3>, ISpanFormattable
 {

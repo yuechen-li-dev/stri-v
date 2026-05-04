@@ -31,7 +31,6 @@ namespace Stride.Core.Mathematics;
 /// A rectangle structure defining X,Y,Width,Height.
 /// </summary>
 [DataContract("Rectangle")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
 public struct Rectangle : IEquatable<Rectangle>, ISpanFormattable
 {

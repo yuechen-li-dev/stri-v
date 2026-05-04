@@ -46,7 +46,6 @@ namespace Stride.Core.Mathematics;
 /// keep the existing shape stable unless a dedicated compatibility proof/migration pass is performed.
 /// </remarks>
 [DataContract("float4x4")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
 public struct Matrix : IEquatable<Matrix>, ISpanFormattable
 {

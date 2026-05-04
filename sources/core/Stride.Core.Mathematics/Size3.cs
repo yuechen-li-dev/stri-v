@@ -31,7 +31,6 @@ namespace Stride.Core.Mathematics;
 /// Structure providing Width, Height and Depth.
 /// </summary>
 [DataContract("!Size3")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential)]
 public struct Size3 : IEquatable<Size3>, IComparable<Size3>, ISpanFormattable
 {
