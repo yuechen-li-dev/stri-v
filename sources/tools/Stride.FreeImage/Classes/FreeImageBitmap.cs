@@ -3436,7 +3436,7 @@ namespace FreeImageAPI
 		/// <param name="obj">The object to test.</param>
 		/// <returns><b>true</b> if this instance is the same <paramref name="obj"/>
 		/// or if both are null references; otherwise, false.</returns>
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			return ReferenceEquals(this, obj);
 		}

@@ -241,7 +241,7 @@ namespace FreeImageAPI.Metadata
 		/// <param name="obj">An object to compare with this instance.</param>
 		/// <returns>A 32-bit signed integer indicating the lexical relationship between the two comparands.</returns>
 		/// <exception cref="ArgumentException"><paramref name="obj"/> is not a <see cref="ImageMetadata"/>.</exception>
-		public int CompareTo(object obj)
+		public int CompareTo(object? obj)
 		{
 			if (obj == null)
 			{
@@ -260,7 +260,7 @@ namespace FreeImageAPI.Metadata
 		/// <param name="other">A <see cref="ImageMetadata"/> to compare.</param>
 		/// <returns>A signed number indicating the relative values of this instance
 		/// and <paramref name="other"/>.</returns>
-		public int CompareTo(ImageMetadata other)
+		public int CompareTo(ImageMetadata? other)
 		{
 			return this.dib.CompareTo(other.dib);
 		}

@@ -170,7 +170,7 @@ namespace FreeImageAPI
 		/// <param name="obj">The object to test.</param>
 		/// <returns><b>true</b> if <paramref name="obj"/> is a <see cref="BITMAPINFO"/> structure
 		/// equivalent to this <see cref="BITMAPINFO"/> structure; otherwise, <b>false</b>.</returns>
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			return ((obj is BITMAPINFO) && (this == ((BITMAPINFO)obj)));
 		}

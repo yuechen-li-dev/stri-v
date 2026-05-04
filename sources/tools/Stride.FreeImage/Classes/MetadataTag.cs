@@ -668,7 +668,7 @@ namespace FreeImageAPI.Metadata
 		/// <param name="obj">The object to test.</param>
 		/// <returns><b>true</b> if <paramref name="obj"/> is a <see cref="MetadataTag"/> instance
 		/// equivalent to this <see cref="MetadataTag"/> instance; otherwise, <b>false</b>.</returns>
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			return ((obj is MetadataTag) && (Equals((MetadataTag)obj)));
 		}
@@ -679,7 +679,7 @@ namespace FreeImageAPI.Metadata
 		/// <param name="other">A <see cref="MetadataTag"/> instance to compare to this instance.</param>
 		/// <returns><b>true</b> if  equivalent to this <see cref="MetadataTag"/> instance;
 		/// otherwise, <b>false</b>.</returns>
-		public bool Equals(MetadataTag other)
+		public bool Equals(MetadataTag? other)
 		{
 			return (this == other);
 		}
@@ -699,7 +699,7 @@ namespace FreeImageAPI.Metadata
 		/// <param name="obj">An object to compare with this instance.</param>
 		/// <returns>A 32-bit signed integer indicating the lexical relationship between the two comparands.</returns>
 		/// <exception cref="ArgumentException"><paramref name="obj"/> is not a <see cref="MetadataTag"/>.</exception>
-		public int CompareTo(object obj)
+		public int CompareTo(object? obj)
 		{
 			if (obj == null)
 			{
@@ -717,7 +717,7 @@ namespace FreeImageAPI.Metadata
 		/// </summary>
 		/// <param name="other">An object to compare with this instance.</param>
 		/// <returns>A 32-bit signed integer that indicates the relative order of the objects being compared.</returns>
-		public int CompareTo(MetadataTag other)
+		public int CompareTo(MetadataTag? other)
 		{
 			CheckDisposed();
 			other.CheckDisposed();
