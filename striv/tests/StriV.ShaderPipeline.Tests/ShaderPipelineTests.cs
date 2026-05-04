@@ -53,7 +53,7 @@ public class ShaderPipelineTests
         var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/SpriteBatchShader.sdsl")).Document!;
         Assert.Equal(3, shader.Streams.Count);
         Assert.Equal(2, shader.Methods.Count);
-        Assert.Contains(shader.Methods, m => m.Body.Contains("base.", StringComparison.Ordinal));
+        Assert.Contains(shader.Methods, m => m.BaseCalls.Count > 0);
         Assert.Contains(shader.Methods, m => m.Body.Contains("streams.", StringComparison.Ordinal));
     }
 
@@ -70,9 +70,72 @@ public class ShaderPipelineTests
     {
         var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/SpriteBatchShader.sdsl")).Document!;
         var result = new ShaderLowerer().LowerSdslToHlsl(shader);
-        Assert.Contains(result.Diagnostics, d => d.Code == "SD302");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD302" && d.Message.Contains("stage method", StringComparison.Ordinal));
         Assert.Contains("TODO(SD301)", result.Hlsl);
         Assert.Contains("TODO(SD300)", result.Hlsl);
+    }
+
+    [Fact]
+    public void BaseCallScanner_DetectsSimpleBaseCalls()
+    {
+        const string source = """
+shader S {
+ stage override void VSMain() { base.VSMain(); }
+}
+""";
+        var method = new ShaderParser().ParseSdsl(source).Document!.Methods.Single();
+        var call = Assert.Single(method.BaseCalls);
+        Assert.Equal("VSMain", call.MethodName);
+        Assert.Equal(0, call.ArgumentCount);
+    }
+
+    [Fact]
+    public void BaseCallScanner_DetectsArguments()
+    {
+        const string source = """
+shader S {
+ stage override void VSMain() { base.Apply(a, b + c); }
+}
+""";
+        var method = new ShaderParser().ParseSdsl(source).Document!.Methods.Single();
+        var call = Assert.Single(method.BaseCalls);
+        Assert.Equal("Apply", call.MethodName);
+        Assert.Equal("a, b + c", call.ArgumentText);
+        Assert.Equal(2, call.ArgumentCount);
+    }
+
+    [Fact]
+    public void BaseCallScanner_IgnoresCommentsAndStrings()
+    {
+        const string source = """
+shader S {
+ stage override void VSMain() {
+   // base.Fake();
+   var s = "base.Fake()";
+   base.Real();
+ }
+}
+""";
+        var method = new ShaderParser().ParseSdsl(source).Document!.Methods.Single();
+        var call = Assert.Single(method.BaseCalls);
+        Assert.Equal("Real", call.MethodName);
+    }
+
+    [Fact]
+    public void SpriteBatchShader_Parse_CapturesBaseCalls()
+    {
+        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/SpriteBatchShader.sdsl")).Document!;
+        Assert.True(shader.Methods.Sum(m => m.BaseCalls.Count) > 0);
+    }
+
+    [Fact]
+    public void SpriteBatchShader_Lowering_EmitsTargetedBaseCallTodo()
+    {
+        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/SpriteBatchShader.sdsl")).Document!;
+        var result = new ShaderLowerer().LowerSdslToHlsl(shader);
+        Assert.Contains("TODO SD302", result.Hlsl);
+        Assert.Contains("base.VSMain", result.Hlsl);
+        Assert.Contains("in VSMain", result.Hlsl);
     }
 
     [Fact]
