@@ -1,3 +1,4 @@
+using System.Linq;
 using Stride.BepuPhysics;
 using Stride.Engine;
 using Stride.Core;
@@ -37,6 +38,18 @@ public class CleanGraphSmokeTests
     [Fact]
     public void EffectBytecodeSerializer_IsAvailable_InCleanProfile()
     {
+        _ = typeof(EffectBytecode).Assembly;
+        _ = typeof(EffectBytecode).FullName;
+
+        var shaderAssembly = typeof(EffectBytecode).Assembly;
+        var isShaderAssemblyLoaded = AppDomain.CurrentDomain
+            .GetAssemblies()
+            .Any(assembly => assembly == shaderAssembly);
+
+        Console.WriteLine($"EffectBytecode assembly: {shaderAssembly.FullName}");
+        Console.WriteLine($"EffectBytecode assembly location: {shaderAssembly.Location}");
+        Console.WriteLine($"EffectBytecode assembly loaded in AppDomain: {isShaderAssemblyLoaded}");
+
         var serializer = SerializerSelector.Default.GetSerializer<EffectBytecode>();
         Assert.NotNull(serializer);
     }
