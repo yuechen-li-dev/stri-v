@@ -336,7 +336,7 @@ namespace Stride.Rendering
             }
         }
 
-        private void FileModifiedEvent(object sender, FileEvent e)
+        private void FileModifiedEvent(object? sender, FileEvent e)
         {
             if (e.ChangeType == FileEventChangeType.Changed || e.ChangeType == FileEventChangeType.Renamed)
             {
