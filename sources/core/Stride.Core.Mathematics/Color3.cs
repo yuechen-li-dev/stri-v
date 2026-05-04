@@ -806,60 +806,7 @@ public struct Color3 : IEquatable<Color3>, ISpanFormattable
         b = B;
     }
 
-#if SlimDX1xInterop
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Stride.Core.Mathematics.Color3"/> to <see cref="SlimDX.Color3"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator SlimDX.Color3(Color3 value)
-    {
-        return new SlimDX.Color3(value.Red, value.Green, value.Blue);
-    }
 
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="SlimDX.Color3"/> to <see cref="Stride.Core.Mathematics.Color3"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator Color3(SlimDX.Color3 value)
-    {
-        return new Color3(value.Red, value.Green, value.Blue);
-    }
-#endif
-
-#if WPFInterop
-    /// <summary>
-    /// Performs an explicit conversion from <see cref="Stride.Core.Mathematics.Color3"/> to <see cref="System.Windows.Media.Color"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator System.Windows.Media.Color(Color3 value)
-    {
-        return new System.Windows.Media.Color()
-        {
-            A = 255,
-            R = (byte)(255f * value.Red),
-            G = (byte)(255f * value.Green),
-            B = (byte)(255f * value.Blue)
-        };
-    }
-
-    /// <summary>
-    /// Performs an explicit conversion from <see cref="System.Windows.Media.Color"/> to <see cref="Stride.Core.Mathematics.Color3"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator Color3(System.Windows.Media.Color value)
-    {
-        return new Color3()
-        {
-            Red = (float)value.R / 255f,
-            Green = (float)value.G / 255f,
-            Blue = (float)value.B / 255f
-        };
-    }
-#endif
 
 #if WinFormsInterop
     /// <summary>

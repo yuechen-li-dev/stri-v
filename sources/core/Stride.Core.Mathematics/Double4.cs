@@ -1376,47 +1376,5 @@ public struct Double4 : IEquatable<Double4>, ISpanFormattable
         w = W;
     }
 
-#if WPFInterop
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Stride.Core.Mathematics.Double4"/> to <see cref="System.Windows.Media.Media3D.Point4D"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator System.Windows.Media.Media3D.Point4D(Double4 value)
-    {
-        return new System.Windows.Media.Media3D.Point4D(value.X, value.Y, value.Z, value.W);
-    }
 
-    /// <summary>
-    /// Performs an explicit conversion from <see cref="System.Windows.Media.Media3D.Point4D"/> to <see cref="Stride.Core.Mathematics.Double4"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator Double4(System.Windows.Media.Media3D.Point4D value)
-    {
-        return new Double4((double)value.X, (double)value.Y, (double)value.Z, (double)value.W);
-    }
-#endif
-
-#if XnaInterop
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Stride.Core.Mathematics.Double4"/> to <see cref="Microsoft.Xna.Framework.Vector4"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator Microsoft.Xna.Framework.Vector4(Double4 value)
-    {
-        return new Microsoft.Xna.Framework.Vector4(value.X, value.Y, value.Z, value.W);
-    }
-
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Microsoft.Xna.Framework.Vector4"/> to <see cref="Stride.Core.Mathematics.Double4"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator Double4(Microsoft.Xna.Framework.Vector4 value)
-    {
-        return new Double4(value.X, value.Y, value.Z, value.W);
-    }
-#endif
 }

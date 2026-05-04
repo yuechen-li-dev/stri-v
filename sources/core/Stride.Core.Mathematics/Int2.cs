@@ -710,47 +710,5 @@ public struct Int2 : IEquatable<Int2>, ISpanFormattable
         y = Y;
     }
 
-#if WPFInterop
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Stride.Core.Mathematics.Int2"/> to <see cref="System.Windows.Media.Media3D.Int3D"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator System.Windows.Media.Media3D.Int3D(Int2 value)
-    {
-        return new System.Windows.Media.Media3D.Int3D(value.X, value.Y, 0.0f);
-    }
 
-    /// <summary>
-    /// Performs an explicit conversion from <see cref="System.Windows.Media.Media3D.Int3D"/> to <see cref="Stride.Core.Mathematics.Int2"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator Int2(System.Windows.Media.Media3D.Int3D value)
-    {
-        return new Int2((float)value.X, (float)value.Y);
-    }
-#endif
-
-#if XnaInterop
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Stride.Core.Mathematics.Int2"/> to <see cref="Microsoft.Xna.Framework.Int2"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator Microsoft.Xna.Framework.Int2(Int2 value)
-    {
-        return new Microsoft.Xna.Framework.Int2(value.X, value.Y);
-    }
-
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Microsoft.Xna.Framework.Int2"/> to <see cref="Stride.Core.Mathematics.Int2"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator Int2(Microsoft.Xna.Framework.Int2 value)
-    {
-        return new Int2(value.X, value.Y);
-    }
-#endif
 }
