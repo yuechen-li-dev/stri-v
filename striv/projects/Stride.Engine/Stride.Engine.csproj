@@ -18,7 +18,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.ValueTuple" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow">
+      <NoWarn>NU1510</NoWarn>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="../../../sources/engine/Stride.Engine/Shaders.Compiler/**/*.cs" />
