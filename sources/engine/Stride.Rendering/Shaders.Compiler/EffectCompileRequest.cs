@@ -30,14 +30,14 @@ namespace Stride.Shaders.Compiler
             UsedParameters = usedParameters;
         }
 
-        public bool Equals(EffectCompileRequest other)
+        public bool Equals(EffectCompileRequest? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return string.Equals(EffectName, other.EffectName) && ShaderMixinObjectId.Compute(EffectName, UsedParameters) == ShaderMixinObjectId.Compute(other.EffectName, other.UsedParameters);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

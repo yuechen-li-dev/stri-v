@@ -568,7 +568,7 @@ namespace Stride.Streaming
             }
         }
 
-        private void OnEnabledChanged(object sender, EventArgs e)
+        private void OnEnabledChanged(object? sender, EventArgs e)
         {
             if (!Enabled)
             {
