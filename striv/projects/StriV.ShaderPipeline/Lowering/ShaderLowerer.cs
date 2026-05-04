@@ -6,7 +6,7 @@ namespace StriV.ShaderPipeline.Lowering;
 
 public sealed record StreamBinding(string Type, string Name, string Semantic, int Line, int Column);
 public sealed record StreamLayout(IReadOnlyList<StreamBinding> Bindings, IReadOnlyList<Diagnostic> Diagnostics);
-public sealed record LoweringResult(string Hlsl, IReadOnlyList<Diagnostic> Diagnostics);
+public sealed record LoweringResult(string Hlsl, IReadOnlyList<Diagnostic> Diagnostics, StreamUsageAnalysisResult StreamUsage);
 public sealed record ShaderSpecialization(IReadOnlyDictionary<string, bool> BoolValues);
 public enum StreamSemanticKind { VertexInput, VertexOutput, PixelInput, PixelOutput, Interpolant, Unknown }
 public sealed record StageIoLayout(
@@ -29,7 +29,7 @@ public sealed class ShaderLowerer
         {
             if (!registry.TryAdd(s.Name, s)) diags.Add(Diagnostic.Create("SD316", $"Duplicate shader name '{s.Name}'."));
         }
-        if (!registry.TryGetValue(entryShaderName, out var shader)) return new("", diags);
+        if (!registry.TryGetValue(entryShaderName, out var shader)) return new("", diags, new StreamUsageAnalysisResult([], [], []));
 
         SdslShader? baseShader = null;
         if (shader.BaseShaders.Count > 1) diags.Add(Diagnostic.Create("SD313", $"Multiple base shaders are unsupported for '{shader.Name}'."));
@@ -44,6 +44,9 @@ public sealed class ShaderLowerer
         var mergedStreams = MergeStreams(baseShader, shader, diags);
         var genericSubstitutions = BuildGenericSubstitutions(shader, specialization, diags);
         var methods = MergeMethods(baseShader, shader, diags);
+        var stageMethods = methods.Values.Where(m => m.Name is "VSMain" or "PSMain" or "Shading").ToArray();
+        var usage = new StreamUsageAnalyzer().Analyze(stageMethods, mergedStreams.Select(s => s.Name).ToArray());
+        diags.AddRange(usage.Diagnostics);
 
         var sb = new StringBuilder();
         sb.AppendLine($"// Lowered from {shader.Name}");
@@ -89,7 +92,7 @@ public sealed class ShaderLowerer
             else if (method.Name == "PSMain") { var suffix = method.ReturnType == "float4" ? " : SV_Target" : string.Empty; sb.AppendLine($"{method.ReturnType} PSMain(StriVPSInput streams){suffix}"); sb.AppendLine("{"); foreach (var l in rewritten.Split('\n')) sb.AppendLine($"    {l.TrimEnd()}"); sb.AppendLine("}"); }
         }
 
-        return new(sb.ToString(), diags);
+        return new(sb.ToString(), diags, usage);
     }
 
     private static IReadOnlyDictionary<string, string> BuildGenericSubstitutions(SdslShader shader, ShaderSpecialization? specialization, List<Diagnostic> diags)
