@@ -26,7 +26,7 @@ public class SpriteBatchPairTests
         Assert.NotNull(result.Document);
         Assert.True(result.Document!.Shaders.Count >= 2);
 
-        var spriteBatch = Assert.Single(result.Document.Shaders.Where(s => s.Name == "SpriteBatchShader"));
+        var spriteBatch = Assert.Single(result.Document.Shaders, s => s.Name == "SpriteBatchShader");
         Assert.Contains("SpriteBase", spriteBatch.BaseShaders);
 
         var lowered = new ShaderLowerer().LowerSdslDocumentToHlsl(result.Document, "SpriteBatchShader");
@@ -37,10 +37,10 @@ public class SpriteBatchPairTests
     public void SpriteBatchPair_Parse_CapturesGenericParameter()
     {
         var result = new ShaderParser().ParseSdslDocument(ReadCombinedSpritePair());
-        var spriteBatch = Assert.Single(result.Document!.Shaders.Where(s => s.Name == "SpriteBatchShader"));
+        var spriteBatch = Assert.Single(result.Document!.Shaders, s => s.Name == "SpriteBatchShader");
 
         Assert.Equal("bool TSRgb", spriteBatch.GenericParametersText);
-        Assert.Empty(result.Diagnostics.Where(d => d.Code == "SD323"));
+        Assert.DoesNotContain(result.Diagnostics, d => d.Code == "SD323");
     }
 
     [Fact]

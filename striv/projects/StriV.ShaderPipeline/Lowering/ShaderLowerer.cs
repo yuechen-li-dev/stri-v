@@ -50,7 +50,7 @@ public sealed class ShaderLowerer
 
         var sb = new StringBuilder();
         sb.AppendLine($"// Lowered from {shader.Name}");
-        var io = BuildStageIoLayout(mergedStreams, diags);
+        var io = BuildStageIoLayout(mergedStreams, usage.Usage, diags);
         if (io.VSInput.Count > 0) EmitStageStruct(sb, "StriVVSInput", io.VSInput);
         EmitStageStruct(sb, "StriVVSOutput", io.VSOutput);
         EmitStageStruct(sb, "StriVPSInput", io.PSInput);
@@ -236,8 +236,9 @@ public sealed class ShaderLowerer
         sb.AppendLine();
     }
 
-    private static StageIoLayout BuildStageIoLayout(IReadOnlyList<SdslStream> mergedStreams, List<Diagnostic> diags)
+    private static StageIoLayout BuildStageIoLayout(IReadOnlyList<SdslStream> mergedStreams, IReadOnlyList<StreamUsage> usage, List<Diagnostic> diags)
     {
+        var usageByName = usage.ToDictionary(u => u.StreamName, StringComparer.Ordinal);
         var vsIn = new List<SdslStream>();
         var vsOut = new List<SdslStream>();
         var psIn = new List<SdslStream>();
@@ -260,9 +261,36 @@ public sealed class ShaderLowerer
                 continue;
 
             vsOut.Add(s);
-            psIn.Add(s);
+            if (ShouldIncludeInPsInput(s, kind, usageByName, diags))
+                psIn.Add(s);
         }
         return new(vsIn, vsOut, psIn, psOut);
+    }
+
+    private static bool ShouldIncludeInPsInput(SdslStream stream, StreamSemanticKind kind, IReadOnlyDictionary<string, StreamUsage> usageByName, IReadOnlyList<Diagnostic> diags)
+    {
+        if (kind is StreamSemanticKind.PixelOutput)
+            return false;
+
+        if (kind is StreamSemanticKind.Unknown)
+            return true;
+
+        if (string.Equals(stream.Semantic, "SV_Position", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (!usageByName.TryGetValue(stream.Name, out var usage))
+            return true;
+
+        var hasUncertainAccess = diags.Any(d =>
+            d.Code == "SD341" &&
+            d.Message.Contains($"'{stream.Name}'", StringComparison.Ordinal));
+        if (hasUncertainAccess)
+            return true;
+
+        if (usage.PSRead || usage.UnknownRead)
+            return true;
+
+        return false;
     }
 
     private static StreamSemanticKind ClassifySemantic(string semanticRaw)
