@@ -6,8 +6,16 @@ using System.Text.RegularExpressions;
 namespace Stride.Core.IO;
 
 /// <summary>
-/// Virtual abstraction over a file system.
-/// It handles access to files, http, packages, path rewrite, etc...
+/// Virtual abstraction over the process-wide file system graph.
+/// It owns mount-point-to-provider resolution and exposes globally shared providers used by runtime and tooling.
+/// <para>
+/// Initialization note: touching <see cref="VirtualFileSystem"/> triggers eager static construction that materializes
+/// providers using <c>PlatformFolders</c> paths. This is a hidden side effect of accessing members such as
+/// <see cref="ApplicationData"/>, <see cref="ApplicationCache"/>, or <see cref="ApplicationBinary"/>.
+/// </para>
+/// <para>
+/// Future refactors should preserve mount semantics while making startup ownership explicit (instead of implicit static initialization).
+/// </para>
 /// </summary>
 public static partial class VirtualFileSystem
 {
@@ -34,6 +42,8 @@ public static partial class VirtualFileSystem
 
     /// <summary>
     /// The application database file provider (ObjectId level).
+    /// This provider is intentionally assigned by higher-level initialization code.
+    /// Leaving it null/default creates a latent failure point for callers expecting object-database access.
     /// </summary>
     public static IVirtualFileProvider ApplicationObjectDatabase;
 
@@ -77,6 +87,8 @@ public static partial class VirtualFileSystem
     /// </summary>
     static VirtualFileSystem()
     {
+        // Static initialization is intentionally eager today.
+        // Any first access to this type toggles PlatformFolders state and binds OS-specific directories.
         PlatformFolders.IsVirtualFileSystemInitialized = true;
         // TODO: find a better solution to customize the ApplicationDataDirectory, now we're very limited due to the initialization from a static constructor
 #if STRIDE_PLATFORM_ANDROID
