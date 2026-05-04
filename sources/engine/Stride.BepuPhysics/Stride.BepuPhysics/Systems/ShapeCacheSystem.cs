@@ -336,7 +336,7 @@ internal class ShapeCacheSystem : IDisposable, IService
     /// </remarks>
     public record Cache(Model TargetModel, ShapeCacheSystem CacheSystem)
     {
-#warning consider splitting buffer and bepu cache into individual caches instead of grouped like here, otherwise buffers will be kept in memory when hit once by the navmesh and held through mesh physics
+// TODO(striv-m6g): consider splitting buffer and bepu cache into individual caches instead of grouped like here, otherwise buffers will be kept in memory when hit once by the navmesh and held through mesh physics
         (VertexPosition3[] Vertices, int[] Indices)? _buffers;
         Mesh? _bepuMesh;
         public Mesh GetBepuMesh(Vector3 scale)

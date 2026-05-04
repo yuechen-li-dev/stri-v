@@ -23,7 +23,7 @@ internal unsafe struct SpanManifoldCollector(OverlapInfoStack* Ptr, int Length, 
         if (Head >= Length)
             return;
 
-#warning should short circuit the whole overlap test in the caller as soon as head is filled
+// TODO(striv-m6g): should short circuit the whole overlap test in the caller as soon as head is filled
         CollidableComponent? collidable = null;
         for (int i = 0; i < manifold.Count; ++i)
         {
@@ -48,7 +48,7 @@ internal unsafe struct SpanCollidableCollector(CollidableStack* Ptr, int Length,
         if (Head >= Length)
             return;
 
-#warning should short circuit the whole overlap test in the caller as soon as head is filled
+// TODO(striv-m6g): should short circuit the whole overlap test in the caller as soon as head is filled
         for (int i = 0; i < manifold.Count; ++i)
         {
             if (manifold.GetDepth(i) < 0)

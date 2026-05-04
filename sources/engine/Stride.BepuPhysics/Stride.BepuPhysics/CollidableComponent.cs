@@ -251,7 +251,7 @@ public abstract class CollidableComponent : EntityComponent
 
     internal void TryUpdateFeatures()
     {
-        #warning Norbo: Some of the callsites for this method may not require a full reconstruction of the body ? Something we should validate
+        // TODO(striv-m6g): Norbo: Some of the callsites for this method may not require a full reconstruction of the body ? Something we should validate
         if (Simulation is not null)
             ReAttach(Simulation);
         else if (Processor is not null) // We may have to fall back to this when 'Collider.TryAttach' failed previously; when this collidable didn't have any collider before
@@ -335,7 +335,7 @@ public abstract class CollidableComponent : EntityComponent
         mat.Layer = CollisionLayer;
         mat.CollisionGroup = CollisionGroup;
 
-#warning this is still kind of a mess, what should we do here ?
+// TODO(striv-m6g): this is still kind of a mess, what should we do here ?
         mat.Gravity = this is BodyComponent body && body.Gravity;
     }
 
