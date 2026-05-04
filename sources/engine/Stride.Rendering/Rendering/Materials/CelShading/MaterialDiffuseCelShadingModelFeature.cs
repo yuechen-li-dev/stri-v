@@ -45,7 +45,7 @@ namespace Stride.Rendering.Materials
             shaderBuilder.LightDependentSurface = shaderSource;
         }
 
-        public bool Equals(MaterialDiffuseCelShadingModelFeature other)
+        public bool Equals(MaterialDiffuseCelShadingModelFeature? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;

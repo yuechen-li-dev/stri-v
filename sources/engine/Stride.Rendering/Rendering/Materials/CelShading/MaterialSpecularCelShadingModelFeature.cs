@@ -42,7 +42,7 @@ namespace Stride.Rendering.Materials
             }
         }
 
-        public bool Equals(MaterialSpecularCelShadingModelFeature other)
+        public bool Equals(MaterialSpecularCelShadingModelFeature? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;

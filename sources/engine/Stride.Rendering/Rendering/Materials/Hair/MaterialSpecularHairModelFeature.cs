@@ -333,7 +333,7 @@ namespace Stride.Rendering.Materials
             return Equals((MaterialSpecularHairModelFeature)obj);
         }
 
-        public bool Equals(MaterialSpecularHairModelFeature other)
+        public bool Equals(MaterialSpecularHairModelFeature? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;

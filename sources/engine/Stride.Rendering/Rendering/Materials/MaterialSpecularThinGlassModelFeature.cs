@@ -84,6 +84,6 @@ namespace Stride.Rendering.Materials
             context.AddShaderSource(stage, new ShaderClassSource("MaterialSurfaceTransmittanceShading"));
         }
 
-        public bool Equals(MaterialSpecularThinGlassModelFeature other) => base.Equals(other);
+        public bool Equals(MaterialSpecularThinGlassModelFeature? other) => base.Equals(other);
     }
 }
