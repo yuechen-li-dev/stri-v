@@ -58,7 +58,7 @@ public class BodyComponent : CollidableComponent
             _kinematic = value;
             if (BodyReference is { } bRef)
             {
-#warning Norbo: maybe setting bRef.LocalInertia is enough instead of getting and applying description ... ?
+// TODO(striv-m6g): Norbo: maybe setting bRef.LocalInertia is enough instead of getting and applying description ... ?
                 bRef.GetDescription(out var description);
                 description.LocalInertia = Kinematic ? new BodyInertia() : _nativeInertia;
                 bRef.ApplyDescription(description);
@@ -140,7 +140,7 @@ public class BodyComponent : CollidableComponent
             _sleepThreshold = value;
             if (BodyReference is { } bRef)
             {
-#warning Norbo: maybe setting bRef.Activity.SleepThreshold is enough instead of getting and applying description ... ?
+// TODO(striv-m6g): Norbo: maybe setting bRef.Activity.SleepThreshold is enough instead of getting and applying description ... ?
                 bRef.GetDescription(out var description);
                 description.Activity.SleepThreshold = value;
                 bRef.ApplyDescription(description);
@@ -164,7 +164,7 @@ public class BodyComponent : CollidableComponent
             _minimumTimestepCountUnderThreshold = value;
             if (BodyReference is { } bRef)
             {
-#warning Norbo: maybe setting bRef.Activity.MinimumTimestepsUnderThreshold is enough instead of getting and applying description ... ?
+// TODO(striv-m6g): Norbo: maybe setting bRef.Activity.MinimumTimestepsUnderThreshold is enough instead of getting and applying description ... ?
                 bRef.GetDescription(out var description);
                 description.Activity.MinimumTimestepCountUnderThreshold = value;
                 bRef.ApplyDescription(description);
@@ -447,7 +447,7 @@ public class BodyComponent : CollidableComponent
 
         if (BodyReference is { } bRef)
         {
-#warning Norbo: maybe setting bRef.Velocity is enough instead of getting and applying description ... ?
+// TODO(striv-m6g): Norbo: maybe setting bRef.Velocity is enough instead of getting and applying description ... ?
             bRef.GetDescription(out var previousDesc);
             bDescription.Velocity = previousDesc.Velocity; //Keep velocity when updating
             bRef.ApplyDescription(bDescription);

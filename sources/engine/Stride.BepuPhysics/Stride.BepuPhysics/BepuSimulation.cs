@@ -49,7 +49,6 @@ public sealed class BepuSimulation : IDisposable
     private TimeSpan _softStartRemainingDuration;
     private bool _softStartScheduled = false;
     private UrlReference<Scene>? _associatedScene = null;
-    private Scheduler? _scheduler;
     private AwaitRunner _preTickRunner = new();
     private AwaitRunner _postTickRunner = new();
 
@@ -294,7 +293,7 @@ public sealed class BepuSimulation : IDisposable
     {
         var targetThreadCount = ThreadCount > -1 ? ThreadCount : Math.Max(1, Environment.ProcessorCount > 4 ? Environment.ProcessorCount - 2 : Environment.ProcessorCount - 1);
 
-        #warning Consider wrapping stride's threadpool/dispatcher into an IThreadDispatcher and passing that over to bepu instead of using their dispatcher
+        // TODO(striv-m6g): Consider wrapping stride's threadpool/dispatcher into an IThreadDispatcher and passing that over to bepu instead of using their dispatcher
         _threadDispatcher = new ThreadDispatcher(targetThreadCount);
         BufferPool = new BufferPool();
         ContactEvents = new ContactEventsManager(BufferPool, this, targetThreadCount);

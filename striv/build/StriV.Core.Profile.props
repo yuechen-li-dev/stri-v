@@ -8,4 +8,10 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <DefineConstants>$(DefineConstants);STRIDE_PLATFORM_LINUX;STRIDE_PLATFORM_DESKTOP;STRIDE_UI_SDL;STRIDE_GRAPHICS_API_VULKAN;STRIDE_ENGINE_WITHOUT_SHADER_COMPILER;STRIDE_ENGINE_WITHOUT_AUDIO;STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup>
+    <!-- Focused warning lane: hide warning noise from inactive projects only when a focus project is explicitly requested. -->
+    <StriVSuppressInactiveProjectWarnings Condition="'$(StriVSuppressInactiveProjectWarnings)' == '' and '$(StriVWarningFocusProject)' != ''">true</StriVSuppressInactiveProjectWarnings>
+    <StriVIsFocusedWarningProject Condition="'$(StriVWarningFocusProject)' != '' and '$(MSBuildProjectName)' == '$(StriVWarningFocusProject)'">true</StriVIsFocusedWarningProject>
+    <WarningLevel Condition="'$(StriVSuppressInactiveProjectWarnings)' == 'true' and '$(StriVIsFocusedWarningProject)' != 'true'">0</WarningLevel>
+  </PropertyGroup>
 </Project>
