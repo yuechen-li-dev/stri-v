@@ -235,7 +235,7 @@ namespace FreeImageAPI
 		/// </summary>
 		/// <param name="array">The array to convert.</param>
 		/// <returns>An array of <see cref="RGBQUAD"/>.</returns>
-		public static RGBQUAD[] ToRGBQUAD(Color[] array)
+		public static RGBQUAD[]? ToRGBQUAD(Color[]? array)
 		{
 			if (array == null)
 				return null;
@@ -254,7 +254,7 @@ namespace FreeImageAPI
 		/// </summary>
 		/// <param name="array">The array to convert.</param>
 		/// <returns>An array of <see cref="RGBQUAD"/>.</returns>
-		public static Color[] ToColor(RGBQUAD[] array)
+		public static Color[]? ToColor(RGBQUAD[]? array)
 		{
 			if (array == null)
 				return null;
