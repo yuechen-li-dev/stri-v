@@ -82,7 +82,7 @@ namespace Stride.Rendering.Materials
             shaderBuilder.ShaderSources.Add(new ShaderClassSource("MaterialSurfaceEmissiveShading", UseAlpha));
         }
 
-        public bool Equals(IMaterialShadingModelFeature other)
+        public bool Equals(IMaterialShadingModelFeature? other)
         {
             return other is MaterialEmissiveMapFeature;
         }

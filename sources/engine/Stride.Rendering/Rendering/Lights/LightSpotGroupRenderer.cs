@@ -291,7 +291,7 @@ namespace Stride.Rendering.Lights
                 return shadowRenderersAreEqual && shadowTypesAreEqual && textureProjectionRenderersAreEqual;
             }
 
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
             {
                 if (ReferenceEquals(null, obj)) return false;
                 return obj is LightGroupKey && Equals((LightGroupKey)obj);
@@ -328,7 +328,7 @@ namespace Stride.Rendering.Lights
                 return SpotLightParameters.Equals(other.SpotLightParameters);
             }
 
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
             {
                 if (ReferenceEquals(null, obj)) return false;
                 return obj is TextureProjectionRendererKey && Equals((TextureProjectionRendererKey)obj);

@@ -52,12 +52,12 @@ namespace Stride.Rendering.Materials
             return IsEnergyConservative.Equals(other.IsEnergyConservative);
         }
 
-        public bool Equals(IMaterialShadingModelFeature other)
+        public bool Equals(IMaterialShadingModelFeature? other)
         {
             return Equals(other as MaterialDiffuseCelShadingModelFeature);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

@@ -141,12 +141,12 @@ namespace Stride.Rendering.Materials
             return IsEnergyConservative == other.IsEnergyConservative && ShadingModel == other.ShadingModel && HairDirectionFunction.Equals(other.HairDirectionFunction) && HairShadowingFunction.Equals(other.HairShadowingFunction) && LightAttenuationFunction.Equals(other.LightAttenuationFunction) && AlphaThreshold.Equals(other.AlphaThreshold);
         }
 
-        public bool Equals(IMaterialShadingModelFeature other)
+        public bool Equals(IMaterialShadingModelFeature? other)
         {
             return Equals(other as MaterialDiffuseHairModelFeature);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

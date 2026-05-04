@@ -48,7 +48,7 @@ namespace Stride.Rendering.Lights
             return Key.Equals(other.Key) && Value.Equals(other.Value);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             return obj is LightShaderGroupEntry<T> && Equals((LightShaderGroupEntry<T>)obj);
@@ -275,7 +275,7 @@ namespace Stride.Rendering.Lights
                 return shadowRenderersAreEqual && shadowTypesAreEqual;
             }
 
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
             {
                 if (ReferenceEquals(null, obj)) return false;
                 return obj is LightGroupKey && Equals((LightGroupKey)obj);

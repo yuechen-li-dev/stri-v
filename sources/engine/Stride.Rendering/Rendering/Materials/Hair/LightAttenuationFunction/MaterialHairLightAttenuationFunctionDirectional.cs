@@ -75,7 +75,7 @@ namespace Stride.Rendering.Materials
             return new ShaderClassSource("MaterialHairLightAttenuationFunctionDirectional", (int)SelectedNormalMode, uniqueHardnessReciprocalKey, uniqueBoundaryShiftKey);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

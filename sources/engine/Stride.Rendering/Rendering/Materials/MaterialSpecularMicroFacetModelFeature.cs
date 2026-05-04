@@ -77,7 +77,7 @@ namespace Stride.Rendering.Materials
             }
         }
 
-        public bool Equals(IMaterialShadingModelFeature other)
+        public bool Equals(IMaterialShadingModelFeature? other)
         {
             return Equals((object)other);
         }
@@ -89,7 +89,7 @@ namespace Stride.Rendering.Materials
             return Equals(Fresnel, other.Fresnel) && Equals(Visibility, other.Visibility) && Equals(NormalDistribution, other.NormalDistribution) && Equals(Environment, other.Environment);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
