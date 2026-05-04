@@ -15,5 +15,11 @@
   <ItemGroup>
     <ProjectReference Include="../Stride.Games/Stride.Games.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Stri-V Core excludes editor/Game Studio presentation shaders from clean runtime rendering. -->
+    <Compile Remove="../../../sources/engine/Stride.Rendering/Rendering/Editor/**/*.cs" />
+    <!-- Stri-V Core is desktop Vulkan-first and currently excludes VR-specific shader key plumbing. -->
+    <Compile Remove="../../../sources/engine/Stride.Rendering/Rendering/Shaders/GlobalVR.sdsl.cs" />
+  </ItemGroup>
   <Import Project="../../build/StriV.AssemblyProcessor.targets" />
 </Project>
