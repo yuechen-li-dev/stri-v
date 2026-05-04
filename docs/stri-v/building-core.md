@@ -188,6 +188,22 @@ Both scripts also forward additional arguments to the M1c `dotnet build` invocat
     - `StrideAssemblyProcessorBasePath=<absolute path with trailing slash>`
     - `StrideAssemblyProcessorHash=sourcebuild`
 
+## Optional DXC shader backend validation
+
+`StriV.ShaderPipeline` tests can optionally compile lowered HLSL with DXC when `dxc`
+is available on PATH. DXC is not required for normal clean graph builds/tests.
+
+Probe:
+
+```bash
+./striv/build/striv-probe-dxc.sh
+```
+
+When DXC is unavailable, shader backend compile-smoke tests skip/early-return and the
+test suite remains green. To enable SPIR-V validation, install DXC from a trusted source
+such as the official Microsoft DirectXShaderCompiler releases or a Vulkan SDK-provided
+toolchain, then ensure `dxc` is on PATH.
+
 ## Current limitations
 
 - M1a is foundational core only, not a full engine build.
