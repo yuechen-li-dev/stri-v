@@ -10,13 +10,25 @@ using Stride.Engine.Design;
 
 namespace Stride.BepuPhysics.Constraints;
 
+/// <summary>
+/// Drives relative angular velocity between two bodies.
+/// </summary>
+/// <remarks>
+/// The target velocity is defined in body A local space, matching Bepu's <see cref="AngularMotor"/> description contract.
+/// </remarks>
 [DataContract("AngularMotorConstraint")]
 [DefaultEntityComponentProcessor(typeof(ConstraintProcessor), ExecutionMode = ExecutionMode.Runtime)]
 [ComponentCategory("Physics - Bepu Constraint")]
 public sealed class AngularMotorConstraintComponent : TwoBodyConstraintComponent<AngularMotor>, IMotor
 {
+    /// <summary>
+    /// Initializes default motor settings with finite force and damping.
+    /// </summary>
     public AngularMotorConstraintComponent() => BepuConstraint = new() { Settings = new MotorSettings(1000, 10) };
 
+    /// <summary>
+    /// Relative angular velocity target expressed in body A local coordinates.
+    /// </summary>
     public Vector3 TargetVelocityLocalA
     {
         get

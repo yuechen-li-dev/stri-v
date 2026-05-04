@@ -9,6 +9,7 @@ namespace Stride.BepuPhysics.Constraints;
 
 public abstract class ConstraintComponent<T> : ConstraintComponentBase where T : unmanaged, IConstraintDescription<T>
 {
+    // Serialized/editor state writes into this description. Runtime attachment uses this value as the source of truth.
     internal T BepuConstraint;
     private readonly List<BodyComponent> _attachedBodies = new();
     private ConstraintHandle _cHandle = new(-1);
@@ -54,11 +55,14 @@ public abstract class ConstraintComponent<T> : ConstraintComponentBase where T :
             _attachedBodies.Add(component);
         }
 
+        // Constraints are rebuilt from current component references, rather than patched incrementally.
+        // This keeps ownership simple for future nullability and warning-cleanup passes.
         TryReattachConstraint();
     }
 
     internal override ConstraintState TryReattachConstraint()
     {
+        // Always clear any previous runtime handle first so this method is idempotent and safe to call repeatedly.
         DetachConstraint();
 
         if (_bepuConfig is null)
@@ -101,6 +105,7 @@ public abstract class ConstraintComponent<T> : ConstraintComponentBase where T :
 
         Span<BodyHandle> validBodies = bodies[..count];
 
+        // Runtime handle creation is owned by constraint components, but only after all body handles are resolved.
         _cHandle = _bepuSimulation.Simulation.Solver.Add(validBodies, BepuConstraint);
 
         return ConstraintState.FullyOperational;
@@ -120,6 +125,7 @@ public abstract class ConstraintComponent<T> : ConstraintComponentBase where T :
 
     internal void TryUpdateDescription()
     {
+        // Live updates are best-effort. Before activation or after detachment we intentionally keep only component state.
         if (_bepuSimulation != null && _cHandle.Value != -1 && _bepuSimulation.Simulation.Solver.ConstraintExists(_cHandle))
         {
             _bepuSimulation.Simulation.Solver.ApplyDescription(_cHandle, BepuConstraint);

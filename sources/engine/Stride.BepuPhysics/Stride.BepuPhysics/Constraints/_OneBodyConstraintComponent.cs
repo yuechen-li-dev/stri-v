@@ -5,8 +5,14 @@ using BepuPhysics.Constraints;
 
 namespace Stride.BepuPhysics.Constraints;
 
+/// <summary>
+/// Base component for constraints that bind a single body.
+/// </summary>
 public abstract class OneBodyConstraintComponent<T> : ConstraintComponent<T>, IOneBody where T : unmanaged, IConstraintDescription<T>, IOneBodyConstraintDescription<T>
 {
+    /// <summary>
+    /// Constrained body.
+    /// </summary>
     public BodyComponent? A
     {
         get => this[0];
