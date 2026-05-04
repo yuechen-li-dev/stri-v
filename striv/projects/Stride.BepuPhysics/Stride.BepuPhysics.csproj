@@ -8,6 +8,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../..//sources/engine/Stride.BepuPhysics/Stride.BepuPhysics/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <!-- M6c 5S Sort quarantine: editor/debug gizmo visualization helpers are non-core runtime paths. -->
+    <Compile Remove="../../../sources/engine/Stride.BepuPhysics/Stride.BepuPhysics/Systems/CollidableGizmo.cs" />
+    <Compile Remove="../../../sources/engine/Stride.BepuPhysics/Stride.BepuPhysics/Systems/ConstraintGizmo.cs" />
     <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
       <Link>Properties/SharedAssemblyInfo.cs</Link>
     </Compile>
