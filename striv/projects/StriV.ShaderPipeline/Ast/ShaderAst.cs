@@ -10,9 +10,12 @@ public sealed record SdslDocument(
     IReadOnlyList<SdslShader> Shaders,
     IReadOnlyList<Diagnostic> Diagnostics);
 
+public sealed record ShaderGenericParameter(string TypeText, string Name, SourceSpan Span);
+
 public sealed record SdslShader(
     string Name,
     string? GenericParametersText,
+    IReadOnlyList<ShaderGenericParameter> GenericParameters,
     IReadOnlyList<string> BaseShaders,
     IReadOnlyList<SdslStream> Streams,
     IReadOnlyList<SdslStageMethod> Methods,

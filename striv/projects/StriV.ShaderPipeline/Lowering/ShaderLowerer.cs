@@ -7,14 +7,15 @@ namespace StriV.ShaderPipeline.Lowering;
 public sealed record StreamBinding(string Type, string Name, string Semantic, int Line, int Column);
 public sealed record StreamLayout(IReadOnlyList<StreamBinding> Bindings, IReadOnlyList<Diagnostic> Diagnostics);
 public sealed record LoweringResult(string Hlsl, IReadOnlyList<Diagnostic> Diagnostics);
+public sealed record ShaderSpecialization(IReadOnlyDictionary<string, bool> BoolValues);
 
 public sealed class ShaderLowerer
 {
     public string EmitHlsl(HlslDocument document) => document.Source;
 
-    public LoweringResult LowerSdslToHlsl(SdslShader shader) => LowerSdslDocumentToHlsl(new SdslDocument([shader], []), shader.Name);
+    public LoweringResult LowerSdslToHlsl(SdslShader shader, ShaderSpecialization? specialization = null) => LowerSdslDocumentToHlsl(new SdslDocument([shader], []), shader.Name, specialization);
 
-    public LoweringResult LowerSdslDocumentToHlsl(SdslDocument doc, string entryShaderName)
+    public LoweringResult LowerSdslDocumentToHlsl(SdslDocument doc, string entryShaderName, ShaderSpecialization? specialization = null)
     {
         var diags = new List<Diagnostic>(doc.Diagnostics);
         var registry = new Dictionary<string, SdslShader>(StringComparer.Ordinal);
@@ -35,6 +36,7 @@ public sealed class ShaderLowerer
         }
 
         var mergedStreams = MergeStreams(baseShader, shader, diags);
+        var genericSubstitutions = BuildGenericSubstitutions(shader, specialization, diags);
         var methods = MergeMethods(baseShader, shader, diags);
 
         var sb = new StringBuilder();
@@ -58,11 +60,96 @@ public sealed class ShaderLowerer
         foreach (var method in methods.Values)
         {
             var rewritten = RewriteBaseCalls(method, baseShader, methods, diags);
+            rewritten = SubstituteIdentifiers(rewritten, genericSubstitutions);
             if (method.Name == "VSMain") { sb.AppendLine("StriVStageStreams VSMain()"); sb.AppendLine("{"); sb.AppendLine("    StriVStageStreams streams;"); foreach (var l in rewritten.Split('\n')) sb.AppendLine($"    {l.TrimEnd()}"); sb.AppendLine("    return streams;"); sb.AppendLine("}"); }
             else if (method.Name == "PSMain") { var suffix = method.ReturnType == "float4" ? " : SV_Target" : string.Empty; sb.AppendLine($"{method.ReturnType} PSMain(StriVStageStreams streams){suffix}"); sb.AppendLine("{"); foreach (var l in rewritten.Split('\n')) sb.AppendLine($"    {l.TrimEnd()}"); sb.AppendLine("}"); }
         }
 
         return new(sb.ToString(), diags);
+    }
+
+    private static IReadOnlyDictionary<string, string> BuildGenericSubstitutions(SdslShader shader, ShaderSpecialization? specialization, List<Diagnostic> diags)
+    {
+        var values = specialization?.BoolValues ?? new Dictionary<string, bool>(StringComparer.Ordinal);
+        var supported = new Dictionary<string, string>(StringComparer.Ordinal);
+        var known = shader.GenericParameters.Select(p => p.Name).ToHashSet(StringComparer.Ordinal);
+
+        foreach (var pair in values)
+        {
+            if (!known.Contains(pair.Key))
+                diags.Add(Diagnostic.Create("SD322", $"Specialization provided for unknown generic parameter '{pair.Key}'."));
+        }
+
+        foreach (var p in shader.GenericParameters)
+        {
+            if (!string.Equals(p.TypeText, "bool", StringComparison.Ordinal))
+            {
+                diags.Add(Diagnostic.Create("SD321", $"Unsupported generic parameter type '{p.TypeText}' for '{p.Name}'.", p.Span.Line, p.Span.Column));
+                continue;
+            }
+
+            if (!values.TryGetValue(p.Name, out var v))
+            {
+                diags.Add(Diagnostic.Create("SD320", $"Missing specialization value for generic parameter '{p.Name}'.", p.Span.Line, p.Span.Column));
+                continue;
+            }
+
+            supported[p.Name] = v ? "true" : "false";
+        }
+
+        return supported;
+    }
+
+    public static string SubstituteIdentifiers(string text, IReadOnlyDictionary<string, string> substitutions)
+    {
+        if (substitutions.Count == 0 || string.IsNullOrEmpty(text)) return text;
+        var sb = new StringBuilder(text.Length);
+        var i = 0;
+        while (i < text.Length)
+        {
+            var c = text[i];
+            if (c == '"')
+            {
+                var start = i++;
+                while (i < text.Length)
+                {
+                    if (text[i] == '\\') { i += 2; continue; }
+                    if (text[i] == '"') { i++; break; }
+                    i++;
+                }
+                sb.Append(text.AsSpan(start, i - start));
+                continue;
+            }
+            if (c == '/' && i + 1 < text.Length && text[i + 1] == '/')
+            {
+                var start = i;
+                i += 2;
+                while (i < text.Length && text[i] != '\n') i++;
+                sb.Append(text.AsSpan(start, i - start));
+                continue;
+            }
+            if (c == '/' && i + 1 < text.Length && text[i + 1] == '*')
+            {
+                var start = i; i += 2;
+                while (i + 1 < text.Length && !(text[i] == '*' && text[i + 1] == '/')) i++;
+                if (i + 1 < text.Length) i += 2;
+                sb.Append(text.AsSpan(start, i - start));
+                continue;
+            }
+
+            if (char.IsLetter(c) || c == '_')
+            {
+                var start = i++;
+                while (i < text.Length && (char.IsLetterOrDigit(text[i]) || text[i] == '_')) i++;
+                var ident = text[start..i];
+                if (substitutions.TryGetValue(ident, out var repl)) sb.Append(repl);
+                else sb.Append(ident);
+                continue;
+            }
+            sb.Append(c);
+            i++;
+        }
+        return sb.ToString();
     }
 
     private static string RewriteBaseCalls(SdslStageMethod method, SdslShader? baseShader, Dictionary<string,SdslStageMethod> methods, List<Diagnostic> diags)

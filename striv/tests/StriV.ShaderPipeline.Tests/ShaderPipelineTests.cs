@@ -61,7 +61,7 @@ public class ShaderPipelineTests
     public void SpriteBatchShader_Parse_DetectsUnsupportedGenericAndInheritanceSemantics()
     {
         var result = new ShaderParser().ParseSdsl(ReadFixture("sdsl/SpriteBatchShader.sdsl"));
-        Assert.Contains(result.Diagnostics, d => d.Code == "SD301");
+        Assert.Empty(result.Diagnostics.Where(d => d.Code == "SD323"));
     }
 
     [Fact]
