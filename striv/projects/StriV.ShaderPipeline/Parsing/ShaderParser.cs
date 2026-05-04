@@ -23,40 +23,60 @@ public sealed class ShaderParser
 
     public ParseResult<SdslShader> ParseSdsl(string source)
     {
+        var doc = ParseSdslDocument(source);
+        return doc.Document is null || doc.Document.Shaders.Count == 0
+            ? new(null, doc.Diagnostics)
+            : new(doc.Document.Shaders[0], doc.Diagnostics);
+    }
+
+    public ParseResult<SdslDocument> ParseSdslDocument(string source)
+    {
         var diags = new List<Diagnostic>();
-        var header = Regex.Match(source, @"shader\s+([A-Za-z_]\w*)(\s*<([^>]+)>)?(\s*:\s*([^\{\r\n]+))?");
-        if (!header.Success) return new(null, [Diagnostic.Create("SD000", "Missing shader header")]);
-        var name = header.Groups[1].Value;
-        var genericParametersText = header.Groups[3].Success ? header.Groups[3].Value.Trim() : null;
-        var baseShaders = header.Groups[5].Success
-            ? header.Groups[5].Value.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList()
-            : new List<string>();
+        var shaders = new List<SdslShader>();
 
-        if (!string.IsNullOrWhiteSpace(genericParametersText))
-            diags.Add(Diagnostic.Create("SD301", "Generic parameters parsed but specialization is not implemented.", GetSpan(source, header.Groups[3].Index).Line, GetSpan(source, header.Groups[3].Index).Column));
-        if (baseShaders.Count > 0)
-            diags.Add(Diagnostic.Create("SD300", "Shader inheritance parsed but mixin merge is not implemented.", GetSpan(source, header.Groups[5].Index).Line, GetSpan(source, header.Groups[5].Index).Column));
-
-        var streams = new List<SdslStream>();
-        var streamRegex = new Regex(@"stage\s+stream\s+([^\s]+)\s+([A-Za-z_]\w*)\s*:\s*([A-Za-z_]\w*)\s*;", RegexOptions.Multiline);
-        foreach (Match m in streamRegex.Matches(source))
+        var shaderHeader = new Regex(@"shader\s+([A-Za-z_]\w*)(\s*<([^>]+)>)?(\s*:\s*([^\{\r\n]+))?\s*\{", RegexOptions.Multiline);
+        var matches = shaderHeader.Matches(source);
+        foreach (Match header in matches)
         {
-            var span = GetSpan(source, m.Index);
-            streams.Add(new(m.Groups[1].Value, m.Groups[2].Value, m.Groups[3].Value, span));
+            var name = header.Groups[1].Value;
+            var genericParametersText = header.Groups[3].Success ? header.Groups[3].Value.Trim() : null;
+            var baseShaders = header.Groups[5].Success
+                ? header.Groups[5].Value.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList()
+                : new List<string>();
+
+            var block = ReadBalancedBlock(source, header.Index + header.Length - 1, out _);
+            var bodySource = block[1..^1];
+
+            if (!string.IsNullOrWhiteSpace(genericParametersText))
+                diags.Add(Diagnostic.Create("SD301", "Generic parameters parsed but specialization is not implemented.", GetSpan(source, header.Groups[3].Index).Line, GetSpan(source, header.Groups[3].Index).Column));
+
+            var streams = new List<SdslStream>();
+            var streamRegex = new Regex(@"stage\s+stream\s+([^\s]+)\s+([A-Za-z_]\w*)\s*:\s*([A-Za-z_]\w*)\s*;", RegexOptions.Multiline);
+            foreach (Match m in streamRegex.Matches(bodySource))
+            {
+                var span = GetSpan(source, header.Index + m.Index);
+                streams.Add(new(m.Groups[1].Value, m.Groups[2].Value, m.Groups[3].Value, span));
+            }
+
+            var methods = new List<SdslStageMethod>();
+            var methodRegex = new Regex(@"(stage\s+(override\s+)?)\s*([^\s]+)\s+([A-Za-z_]\w*)\s*\(([^\)]*)\)\s*\{", RegexOptions.Multiline);
+            foreach (Match m in methodRegex.Matches(bodySource))
+            {
+                var body = ReadBalancedBlock(bodySource, m.Index + m.Length - 1, out _);
+                var span = GetSpan(source, header.Index + m.Index);
+                var bodyText = body[1..^1].Trim();
+                var baseCalls = BaseCallScanner.Scan(bodyText, new SourceSpan(0, 0, span.Line, span.Column));
+                var mods = m.Groups[2].Success ? new[] { "stage", "override" } : new[] { "stage" };
+                methods.Add(new(m.Groups[3].Value, m.Groups[4].Value, m.Groups[5].Value, bodyText, baseCalls, mods, span));
+            }
+
+            shaders.Add(new(name, genericParametersText, baseShaders, streams, methods, new[] { "shader" }));
         }
 
-        var methods = new List<SdslStageMethod>();
-        var methodRegex = new Regex(@"(stage\s+override)\s+([^\s]+)\s+([A-Za-z_]\w*)\s*\(([^\)]*)\)\s*\{", RegexOptions.Multiline);
-        foreach (Match m in methodRegex.Matches(source))
-        {
-            var body = ReadBalancedBlock(source, m.Index + m.Length - 1, out _);
-            var span = GetSpan(source, m.Index);
-            var bodyText = body[1..^1].Trim();
-            var baseCalls = BaseCallScanner.Scan(bodyText, span);
-            methods.Add(new(m.Groups[2].Value, m.Groups[3].Value, m.Groups[4].Value, bodyText, baseCalls, new[] { "stage", "override" }, span));
-        }
+        if (shaders.Count == 0)
+            diags.Add(Diagnostic.Create("SD000", "Missing shader header"));
 
-        return new(new(name, genericParametersText, baseShaders, streams, methods, new[] { "shader" }), diags);
+        return new(new SdslDocument(shaders, diags), diags);
     }
 
     private static SourceSpan GetSpan(string source, int index)

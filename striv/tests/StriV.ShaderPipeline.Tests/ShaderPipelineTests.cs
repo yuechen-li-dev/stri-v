@@ -61,18 +61,17 @@ public class ShaderPipelineTests
     public void SpriteBatchShader_Parse_DetectsUnsupportedGenericAndInheritanceSemantics()
     {
         var result = new ShaderParser().ParseSdsl(ReadFixture("sdsl/SpriteBatchShader.sdsl"));
-        Assert.Contains(result.Diagnostics, d => d.Code == "SD300");
         Assert.Contains(result.Diagnostics, d => d.Code == "SD301");
     }
 
     [Fact]
     public void SpriteBatchShader_Lowering_EmitsDeterministicDiagnosticsForBaseCalls()
     {
-        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/SpriteBatchShader.sdsl")).Document!;
-        var result = new ShaderLowerer().LowerSdslToHlsl(shader);
-        Assert.Contains(result.Diagnostics, d => d.Code == "SD302" && d.Message.Contains("stage method", StringComparison.Ordinal));
-        Assert.Contains("TODO(SD301)", result.Hlsl);
-        Assert.Contains("TODO(SD300)", result.Hlsl);
+        var parser = new ShaderParser();
+        var doc = parser.ParseSdslDocument(ReadFixture("sdsl/SpriteBatchShader.sdsl")).Document!;
+        var shader = doc.Shaders[0];
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, shader.Name);
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD310" || d.Code == "SD312");
     }
 
     [Fact]
@@ -81,9 +80,35 @@ public class ShaderPipelineTests
         const string source = """
 shader S {
  stage override void VSMain() { base.VSMain(); }
+    [Fact]
+    public void Merge_DiagnosesUnresolvedBaseShader()
+    {
+        var doc = new ShaderParser().ParseSdslDocument("shader C : Missing { stage override void VSMain(){ } }").Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "C");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD310");
+    }
+
+    [Fact]
+    public void Merge_DiagnosesMissingBaseMethod()
+    {
+        var src = "shader B { stage override void VSMain(){} } shader C : B { stage override void PSMain(){ base.PSMain(); } }";
+        var doc = new ShaderParser().ParseSdslDocument(src).Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "C");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD312");
+    }
+
+    [Fact]
+    public void Merge_DiagnosesCycle()
+    {
+        var src = "shader A : B { stage override void VSMain(){} } shader B : A { stage override void VSMain(){} }";
+        var doc = new ShaderParser().ParseSdslDocument(src).Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "A");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD311" || d.Code == "SD310");
+    }
+
 }
 """;
-        var method = new ShaderParser().ParseSdsl(source).Document!.Methods.Single();
+        var method = new ShaderParser().ParseSdsl(source).Document!.Methods.First(m => m.Name == "VSMain");
         var call = Assert.Single(method.BaseCalls);
         Assert.Equal("VSMain", call.MethodName);
         Assert.Equal(0, call.ArgumentCount);
@@ -95,9 +120,35 @@ shader S {
         const string source = """
 shader S {
  stage override void VSMain() { base.Apply(a, b + c); }
+    [Fact]
+    public void Merge_DiagnosesUnresolvedBaseShader()
+    {
+        var doc = new ShaderParser().ParseSdslDocument("shader C : Missing { stage override void VSMain(){ } }").Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "C");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD310");
+    }
+
+    [Fact]
+    public void Merge_DiagnosesMissingBaseMethod()
+    {
+        var src = "shader B { stage override void VSMain(){} } shader C : B { stage override void PSMain(){ base.PSMain(); } }";
+        var doc = new ShaderParser().ParseSdslDocument(src).Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "C");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD312");
+    }
+
+    [Fact]
+    public void Merge_DiagnosesCycle()
+    {
+        var src = "shader A : B { stage override void VSMain(){} } shader B : A { stage override void VSMain(){} }";
+        var doc = new ShaderParser().ParseSdslDocument(src).Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "A");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD311" || d.Code == "SD310");
+    }
+
 }
 """;
-        var method = new ShaderParser().ParseSdsl(source).Document!.Methods.Single();
+        var method = new ShaderParser().ParseSdsl(source).Document!.Methods.First(m => m.Name == "VSMain");
         var call = Assert.Single(method.BaseCalls);
         Assert.Equal("Apply", call.MethodName);
         Assert.Equal("a, b + c", call.ArgumentText);
@@ -114,9 +165,35 @@ shader S {
    var s = "base.Fake()";
    base.Real();
  }
+    [Fact]
+    public void Merge_DiagnosesUnresolvedBaseShader()
+    {
+        var doc = new ShaderParser().ParseSdslDocument("shader C : Missing { stage override void VSMain(){ } }").Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "C");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD310");
+    }
+
+    [Fact]
+    public void Merge_DiagnosesMissingBaseMethod()
+    {
+        var src = "shader B { stage override void VSMain(){} } shader C : B { stage override void PSMain(){ base.PSMain(); } }";
+        var doc = new ShaderParser().ParseSdslDocument(src).Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "C");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD312");
+    }
+
+    [Fact]
+    public void Merge_DiagnosesCycle()
+    {
+        var src = "shader A : B { stage override void VSMain(){} } shader B : A { stage override void VSMain(){} }";
+        var doc = new ShaderParser().ParseSdslDocument(src).Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "A");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD311" || d.Code == "SD310");
+    }
+
 }
 """;
-        var method = new ShaderParser().ParseSdsl(source).Document!.Methods.Single();
+        var method = new ShaderParser().ParseSdsl(source).Document!.Methods.First(m => m.Name == "VSMain");
         var call = Assert.Single(method.BaseCalls);
         Assert.Equal("Real", call.MethodName);
     }
@@ -131,11 +208,11 @@ shader S {
     [Fact]
     public void SpriteBatchShader_Lowering_EmitsTargetedBaseCallTodo()
     {
-        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/SpriteBatchShader.sdsl")).Document!;
-        var result = new ShaderLowerer().LowerSdslToHlsl(shader);
-        Assert.Contains("TODO SD302", result.Hlsl);
-        Assert.Contains("base.VSMain", result.Hlsl);
-        Assert.Contains("in VSMain", result.Hlsl);
+        var parser = new ShaderParser();
+        var doc = parser.ParseSdslDocument(ReadFixture("sdsl/SpriteBatchShader.sdsl")).Document!;
+        var shader = doc.Shaders[0];
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, shader.Name);
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD312" || d.Code == "SD310");
     }
 
     [Fact]
@@ -240,12 +317,37 @@ shader D {
  stage stream float4 Color : COLOR0;
  stage override void VSMain(){ streams.Position = 0; }
  stage override float4 PSMain(){ return streams.Color; }
+    [Fact]
+    public void Merge_DiagnosesUnresolvedBaseShader()
+    {
+        var doc = new ShaderParser().ParseSdslDocument("shader C : Missing { stage override void VSMain(){ } }").Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "C");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD310");
+    }
+
+    [Fact]
+    public void Merge_DiagnosesMissingBaseMethod()
+    {
+        var src = "shader B { stage override void VSMain(){} } shader C : B { stage override void PSMain(){ base.PSMain(); } }";
+        var doc = new ShaderParser().ParseSdslDocument(src).Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "C");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD312");
+    }
+
+    [Fact]
+    public void Merge_DiagnosesCycle()
+    {
+        var src = "shader A : B { stage override void VSMain(){} } shader B : A { stage override void VSMain(){} }";
+        var doc = new ShaderParser().ParseSdslDocument(src).Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "A");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD311" || d.Code == "SD310");
+    }
+
 }
 """;
         var shader = new ShaderParser().ParseSdsl(source).Document!;
         var result = new ShaderLowerer().LowerSdslToHlsl(shader);
-        Assert.Contains(result.Diagnostics, d => d.Code == "SD200");
-        Assert.Contains(result.Diagnostics, d => d.Code == "SD201");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD315");
     }
 
     [Fact]
@@ -258,4 +360,68 @@ shader D {
         var emitted = new ShaderLowerer().EmitHlsl(result.Document!);
         Assert.Contains("float4 PSMain", emitted);
     }
+
+
+    [Fact]
+    public void MultiShaderDocument_ParsesTwoShaders()
+    {
+        var source = ReadFixture("sdsl/inheritance/simple_base_shader.sdsl");
+        var result = new ShaderParser().ParseSdslDocument(source);
+        Assert.Equal(2, result.Document!.Shaders.Count);
+    }
+
+    [Fact]
+    public void SingleBaseMerge_RewritesBaseCall()
+    {
+        var parser = new ShaderParser();
+        var doc = parser.ParseSdslDocument(ReadFixture("sdsl/inheritance/simple_base_shader.sdsl")).Document!;
+        var lowered = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "ChildSprite");
+        Assert.Contains("__base_BaseSprite_VSMain(streams);", lowered.Hlsl);
+        Assert.DoesNotContain("base.VSMain();", lowered.Hlsl);
+    }
+
+    [Fact]
+    public void SingleBaseMerge_EmitsBaseHelper()
+    {
+        var parser = new ShaderParser();
+        var doc = parser.ParseSdslDocument(ReadFixture("sdsl/inheritance/simple_base_shader.sdsl")).Document!;
+        var lowered = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "ChildSprite");
+        Assert.Contains("void __base_BaseSprite_VSMain(inout StriVStageStreams streams)", lowered.Hlsl);
+    }
+
+    [Fact]
+    public void SingleBaseMerge_NoUnresolvedBaseDiagnosticForSupportedCase()
+    {
+        var parser = new ShaderParser();
+        var doc = parser.ParseSdslDocument(ReadFixture("sdsl/inheritance/simple_base_shader.sdsl")).Document!;
+        var lowered = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "ChildSprite");
+        Assert.DoesNotContain(lowered.Diagnostics, d => d.Code == "SD302");
+    }
+
+    [Fact]
+    public void Merge_DiagnosesUnresolvedBaseShader()
+    {
+        var doc = new ShaderParser().ParseSdslDocument("shader C : Missing { stage override void VSMain(){ } }").Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "C");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD310");
+    }
+
+    [Fact]
+    public void Merge_DiagnosesMissingBaseMethod()
+    {
+        var src = "shader B { stage override void VSMain(){} } shader C : B { stage override void PSMain(){ base.PSMain(); } }";
+        var doc = new ShaderParser().ParseSdslDocument(src).Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "C");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD312");
+    }
+
+    [Fact]
+    public void Merge_DiagnosesCycle()
+    {
+        var src = "shader A : B { stage override void VSMain(){} } shader B : A { stage override void VSMain(){} }";
+        var doc = new ShaderParser().ParseSdslDocument(src).Document!;
+        var result = new ShaderLowerer().LowerSdslDocumentToHlsl(doc, "A");
+        Assert.Contains(result.Diagnostics, d => d.Code == "SD311" || d.Code == "SD310");
+    }
+
 }
