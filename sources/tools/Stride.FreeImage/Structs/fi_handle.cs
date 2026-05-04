@@ -145,9 +145,9 @@ namespace FreeImageAPI.IO
 		/// was created by managed code.
 		/// </summary>
 		/// <returns><see cref="Object"/> assigned to this handle or null on failure.</returns>
-		internal object GetObject()
+		internal object? GetObject()
 		{
-			object result = null;
+			object? result = null;
 			if (handle != IntPtr.Zero)
 			{
 				try

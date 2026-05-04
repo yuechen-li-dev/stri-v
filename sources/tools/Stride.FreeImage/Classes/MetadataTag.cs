@@ -386,7 +386,7 @@ namespace FreeImageAPI.Metadata
 		/// <summary>
 		/// Gets or sets the value of the metadata.
 		/// </summary>
-		public object Value
+		public object? Value
 		{
 			get
 			{

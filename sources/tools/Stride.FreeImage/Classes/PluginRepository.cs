@@ -44,7 +44,7 @@ namespace FreeImageAPI.Plugins
 		/// </summary>
 		/// <param name="fif">The representing format.</param>
 		/// <returns>An instance of <see cref="FreeImageAPI.Plugins.FreeImagePlugin"/>.</returns>
-		public static FreeImagePlugin Plugin(FREE_IMAGE_FORMAT fif)
+		public static FreeImagePlugin? Plugin(FREE_IMAGE_FORMAT fif)
 		{
 			return Plugin((int)fif);
 		}
@@ -55,7 +55,7 @@ namespace FreeImageAPI.Plugins
 		/// </summary>
 		/// <param name="index">The index of the representing format.</param>
 		/// <returns>An instance of <see cref="FreeImagePlugin"/>.</returns>
-		public static FreeImagePlugin Plugin(int index)
+		public static FreeImagePlugin? Plugin(int index)
 		{
 			return (index >= 0) ? plugins[index] : null;
 		}
@@ -68,9 +68,9 @@ namespace FreeImageAPI.Plugins
 		/// </summary>
 		/// <param name="expression">The expression to search for.</param>
 		/// <returns>An instance of <see cref="FreeImageAPI.Plugins.FreeImagePlugin"/>.</returns>
-		public static FreeImagePlugin Plugin(string expression)
+		public static FreeImagePlugin? Plugin(string expression)
 		{
-			FreeImagePlugin result = null;
+			FreeImagePlugin? result = null;
 			expression = expression.ToLowerInvariant();
 
 			foreach (FreeImagePlugin plugin in plugins)
@@ -93,7 +93,7 @@ namespace FreeImageAPI.Plugins
 		/// </summary>
 		/// <param name="format">The format of the Plugin.</param>
 		/// <returns>An instance of <see cref="FreeImageAPI.Plugins.FreeImagePlugin"/>.</returns>
-		public static FreeImagePlugin PluginFromFormat(string format)
+		public static FreeImagePlugin? PluginFromFormat(string format)
 		{
 			return Plugin(FreeImage.GetFIFFromFormat(format));
 		}
@@ -103,7 +103,7 @@ namespace FreeImageAPI.Plugins
 		/// </summary>
 		/// <param name="filename">The valid filename for the plugin.</param>
 		/// <returns>An instance of <see cref="FreeImageAPI.Plugins.FreeImagePlugin"/>.</returns>
-		public static FreeImagePlugin PluginFromFilename(string filename)
+		public static FreeImagePlugin? PluginFromFilename(string filename)
 		{
 			return Plugin(FreeImage.GetFIFFromFilename(filename));
 		}
@@ -113,7 +113,7 @@ namespace FreeImageAPI.Plugins
 		/// </summary>
 		/// <param name="mime">The valid mime for the plugin.</param>
 		/// <returns>An instance of <see cref="FreeImageAPI.Plugins.FreeImagePlugin"/>.</returns>
-		public static FreeImagePlugin PluginFromMime(string mime)
+		public static FreeImagePlugin? PluginFromMime(string mime)
 		{
 			return Plugin(FreeImage.GetFIFFromMime(mime));
 		}
