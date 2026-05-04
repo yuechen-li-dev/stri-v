@@ -4,6 +4,8 @@
     <AssemblyName>Stride.FreeImage</AssemblyName>
     <RootNamespace>FreeImageAPI</RootNamespace>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Nullable>disable</Nullable>
+    <NoWarn>$(NoWarn);CS8632</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
