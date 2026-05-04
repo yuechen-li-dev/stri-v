@@ -7,23 +7,30 @@ using Stride.Games;
 
 namespace Stride.BepuPhysics.Systems;
 
+/// <summary>
+/// Updates every registered <see cref="BepuSimulation"/> once per Stride frame using warped elapsed time.
+/// </summary>
 internal class PhysicsGameSystem : GameSystemBase
 {
+    // This configuration owns the simulation list used by all runtime processors in the scene.
     private BepuConfiguration _bepuConfiguration;
 
     public PhysicsGameSystem(BepuConfiguration configuration, IServiceRegistry registry) : base(registry)
     {
         _bepuConfiguration = configuration;
         UpdateOrder = SystemsOrderHelper.ORDER_OF_GAME_SYSTEM;
-        Enabled = true; //enabled by default
-
+        Enabled = true; // Enabled by default.
 
         foreach (var bepuSim in _bepuConfiguration.BepuSimulations)
         {
+            // Reset soft-start as soon as the system is created so startup behavior is deterministic.
             bepuSim.ResetSoftStart();
         }
     }
 
+    /// <summary>
+    /// Advances each configured simulation for the current frame when positive warped time elapsed.
+    /// </summary>
     public override void Update(GameTime time)
     {
         var elapsed = time.WarpElapsed;

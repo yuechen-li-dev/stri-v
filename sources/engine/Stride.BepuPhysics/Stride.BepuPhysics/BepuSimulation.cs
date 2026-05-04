@@ -29,6 +29,9 @@ using SBodyVelocity = Stride.BepuPhysics.Definitions.BodyVelocity;
 namespace Stride.BepuPhysics;
 
 [DataContract]
+/// <summary>
+/// Owns one Bepu runtime world and coordinates Stride-facing update flow, synchronization, and query helpers.
+/// </summary>
 public sealed class BepuSimulation : IDisposable
 {
     private const string CategoryTime = "Time";
@@ -37,7 +40,9 @@ public sealed class BepuSimulation : IDisposable
     private const string MaskCategory = "Collision Matrix";
 
     private TimeSpan _fixedTimeStep = TimeSpan.FromTicks(TimeSpan.TicksPerSecond / 60);
+    // Registered simulation update components are grouped by runtime type to preserve fast invoke paths.
     private readonly Dictionary<Type, Elider> _simulationUpdateComponents = new();
+    // Bodies tracked for transform interpolation between fixed simulation ticks.
     private readonly List<BodyComponent> _interpolatedBodies = new();
     private readonly ThreadDispatcher _threadDispatcher;
     private TimeSpan _remainingUpdateTime;
@@ -53,6 +58,7 @@ public sealed class BepuSimulation : IDisposable
     internal CollidableProperty<MaterialProperties> CollidableMaterials { get; } = new();
     internal ContactEventsManager ContactEvents { get; }
 
+    // Index in these lists matches Bepu handle values for O(1) reverse lookup.
     internal List<BodyComponent?> Bodies { get; } = new();
     internal List<StaticComponent?> Statics { get; } = new();
 
