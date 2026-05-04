@@ -12,6 +12,11 @@
       <Link>Properties/SharedAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Stri-V clean core is Linux/Vulkan-first; Android launcher surface is mobile-only and out of scope. -->
+    <Compile Remove="../../../sources/engine/Stride.Games/Starter/StrideActivity.cs" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Stride.Graphics/Stride.Graphics.csproj" />
   </ItemGroup>

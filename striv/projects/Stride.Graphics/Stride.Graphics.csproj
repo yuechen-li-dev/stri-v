@@ -12,6 +12,11 @@
       <Link>Properties/SharedAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Stri-V clean core is Linux/Vulkan-first; Windows Mixed Reality presenter is UWP/Direct3D-specific. -->
+    <Compile Remove="../../../sources/engine/Stride.Graphics/WindowsMixedReality/**/*.cs" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Stride/Stride.csproj" />
     <ProjectReference Include="../Stride.Shaders/Stride.Shaders.csproj" />
