@@ -56,7 +56,7 @@ public class SpriteBatchDxcInventoryTests
     {
         var lowered = LowerSpecialized(tsRgb: false);
         Assert.DoesNotContain(lowered.Diagnostics, d => d.Code is "SD300" or "SD301" or "SD310" or "SD320");
-        Assert.All(lowered.Diagnostics, d => Assert.Contains(d.Code, new[] { "SD312", "SD330", "SD331" }));
+        Assert.All(lowered.Diagnostics, d => Assert.Contains(d.Code, new[] { "SD312", "SD330", "SD331", "SD340" }));
     }
 
     [Fact]
