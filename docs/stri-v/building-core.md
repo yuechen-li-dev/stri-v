@@ -741,3 +741,69 @@ The clean graph currently preserves the minimum legacy serializer registration b
 for runtime startup. Stri-V should later replace or reduce broad reflection/AP-dependent
 serialization with explicit registrations/source generation where practical, especially once
 the TOML asset manifest and shader artifact pipeline are designed.
+
+## Asset tool
+
+`StriV.AssetTool` currently supports **shader assets only**. Asset manifests are flat TOML source-of-intent inputs; generated JSON manifests, lowered/generated HLSL, optional SPIR-V binaries, and compiler logs are output artifacts.
+
+Build shader assets from a flat TOML manifest:
+
+```bash
+dotnet run --project striv/projects/StriV.AssetTool/StriV.AssetTool.csproj -- build-assets \
+  --manifest striv/tests/fixtures/assets/shader_manifest/assets.toml \
+  --output /tmp/striv-assets
+```
+
+Quiet mode:
+
+```bash
+dotnet run --project striv/projects/StriV.AssetTool/StriV.AssetTool.csproj -- build-assets \
+  --manifest <assets.toml> \
+  --output <output-dir> \
+  --quiet
+```
+
+JSONL diagnostics / CI mode:
+
+```bash
+dotnet run --project striv/projects/StriV.AssetTool/StriV.AssetTool.csproj -- build-assets \
+  --manifest <assets.toml> \
+  --output <output-dir> \
+  --diagnostics jsonl
+```
+
+Exit codes:
+
+- `0`: success / no fatal diagnostics
+- `1`: fatal parse/validation/build diagnostics
+- `2`: missing manifest path
+
+DXC behavior:
+
+- DXC is optional by default; missing DXC does not fail asset builds unless strict mode is requested.
+- `--strict-dxc` treats unavailable/failed DXC stages as fatal.
+- `--no-dxc` disables DXC emission.
+
+Helper script wrapper (bash):
+
+```bash
+./striv/build/striv-build-assets.sh \
+  --manifest striv/tests/fixtures/assets/shader_manifest/assets.toml \
+  --output /tmp/striv-assets \
+  --diagnostics jsonl
+```
+
+The helper script defaults to:
+
+- `--manifest striv/tests/fixtures/assets/shader_manifest/assets.toml`
+- `--output /tmp/striv-assets`
+
+and forwards additional arguments directly to `StriV.AssetTool`.
+
+Current limitations for this slice:
+
+- No new asset kinds beyond shaders.
+- No runtime integration.
+- No editor integration.
+- No watch mode.
+- No incremental cache.
