@@ -20,7 +20,7 @@ public class GenericSpecializationTests
     public void GenericParser_ParsesBoolParameter()
     {
         var doc = new ShaderParser().ParseSdslDocument(ReadCombinedSpritePair()).Document!;
-        var shader = Assert.Single(doc.Shaders.Where(s => s.Name == "SpriteBatchShader"));
+        var shader = Assert.Single(doc.Shaders, s => s.Name == "SpriteBatchShader");
         var param = Assert.Single(shader.GenericParameters);
         Assert.Equal("bool", param.TypeText);
         Assert.Equal("TSRgb", param.Name);
