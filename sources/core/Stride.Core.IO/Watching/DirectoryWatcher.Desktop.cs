@@ -121,22 +121,19 @@ public partial class DirectoryWatcher
         path = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), path));
 
         // 1) Extract directory information from path
-        DirectoryInfo info;
-        if (File.Exists(path))
+        string? directoryPath = path;
+        if (File.Exists(directoryPath))
         {
-            path = Path.GetDirectoryName(path);
+            directoryPath = Path.GetDirectoryName(directoryPath);
         }
 
-        if (path != null && Directory.Exists(path))
-        {
-            // TODO : Need to investigate later whether ToLower method is safe to remove for Windows OS
-            info = new DirectoryInfo(OperatingSystem.IsLinux() ? path :  path.ToLowerInvariant());
-        }
-        else
+        if (directoryPath == null || !Directory.Exists(directoryPath))
         {
             return null;
         }
 
+        // TODO : Need to investigate later whether ToLower method is safe to remove for Windows OS
+        var info = new DirectoryInfo(OperatingSystem.IsLinux() ? directoryPath : directoryPath.ToLowerInvariant());
         return info;
     }
 
@@ -303,12 +300,14 @@ public partial class DirectoryWatcher
         {
             if (e.ChangeType == WatcherChangeTypes.Renamed)
             {
-                var renamedEventArgs = e as RenamedEventArgs;
-                OnModified(this, new FileRenameEvent(e.Name, e.FullPath, renamedEventArgs.OldFullPath));
+                if (e is RenamedEventArgs renamedEventArgs)
+                {
+                    OnModified(this, new FileRenameEvent(e.Name ?? string.Empty, e.FullPath, renamedEventArgs.OldFullPath));
+                }
             }
             else
             {
-                OnModified(this, new FileEvent((FileEventChangeType)e.ChangeType, e.Name, e.FullPath));
+                OnModified(this, new FileEvent((FileEventChangeType)e.ChangeType, e.Name ?? string.Empty, e.FullPath));
             }
         }
     }

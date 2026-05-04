@@ -10,7 +10,7 @@ namespace Stride.Core.Serialization;
 public class VirtualFileStream : Stream
 {
     public Stream InternalStream { get; protected internal set; }
-    protected VirtualFileStream virtualFileStream;
+    protected VirtualFileStream? virtualFileStream;
     protected readonly long startPosition;
     protected readonly long endPosition;
     private readonly bool disposeInternalStream;
@@ -74,7 +74,7 @@ public class VirtualFileStream : Stream
             InternalStream.Dispose();
         }
 
-        InternalStream = null;
+        InternalStream = null!;
         base.Dispose(disposing);
     }
 

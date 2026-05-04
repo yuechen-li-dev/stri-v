@@ -35,7 +35,7 @@ public abstract class VirtualFileProviderBase : IVirtualFileProvider
     /// <inheritdoc/>
     public virtual bool TryGetFileLocation(string path, out string filePath, out long start, out long end)
     {
-        filePath = null;
+        filePath = string.Empty;
         start = 0;
         end = -1;
         return false;
