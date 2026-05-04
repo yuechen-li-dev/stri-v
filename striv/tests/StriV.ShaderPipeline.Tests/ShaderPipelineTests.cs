@@ -224,13 +224,69 @@ shader S {
         Assert.Contains("struct StriVVSOutput", lowered);
         Assert.Contains("struct StriVPSInput", lowered);
         Assert.Contains("float4 Position : SV_Position;", lowered);
-        Assert.Contains("StriVVSOutput VSMain()", lowered);
+        Assert.Contains("StriVVSOutput VSMain(StriVVSInput input)", lowered);
         Assert.Contains("StriVVSOutput streams;", lowered);
         Assert.Contains("return streams;", lowered);
         Assert.Contains("float4 PSMain(StriVPSInput streams) : SV_Target", lowered);
         Assert.DoesNotContain("struct StriVStageStreams", lowered);
         Assert.DoesNotContain("static StageStreams __streams", lowered);
         Assert.DoesNotContain("__streams.", lowered);
+    }
+
+
+    [Fact]
+    public void StreamLayout_ClassifiesPositionAsVsInputOnly()
+    {
+        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/simple_vertex_input_shader.sdsl")).Document!;
+        var lowered = new ShaderLowerer().LowerSdslToHlsl(shader).Hlsl;
+        Assert.Contains("struct StriVVSInput", lowered);
+        Assert.Contains("float3 Position : POSITION;", lowered);
+        var vsOutStart = lowered.IndexOf("struct StriVVSOutput", StringComparison.Ordinal);
+        var psInStart = lowered.IndexOf("struct StriVPSInput", StringComparison.Ordinal);
+        var psOutStart = lowered.IndexOf("struct StriVPSOutput", StringComparison.Ordinal);
+        var vsOutBlock = lowered[vsOutStart..psInStart];
+        var psInBlock = lowered[psInStart..psOutStart];
+        Assert.DoesNotContain("Position : POSITION", vsOutBlock, StringComparison.Ordinal);
+        Assert.DoesNotContain("Position : POSITION", psInBlock, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StreamLayout_ClassifiesTexCoordAsInputAndInterpolant()
+    {
+        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/simple_vertex_input_shader.sdsl")).Document!;
+        var lowered = new ShaderLowerer().LowerSdslToHlsl(shader).Hlsl;
+        Assert.Contains("struct StriVVSInput", lowered);
+        Assert.Contains("float2 TexCoord : TEXCOORD0;", lowered);
+        Assert.Contains("struct StriVVSOutput", lowered);
+        Assert.Contains("struct StriVPSInput", lowered);
+    }
+
+    [Fact]
+    public void VSMain_WithInputStreams_AcceptsStriVVSInput()
+    {
+        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/simple_vertex_input_shader.sdsl")).Document!;
+        var lowered = new ShaderLowerer().LowerSdslToHlsl(shader).Hlsl;
+        Assert.Contains("StriVVSOutput VSMain(StriVVSInput input)", lowered);
+    }
+
+    [Fact]
+    public void VSMain_RewritesInputOnlyStreamsToInput()
+    {
+        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/simple_vertex_input_shader.sdsl")).Document!;
+        var lowered = new ShaderLowerer().LowerSdslToHlsl(shader).Hlsl;
+        Assert.Contains("float4(input.Position, 1.0)", lowered);
+        Assert.DoesNotContain("streams.Position", lowered, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PSMain_DoesNotReceiveInputOnlyPosition()
+    {
+        var shader = new ShaderParser().ParseSdsl(ReadFixture("sdsl/simple_vertex_input_shader.sdsl")).Document!;
+        var lowered = new ShaderLowerer().LowerSdslToHlsl(shader).Hlsl;
+        var psInStart = lowered.IndexOf("struct StriVPSInput", StringComparison.Ordinal);
+        var psOutStart = lowered.IndexOf("struct StriVPSOutput", StringComparison.Ordinal);
+        var psInBlock = lowered[psInStart..psOutStart];
+        Assert.DoesNotContain("POSITION", psInBlock, StringComparison.Ordinal);
     }
 
     [Fact]

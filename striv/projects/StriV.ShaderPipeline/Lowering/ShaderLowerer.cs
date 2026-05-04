@@ -48,6 +48,7 @@ public sealed class ShaderLowerer
         var sb = new StringBuilder();
         sb.AppendLine($"// Lowered from {shader.Name}");
         var io = BuildStageIoLayout(mergedStreams, diags);
+        if (io.VSInput.Count > 0) EmitStageStruct(sb, "StriVVSInput", io.VSInput);
         EmitStageStruct(sb, "StriVVSOutput", io.VSOutput);
         EmitStageStruct(sb, "StriVPSInput", io.PSInput);
         EmitStageStruct(sb, "StriVPSOutput", io.PSOutput);
@@ -69,7 +70,22 @@ public sealed class ShaderLowerer
         {
             var rewritten = RewriteBaseCalls(method, baseShader, methods, diags);
             rewritten = SubstituteIdentifiers(rewritten, genericSubstitutions);
-            if (method.Name == "VSMain") { sb.AppendLine("StriVVSOutput VSMain()"); sb.AppendLine("{"); sb.AppendLine("    StriVVSOutput streams;"); foreach (var l in rewritten.Split('\n')) sb.AppendLine($"    {l.TrimEnd()}"); sb.AppendLine("    return streams;"); sb.AppendLine("}"); }
+            if (method.Name == "VSMain")
+            {
+                var hasInput = io.VSInput.Count > 0;
+                if (hasInput) rewritten = RewriteInputOnlyStreamsForVsBody(rewritten, io.VSInput, io.VSOutput);
+                sb.AppendLine(hasInput ? "StriVVSOutput VSMain(StriVVSInput input)" : "StriVVSOutput VSMain()");
+                sb.AppendLine("{");
+                sb.AppendLine("    StriVVSOutput streams;");
+                if (hasInput)
+                {
+                    var passThroughNames = io.VSInput.Select(s => s.Name).Intersect(io.VSOutput.Select(s => s.Name), StringComparer.Ordinal);
+                    foreach (var n in passThroughNames) sb.AppendLine($"    streams.{n} = input.{n};");
+                }
+                foreach (var l in rewritten.Split('\n')) sb.AppendLine($"    {l.TrimEnd()}");
+                sb.AppendLine("    return streams;");
+                sb.AppendLine("}");
+            }
             else if (method.Name == "PSMain") { var suffix = method.ReturnType == "float4" ? " : SV_Target" : string.Empty; sb.AppendLine($"{method.ReturnType} PSMain(StriVPSInput streams){suffix}"); sb.AppendLine("{"); foreach (var l in rewritten.Split('\n')) sb.AppendLine($"    {l.TrimEnd()}"); sb.AppendLine("}"); }
         }
 
@@ -219,6 +235,7 @@ public sealed class ShaderLowerer
 
     private static StageIoLayout BuildStageIoLayout(IReadOnlyList<SdslStream> mergedStreams, List<Diagnostic> diags)
     {
+        var vsIn = new List<SdslStream>();
         var vsOut = new List<SdslStream>();
         var psIn = new List<SdslStream>();
         var psOut = new List<SdslStream>();
@@ -227,17 +244,22 @@ public sealed class ShaderLowerer
             var kind = ClassifySemantic(s.Semantic);
             if (kind is StreamSemanticKind.Unknown)
                 diags.Add(Diagnostic.Create("SD330", $"Unknown stream semantic '{s.Semantic}' classified as interpolant.", s.Span.Line, s.Span.Column));
+            if (kind is StreamSemanticKind.VertexInput or StreamSemanticKind.Interpolant)
+                vsIn.Add(s);
             if (kind is StreamSemanticKind.PixelOutput)
             {
                 diags.Add(Diagnostic.Create("SD331", $"Pixel-output semantic '{s.Semantic}' is excluded from vertex output.", s.Span.Line, s.Span.Column));
                 psOut.Add(s);
                 continue;
             }
-            // Conservative default: transit values through VS->PS.
+
+            if (kind is StreamSemanticKind.VertexInput)
+                continue;
+
             vsOut.Add(s);
             psIn.Add(s);
         }
-        return new([], vsOut, psIn, psOut);
+        return new(vsIn, vsOut, psIn, psOut);
     }
 
     private static StreamSemanticKind ClassifySemantic(string semanticRaw)
@@ -245,6 +267,7 @@ public sealed class ShaderLowerer
         var semantic = semanticRaw.Trim().ToUpperInvariant();
         if (semantic is "SV_POSITION") return StreamSemanticKind.VertexOutput;
         if (semantic.StartsWith("SV_TARGET", StringComparison.Ordinal)) return StreamSemanticKind.PixelOutput;
+        if (semantic.StartsWith("BLENDINDICES", StringComparison.Ordinal) || semantic.StartsWith("BLENDWEIGHT", StringComparison.Ordinal)) return StreamSemanticKind.VertexInput;
         if (semantic.StartsWith("COLOR", StringComparison.Ordinal) ||
             semantic.StartsWith("TEXCOORD", StringComparison.Ordinal) ||
             semantic.StartsWith("NORMAL", StringComparison.Ordinal) ||
@@ -252,5 +275,52 @@ public sealed class ShaderLowerer
             semantic.StartsWith("BINORMAL", StringComparison.Ordinal)) return StreamSemanticKind.Interpolant;
         if (semantic == "POSITION") return StreamSemanticKind.VertexInput;
         return StreamSemanticKind.Unknown;
+    }
+
+    private static string RewriteInputOnlyStreamsForVsBody(string text, IReadOnlyList<SdslStream> vsInput, IReadOnlyList<SdslStream> vsOutput)
+    {
+        var inputOnly = vsInput.Select(s => s.Name).Except(vsOutput.Select(s => s.Name), StringComparer.Ordinal).ToHashSet(StringComparer.Ordinal);
+        if (inputOnly.Count == 0 || string.IsNullOrEmpty(text)) return text;
+        var sb = new StringBuilder(text.Length);
+        var i = 0;
+        while (i < text.Length)
+        {
+            var c = text[i];
+            if (c == '"')
+            {
+                var start = i++;
+                while (i < text.Length)
+                {
+                    if (text[i] == '\\') { i += 2; continue; }
+                    if (text[i] == '"') { i++; break; }
+                    i++;
+                }
+                sb.Append(text.AsSpan(start, i - start));
+                continue;
+            }
+            if (c == '/' && i + 1 < text.Length && text[i + 1] == '/')
+            {
+                var start = i; i += 2; while (i < text.Length && text[i] != '\n') i++; sb.Append(text.AsSpan(start, i - start)); continue;
+            }
+            if (c == '/' && i + 1 < text.Length && text[i + 1] == '*')
+            {
+                var start = i; i += 2; while (i + 1 < text.Length && !(text[i] == '*' && text[i + 1] == '/')) i++; if (i + 1 < text.Length) i += 2; sb.Append(text.AsSpan(start, i - start)); continue;
+            }
+
+            if (i + 8 <= text.Length && text.AsSpan(i, 8).SequenceEqual("streams."))
+            {
+                var nameStart = i + 8;
+                var j = nameStart;
+                if (j < text.Length && (char.IsLetter(text[j]) || text[j] == '_'))
+                {
+                    j++;
+                    while (j < text.Length && (char.IsLetterOrDigit(text[j]) || text[j] == '_')) j++;
+                    var ident = text[nameStart..j];
+                    if (inputOnly.Contains(ident)) { sb.Append("input."); sb.Append(ident); i = j; continue; }
+                }
+            }
+            sb.Append(c); i++;
+        }
+        return sb.ToString();
     }
 }
