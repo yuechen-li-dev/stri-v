@@ -11,6 +11,17 @@
       <Link>Properties/SharedAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Stri-V clean core is Linux/Vulkan-first; mobile and UWP input backends are out of scope. -->
+    <Compile Remove="../../../sources/engine/Stride.Input/Android/**/*.cs" />
+    <Compile Remove="../../../sources/engine/Stride.Input/UWP/**/*.cs" />
+
+    <!-- Windows-only RawInput/DirectInput/XInput integrations are excluded from the clean Linux profile. -->
+    <Compile Remove="../../../sources/engine/Stride.Input/InputSourceWindowsDirectInput.cs" />
+    <Compile Remove="../../../sources/engine/Stride.Input/InputSourceWindowsRawInput.cs" />
+    <Compile Remove="../../../sources/engine/Stride.Input/InputSourceWindowsXInput.cs" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Stride.Games/Stride.Games.csproj" />
   </ItemGroup>
