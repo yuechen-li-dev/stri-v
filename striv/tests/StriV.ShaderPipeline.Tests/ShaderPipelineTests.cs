@@ -1,12 +1,21 @@
+using System.Diagnostics;
 using StriV.ShaderPipeline.Lexing;
 using StriV.ShaderPipeline.Lowering;
 using StriV.ShaderPipeline.Parsing;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace StriV.ShaderPipeline.Tests;
 
 public class ShaderPipelineTests
 {
+    private readonly ITestOutputHelper output;
+
+    public ShaderPipelineTests(ITestOutputHelper output)
+    {
+        this.output = output;
+    }
+
     private static string ReadFixture(string rel)
     {
         var path = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "fixtures/shaders", rel));
@@ -39,6 +48,82 @@ public class ShaderPipelineTests
         Assert.Contains("float4 PSMain(StriVStageStreams streams) : SV_Target", lowered);
         Assert.DoesNotContain("static StageStreams __streams", lowered);
         Assert.DoesNotContain("__streams.", lowered);
+    }
+
+    [Fact]
+    public void LoweredSimpleStreamShader_HasNoSdslKeywords()
+    {
+        var source = ReadFixture("sdsl/simple_stream_shader.sdsl");
+        var shader = new ShaderParser().ParseSdsl(source).Document!;
+        var lowered = new ShaderLowerer().LowerSdslToHlsl(shader).Hlsl;
+
+        Assert.DoesNotContain("shader ", lowered, StringComparison.Ordinal);
+        Assert.DoesNotContain("stage ", lowered, StringComparison.Ordinal);
+        Assert.DoesNotContain("stream ", lowered, StringComparison.Ordinal);
+        Assert.DoesNotContain("override ", lowered, StringComparison.Ordinal);
+        Assert.DoesNotContain("__streams", lowered, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void LoweredSimpleStreamShader_CanCompileWithDxc_WhenAvailable()
+    {
+        var source = ReadFixture("sdsl/simple_stream_shader.sdsl");
+        var shader = new ShaderParser().ParseSdsl(source).Document!;
+        var lowered = new ShaderLowerer().LowerSdslToHlsl(shader).Hlsl;
+
+        var dxc = DxcTestProbe.Create();
+        if (!dxc.IsAvailable)
+        {
+            output.WriteLine($"DXC compile-smoke skipped: {dxc.UnavailableReason}");
+            return;
+        }
+
+        output.WriteLine($"Using dxc at: {dxc.ExecutablePath}");
+        var tempDir = Path.Combine(Path.GetTempPath(), "striv-shader-pipeline", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+        var hlslPath = Path.Combine(tempDir, "simple_stream_shader.lowered.hlsl");
+        File.WriteAllText(hlslPath, lowered);
+
+        var ext = dxc.SupportsSpirv ? "spv" : "dxil";
+        var extraArgs = dxc.SupportsSpirv ? "-spirv" : string.Empty;
+        var vsPath = Path.Combine(tempDir, $"simple_stream_shader.vs.{ext}");
+        var psPath = Path.Combine(tempDir, $"simple_stream_shader.ps.{ext}");
+
+        var vsResult = dxc.Compile(hlslPath, "vs_6_0", "VSMain", vsPath, extraArgs);
+        var psResult = dxc.Compile(hlslPath, "ps_6_0", "PSMain", psPath, extraArgs);
+
+        Assert.True(vsResult.ExitCode == 0, $"VS compile failed.\nstdout:\n{vsResult.StdOut}\nstderr:\n{vsResult.StdErr}");
+        Assert.True(psResult.ExitCode == 0, $"PS compile failed.\nstdout:\n{psResult.StdOut}\nstderr:\n{psResult.StdErr}");
+        Assert.True(File.Exists(vsPath) && new FileInfo(vsPath).Length > 0, $"Missing or empty output: {vsPath}");
+        Assert.True(File.Exists(psPath) && new FileInfo(psPath).Length > 0, $"Missing or empty output: {psPath}");
+    }
+
+    [Fact]
+    public void PlainHlslFixture_CanCompileWithDxc_WhenAvailable()
+    {
+        var source = ReadFixture("plain/simple_vertex_pixel.hlsl");
+        var dxc = DxcTestProbe.Create();
+        if (!dxc.IsAvailable)
+        {
+            output.WriteLine($"DXC plain HLSL compile-smoke skipped: {dxc.UnavailableReason}");
+            return;
+        }
+
+        var tempDir = Path.Combine(Path.GetTempPath(), "striv-shader-pipeline", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+        var hlslPath = Path.Combine(tempDir, "simple_vertex_pixel.hlsl");
+        File.WriteAllText(hlslPath, source);
+
+        var ext = dxc.SupportsSpirv ? "spv" : "dxil";
+        var extraArgs = dxc.SupportsSpirv ? "-spirv" : string.Empty;
+        var vsPath = Path.Combine(tempDir, $"simple_vertex_pixel.vs.{ext}");
+        var psPath = Path.Combine(tempDir, $"simple_vertex_pixel.ps.{ext}");
+
+        var vsResult = dxc.Compile(hlslPath, "vs_6_0", "VSMain", vsPath, extraArgs);
+        var psResult = dxc.Compile(hlslPath, "ps_6_0", "PSMain", psPath, extraArgs);
+
+        Assert.True(vsResult.ExitCode == 0, $"VS compile failed.\nstdout:\n{vsResult.StdOut}\nstderr:\n{vsResult.StdErr}");
+        Assert.True(psResult.ExitCode == 0, $"PS compile failed.\nstdout:\n{psResult.StdOut}\nstderr:\n{psResult.StdErr}");
     }
 
     [Fact]
