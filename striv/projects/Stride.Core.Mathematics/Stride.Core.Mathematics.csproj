@@ -8,6 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../..//sources/core/Stride.Core.Mathematics/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <Compile Remove="../../../sources/core/Stride.Core.Mathematics/NamespaceDoc.cs" />
     <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
       <Link>Properties/SharedAssemblyInfo.cs</Link>
     </Compile>

@@ -1686,47 +1686,5 @@ public struct Double3 : IEquatable<Double3>, ISpanFormattable
         z = Z;
     }
 
-#if WPFInterop
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Stride.Core.Mathematics.Double3"/> to <see cref="System.Windows.Media.Media3D.Double3D"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator System.Windows.Media.Media3D.Double3D(Double3 value)
-    {
-        return new System.Windows.Media.Media3D.Double3D(value.X, value.Y, value.Z);
-    }
 
-    /// <summary>
-    /// Performs an explicit conversion from <see cref="System.Windows.Media.Media3D.Double3D"/> to <see cref="Stride.Core.Mathematics.Double3"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static explicit operator Double3(System.Windows.Media.Media3D.Double3D value)
-    {
-        return new Double3((double)value.X, (double)value.Y, (double)value.Z);
-    }
-#endif
-
-#if XnaInterop
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Stride.Core.Mathematics.Double3"/> to <see cref="Microsoft.Xna.Framework.Vector3"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator Microsoft.Xna.Framework.Vector3(Double3 value)
-    {
-        return new Microsoft.Xna.Framework.Vector3(value.X, value.Y, value.Z);
-    }
-
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Microsoft.Xna.Framework.Vector3"/> to <see cref="Stride.Core.Mathematics.Double3"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator Double3(Microsoft.Xna.Framework.Vector3 value)
-    {
-        return new Double3(value.X, value.Y, value.Z);
-    }
-#endif
 }

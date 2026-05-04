@@ -462,47 +462,5 @@ public struct BoundingSphere : IEquatable<BoundingSphere>, ISpanFormattable, IIn
         return value is BoundingSphere boundingSphere && Equals(boundingSphere);
     }
 
-#if SlimDX1xInterop
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Stride.Core.Mathematics.BoundingSphere"/> to <see cref="SlimDX.BoundingSphere"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator SlimDX.BoundingSphere(BoundingSphere value)
-    {
-        return new SlimDX.BoundingSphere(value.Center, value.Radius);
-    }
 
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="SlimDX.BoundingSphere"/> to <see cref="Stride.Core.Mathematics.BoundingSphere"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator BoundingSphere(SlimDX.BoundingSphere value)
-    {
-        return new BoundingSphere(value.Center, value.Radius);
-    }
-#endif
-
-#if SlimDX1xInterop
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Stride.Core.Mathematics.BoundingSphere"/> to <see cref="Microsoft.Xna.Framework.BoundingSphere"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator Microsoft.Xna.Framework.BoundingSphere(BoundingSphere value)
-    {
-        return new Microsoft.Xna.Framework.BoundingSphere(value.Center, value.Radius);
-    }
-
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="Microsoft.Xna.Framework.BoundingSphere"/> to <see cref="Stride.Core.Mathematics.BoundingSphere"/>.
-    /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result of the conversion.</returns>
-    public static implicit operator BoundingSphere(Microsoft.Xna.Framework.BoundingSphere value)
-    {
-        return new BoundingSphere(value.Center, value.Radius);
-    }
-#endif
 }
