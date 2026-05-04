@@ -47,8 +47,7 @@ public sealed class ShaderParser
             var block = ReadBalancedBlock(source, header.Index + header.Length - 1, out _);
             var bodySource = block[1..^1];
 
-            if (!string.IsNullOrWhiteSpace(genericParametersText))
-                diags.Add(Diagnostic.Create("SD301", "Generic parameters parsed but specialization is not implemented.", GetSpan(source, header.Groups[3].Index).Line, GetSpan(source, header.Groups[3].Index).Column));
+            var genericParameters = ParseGenericParameters(source, header.Groups[3], genericParametersText, diags);
 
             var streams = new List<SdslStream>();
             var streamRegex = new Regex(@"stage\s+stream\s+([^\s]+)\s+([A-Za-z_]\w*)\s*:\s*([A-Za-z_]\w*)\s*;", RegexOptions.Multiline);
@@ -70,13 +69,40 @@ public sealed class ShaderParser
                 methods.Add(new(m.Groups[3].Value, m.Groups[4].Value, m.Groups[5].Value, bodyText, baseCalls, mods, span));
             }
 
-            shaders.Add(new(name, genericParametersText, baseShaders, streams, methods, new[] { "shader" }));
+            shaders.Add(new(name, genericParametersText, genericParameters, baseShaders, streams, methods, new[] { "shader" }));
         }
 
         if (shaders.Count == 0)
             diags.Add(Diagnostic.Create("SD000", "Missing shader header"));
 
         return new(new SdslDocument(shaders, diags), diags);
+    }
+
+    private static IReadOnlyList<ShaderGenericParameter> ParseGenericParameters(string source, Group genericGroup, string? genericParametersText, List<Diagnostic> diags)
+    {
+        var parsed = new List<ShaderGenericParameter>();
+        if (string.IsNullOrWhiteSpace(genericParametersText) || !genericGroup.Success)
+            return parsed;
+
+        var parts = genericParametersText.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        var running = 0;
+        foreach (var part in parts)
+        {
+            var tokens = part.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length != 2)
+            {
+                var span = GetSpan(source, genericGroup.Index + running);
+                diags.Add(Diagnostic.Create("SD323", $"Failed to parse generic parameter list '{genericParametersText}'.", span.Line, span.Column));
+                return [];
+            }
+
+            var localIdx = genericParametersText.IndexOf(part, running, StringComparison.Ordinal);
+            if (localIdx < 0) localIdx = running;
+            running = localIdx + part.Length;
+            parsed.Add(new ShaderGenericParameter(tokens[0], tokens[1], GetSpan(source, genericGroup.Index + localIdx)));
+        }
+
+        return parsed;
     }
 
     private static SourceSpan GetSpan(string source, int index)
