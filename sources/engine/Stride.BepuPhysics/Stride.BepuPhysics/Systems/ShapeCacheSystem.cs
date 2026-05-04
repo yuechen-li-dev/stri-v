@@ -16,6 +16,13 @@ using Mesh = BepuPhysics.Collidables.Mesh;
 
 namespace Stride.BepuPhysics.Systems;
 
+/// <summary>
+/// Shared runtime cache for mesh/hull extraction used by colliders and editor/runtime shape consumers.
+/// </summary>
+/// <remarks>
+/// Authoring assets (<see cref="Model"/>, <see cref="DecomposedHulls"/>) are the authoritative inputs.
+/// Cached mesh buffers and Bepu triangle buffers are derived runtime data that may be rebuilt at any time.
+/// </remarks>
 internal class ShapeCacheSystem : IDisposable, IService
 {
     internal readonly BasicMeshBuffers _boxShapeData;
@@ -24,7 +31,9 @@ internal class ShapeCacheSystem : IDisposable, IService
     internal readonly IServiceRegistry Services;
     private readonly Dictionary<DecomposedHulls, BasicMeshBuffers> _hullShapeData = new();
 
+    // Bepu mesh extraction allocates through this pool; ownership stays in this service and is cleared on Dispose.
     private readonly BufferPool _sharedPool = new();
+    // Weak-value cache avoids pinning content forever while allowing fast reuse when callers retain Cache tokens.
     private readonly Dictionary<Model, WeakReference<Cache>> _bepuMeshCache = new();
 
     public ShapeCacheSystem(IServiceRegistry Services)
@@ -41,6 +50,7 @@ internal class ShapeCacheSystem : IDisposable, IService
 
     public void Dispose()
     {
+        // Clears pooled allocations owned by this service. Callers should not retain buffers after service shutdown.
         _sharedPool.Clear();
     }
 
@@ -53,6 +63,7 @@ internal class ShapeCacheSystem : IDisposable, IService
     /// <param name="flushModelChanges">Discard the cache for this model, ensuring latest changes made to the model are reflected</param>
     public void GetModelCache(Model model, out Cache cache, bool flushModelChanges = false)
     {
+        // The returned Cache token is the lifetime contract for model-derived runtime mesh data.
         if (flushModelChanges == false)
         {
             lock (_bepuMeshCache)
@@ -316,6 +327,13 @@ internal class ShapeCacheSystem : IDisposable, IService
     /// <summary>
     /// Hold onto this to keep the cache and the bepu shape for the corresponding mesh alive
     /// </summary>
+    /// <summary>
+    /// Lifetime token for model-derived cache entries.
+    /// </summary>
+    /// <remarks>
+    /// Consumers must keep this record alive while using generated shapes; dropping all strong references allows GC
+    /// to collect associated cache objects and forces rebuilding on the next lookup.
+    /// </remarks>
     public record Cache(Model TargetModel, ShapeCacheSystem CacheSystem)
     {
 #warning consider splitting buffer and bepu cache into individual caches instead of grouped like here, otherwise buffers will be kept in memory when hit once by the navmesh and held through mesh physics
