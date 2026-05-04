@@ -66,10 +66,21 @@ public class CleanGraphSmokeTests
     [Fact]
     public async Task FocusedWarningLane_BepuPhysics_HasZeroWarnings()
     {
+        await AssertFocusedWarningLaneHasZeroWarnings("Stride.BepuPhysics");
+    }
+
+    [Fact]
+    public async Task FocusedWarningLane_CoreMathematics_HasZeroWarnings()
+    {
+        await AssertFocusedWarningLaneHasZeroWarnings("Stride.Core.Mathematics");
+    }
+
+    private static async Task AssertFocusedWarningLaneHasZeroWarnings(string projectName)
+    {
         var repoRoot = LocateRepoRoot();
         var scriptPath = Path.Combine(repoRoot, "striv", "build", "striv-check-focused-project.sh");
 
-        var psi = new ProcessStartInfo("bash", $"{Quote(scriptPath)} Stride.BepuPhysics")
+        var psi = new ProcessStartInfo("bash", $"{Quote(scriptPath)} {projectName}")
         {
             WorkingDirectory = repoRoot,
             RedirectStandardOutput = true,
@@ -90,13 +101,13 @@ public class CleanGraphSmokeTests
             TryKill(process);
             var partialStdOut = await stdoutTask;
             var partialStdErr = await stderrTask;
-            throw new TimeoutException($"Focused warning lane timed out after {ProcessTimeout.TotalSeconds:0}s.\nSTDOUT:\n{partialStdOut}\nSTDERR:\n{partialStdErr}");
+            throw new TimeoutException($"Focused warning lane timed out for {projectName} after {ProcessTimeout.TotalSeconds:0}s.\nSTDOUT:\n{partialStdOut}\nSTDERR:\n{partialStdErr}");
         }
 
         var stdout = await stdoutTask;
         var stderr = await stderrTask;
 
-        Assert.True(process.ExitCode == 0, $"Focused warning check failed with exit code {process.ExitCode}.\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}");
+        Assert.True(process.ExitCode == 0, $"Focused warning check failed for {projectName} with exit code {process.ExitCode}.\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}");
     }
 
     private static string LocateRepoRoot()
