@@ -17,6 +17,8 @@
     <Project Path="projects/Stride.Shaders/Stride.Shaders.csproj" />
     <Project Path="projects/Stride/Stride.csproj" />
     <Project Path="projects/StriV.CoreSmoke/StriV.CoreSmoke.csproj" />
+    <Project Path="projects/StriV.ShaderPipeline/StriV.ShaderPipeline.csproj" />
+    <Project Path="tests/StriV.ShaderPipeline.Tests/StriV.ShaderPipeline.Tests.csproj" />
     <Project Path="tests/StriV.CleanGraph.Tests/StriV.CleanGraph.Tests.csproj" />
   </Folder>
 </Solution>

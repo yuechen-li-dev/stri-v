@@ -1,0 +1,16 @@
+shader SimpleStreamShader
+{
+    stage stream float4 Position : SV_Position;
+    stage stream float4 Color : COLOR0;
+
+    stage override void VSMain()
+    {
+        streams.Position = float4(0.0, 0.0, 0.0, 1.0);
+        streams.Color = float4(1.0, 1.0, 1.0, 1.0);
+    }
+
+    stage override float4 PSMain()
+    {
+        return streams.Color;
+    }
+}
