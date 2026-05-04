@@ -9,7 +9,6 @@ namespace Stride.Core.Mathematics;
 /// Represents a 32-bit color (4 bytes) in the form of RGBA (in byte order: R, G, B, A).
 /// </summary>
 [DataContract("Color")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Size = 4)]
 public partial struct Color : IEquatable<Color>
 {

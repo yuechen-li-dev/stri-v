@@ -37,7 +37,6 @@ namespace Stride.Core.Mathematics;
 /// Represents a two dimensional mathematical vector.
 /// </summary>
 [DataContract("float2")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
 public struct Vector2 : IEquatable<Vector2>, ISpanFormattable
 {

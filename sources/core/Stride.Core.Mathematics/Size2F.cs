@@ -31,7 +31,6 @@ namespace Stride.Core.Mathematics;
 /// Defines a 2D rectangular size (width,height).
 /// </summary>
 [DataContract("Size2F")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
 public struct Size2F : IEquatable<Size2F>, ISpanFormattable
 {

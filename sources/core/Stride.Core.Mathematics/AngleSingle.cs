@@ -36,7 +36,6 @@ namespace Stride.Core.Mathematics;
 /// Represents a unit independant angle using a single-precision floating-point
 /// internal representation.
 /// </summary>
-[DataStyle(DataStyle.Compact)]
 [DataContract]
 public struct AngleSingle : IComparable, IComparable<AngleSingle>, IEquatable<AngleSingle>, ISpanFormattable
 {

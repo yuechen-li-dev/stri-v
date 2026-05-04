@@ -37,7 +37,6 @@ namespace Stride.Core.Mathematics;
 ///   A RGBA color value with 32-bit floating-point precision per channel.
 /// </summary>
 [DataContract("Color4")]
-[DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
 public struct Color4 : IEquatable<Color4>, ISpanFormattable
 {
