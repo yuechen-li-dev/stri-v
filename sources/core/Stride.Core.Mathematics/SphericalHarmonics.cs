@@ -14,6 +14,11 @@ namespace Stride.Core.Mathematics;
 /// A representation of a sphere of values via Spherical Harmonics (SH).
 /// </summary>
 /// <typeparam name="TDataType">The type of data contained by the sphere</typeparam>
+/// <remarks>
+/// Refactor invariant: <see cref="Order"/> and <see cref="Coefficients"/> are part of the serialized data contract.
+/// Their member names/order and coefficient indexing (<c>l*l + l + m</c>) are consumed by existing content and must
+/// remain stable unless a serializer compatibility migration is implemented.
+/// </remarks>
 [DataContract("SphericalHarmonicsGeneric")]
 public abstract class SphericalHarmonics<TDataType>
 {
@@ -49,6 +54,10 @@ public abstract class SphericalHarmonics<TDataType>
     /// <summary>
     /// Initializes a new instance of the <see cref="SphericalHarmonics{TDataType}"/> class (null, for serialization).
     /// </summary>
+    /// <remarks>
+    /// This constructor intentionally leaves <see cref="Coefficients"/> unset for deserialization workflows.
+    /// Future nullable/CS8618 cleanup must preserve this lifecycle behavior instead of forcing eager initialization.
+    /// </remarks>
     internal SphericalHarmonics()
     {
     }

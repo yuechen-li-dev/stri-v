@@ -36,6 +36,11 @@ namespace Stride.Core.Mathematics;
 /// <summary>
 /// Represents a three dimensional mathematical vector.
 /// </summary>
+/// <remarks>
+/// Refactor invariant: <see cref="StructLayoutAttribute"/> and X/Y/Z field order are load-bearing for
+/// binary serialization and for <see cref="Unsafe.BitCast{TFrom,TTo}(TFrom)"/> conversions with
+/// <see cref="System.Numerics.Vector3"/>; do not reorder fields or replace bitcasts without an equivalence proof pass.
+/// </remarks>
 [DataContract("float3")]
 [DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
