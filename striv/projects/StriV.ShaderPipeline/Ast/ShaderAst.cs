@@ -7,6 +7,8 @@ public sealed record HlslFunction(string Signature, string Body);
 
 public sealed record SdslShader(
     string Name,
+    string? GenericParametersText,
+    IReadOnlyList<string> BaseShaders,
     IReadOnlyList<SdslStream> Streams,
     IReadOnlyList<SdslStageMethod> Methods,
     IReadOnlyList<string> Modifiers);

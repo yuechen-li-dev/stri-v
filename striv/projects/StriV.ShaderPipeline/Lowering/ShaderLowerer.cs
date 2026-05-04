@@ -19,6 +19,10 @@ public sealed class ShaderLowerer
 
         var sb = new StringBuilder();
         sb.AppendLine($"// Lowered from {shader.Name}");
+        if (!string.IsNullOrWhiteSpace(shader.GenericParametersText))
+            sb.AppendLine($"// TODO(SD301): generic parameters '{shader.GenericParametersText}' are parsed but not specialized");
+        if (shader.BaseShaders.Count > 0)
+            sb.AppendLine($"// TODO(SD300): base shaders '{string.Join(", ", shader.BaseShaders)}' are parsed but not merged");
         sb.AppendLine("struct StriVStageStreams");
         sb.AppendLine("{");
         foreach (var stream in layout.Bindings) sb.AppendLine($"    {stream.Type} {stream.Name} : {stream.Semantic};");
@@ -27,6 +31,9 @@ public sealed class ShaderLowerer
 
         foreach (var method in shader.Methods)
         {
+            if (method.Body.Contains("base.", StringComparison.Ordinal))
+                diags.Add(Diagnostic.Create("SD302", "base call detected but base resolution is not implemented.", method.Span.Line, method.Span.Column));
+
             if (method.Name == "VSMain")
             {
                 LowerVsMain(sb, method, diags);

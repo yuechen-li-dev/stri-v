@@ -24,9 +24,18 @@ public sealed class ShaderParser
     public ParseResult<SdslShader> ParseSdsl(string source)
     {
         var diags = new List<Diagnostic>();
-        var header = Regex.Match(source, @"shader\s+([A-Za-z_]\w*)");
+        var header = Regex.Match(source, @"shader\s+([A-Za-z_]\w*)(\s*<([^>]+)>)?(\s*:\s*([^\{\r\n]+))?");
         if (!header.Success) return new(null, [Diagnostic.Create("SD000", "Missing shader header")]);
         var name = header.Groups[1].Value;
+        var genericParametersText = header.Groups[3].Success ? header.Groups[3].Value.Trim() : null;
+        var baseShaders = header.Groups[5].Success
+            ? header.Groups[5].Value.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList()
+            : new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(genericParametersText))
+            diags.Add(Diagnostic.Create("SD301", "Generic parameters parsed but specialization is not implemented.", GetSpan(source, header.Groups[3].Index).Line, GetSpan(source, header.Groups[3].Index).Column));
+        if (baseShaders.Count > 0)
+            diags.Add(Diagnostic.Create("SD300", "Shader inheritance parsed but mixin merge is not implemented.", GetSpan(source, header.Groups[5].Index).Line, GetSpan(source, header.Groups[5].Index).Column));
 
         var streams = new List<SdslStream>();
         var streamRegex = new Regex(@"stage\s+stream\s+([^\s]+)\s+([A-Za-z_]\w*)\s*:\s*([A-Za-z_]\w*)\s*;", RegexOptions.Multiline);
@@ -45,7 +54,7 @@ public sealed class ShaderParser
             methods.Add(new(m.Groups[2].Value, m.Groups[3].Value, m.Groups[4].Value, body[1..^1].Trim(), new[] { "stage", "override" }, span));
         }
 
-        return new(new(name, streams, methods, new[] { "shader" }), diags);
+        return new(new(name, genericParametersText, baseShaders, streams, methods, new[] { "shader" }), diags);
     }
 
     private static SourceSpan GetSpan(string source, int index)
