@@ -40,6 +40,14 @@ using FreeImageAPI.IO;
 
 namespace FreeImageAPI
 {
+    /// <summary>
+    /// Raw native interop declarations for the FreeImage C ABI.
+    /// </summary>
+    /// <remarks>
+    /// Set-in-order invariant: keep these signatures and marshaling attributes ABI-stable.
+    /// Changes here can silently break runtime behavior and must be done only with dedicated
+    /// native compatibility validation.
+    /// </remarks>
     internal static partial class FreeImage
 	{
 		#region Constants

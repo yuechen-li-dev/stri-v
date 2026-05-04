@@ -48,9 +48,12 @@ using Stride.Core;
 namespace FreeImageAPI
 {
 	/// <summary>
-	/// Static class importing functions from the FreeImage library
-	/// and providing additional functions.
+	/// Managed wrapper surface layered over <see cref="FreeImage"/> native imports.
 	/// </summary>
+	/// <remarks>
+	/// This file is not the raw ABI declaration layer; it is a managed convenience layer that composes
+	/// imported functions into higher-level operations used by runtime bridge classes.
+	/// </remarks>
 	internal static partial class FreeImage
 	{
 		#region Constants
@@ -64,6 +67,10 @@ namespace FreeImageAPI
 		/// <summary>
 		/// Stores handles used to read from streams.
 		/// </summary>
+		/// <remarks>
+		/// Ownership note: these <see cref="fi_handle"/> values are adapter handles passed through native APIs;
+		/// lifecycle coordination must remain aligned with stream open/close wrappers.
+		/// </remarks>
 		private static Dictionary<FIMULTIBITMAP, fi_handle> streamHandles =
 			new Dictionary<FIMULTIBITMAP, fi_handle>();
 
