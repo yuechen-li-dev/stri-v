@@ -23,6 +23,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <!-- Stri-V Core excludes editor-only compositor glue from the clean runtime graph. -->
+    <Compile Remove="../../../sources/engine/Stride.Engine/Rendering/Compositing/EditorTopLevelCompositor.cs" />
+    <!-- Stri-V Core is desktop Vulkan-first and currently excludes VR-specific runtime helpers. -->
+    <Compile Remove="../../../sources/engine/Stride.Engine/Rendering/Compositing/ForwardRenderer.VRUtils.cs" />
     <Compile Remove="../../../sources/engine/Stride.Engine/Shaders.Compiler/**/*.cs" />
     <Compile Remove="../../../sources/engine/Stride.Engine/Audio/*.cs" />
     <Compile Remove="../../../sources/engine/Stride.Engine/Engine/AudioEmitterComponent.cs" />
