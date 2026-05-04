@@ -10,11 +10,21 @@ using Stride.Engine.Design;
 
 namespace Stride.BepuPhysics.Constraints;
 
+/// <summary>
+/// Constrains two bodies so they rotate around one shared hinge axis while remaining connected at local offsets.
+/// </summary>
+/// <remarks>
+/// Component properties mirror a Bepu <see cref="Hinge"/> description. <see cref="ConstraintProcessor"/> materializes this
+/// description when both body handles are available in the same simulation.
+/// </remarks>
 [DataContract]
 [DefaultEntityComponentProcessor(typeof(ConstraintProcessor), ExecutionMode = ExecutionMode.Runtime)]
 [ComponentCategory("Physics - Bepu Constraint")]
 public sealed class HingeConstraintComponent : TwoBodyConstraintComponent<Hinge>, ISpring, IWithTwoLocalOffset
 {
+    /// <summary>
+    /// Initializes default spring settings for a practical out-of-box hinge response.
+    /// </summary>
     public HingeConstraintComponent() => BepuConstraint = new()
     {
         SpringSettings = new SpringSettings(30, 5)
@@ -34,6 +44,9 @@ public sealed class HingeConstraintComponent : TwoBodyConstraintComponent<Hinge>
         }
     }
 
+    /// <summary>
+    /// Hinge axis expressed in body A local space.
+    /// </summary>
     public Vector3 LocalHingeAxisA
     {
         get
@@ -61,6 +74,9 @@ public sealed class HingeConstraintComponent : TwoBodyConstraintComponent<Hinge>
         }
     }
 
+    /// <summary>
+    /// Hinge axis expressed in body B local space.
+    /// </summary>
     public Vector3 LocalHingeAxisB
     {
         get

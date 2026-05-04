@@ -13,6 +13,13 @@ namespace Stride.BepuPhysics.Constraints;
 [DefaultEntityComponentProcessor(typeof(ConstraintProcessor), ExecutionMode = ExecutionMode.Runtime)]
 [ComponentCategory("Physics - Bepu Constraint")]
 [AllowMultipleComponents]
+/// <summary>
+/// Base type for Stride-side constraint components that are materialized into Bepu solver constraints at runtime.
+/// </summary>
+/// <remarks>
+/// This type stores serialized/editor-facing references and defers runtime binding to <see cref="ConstraintProcessor"/>.
+/// Constraints are expected to survive arbitrary scene/entity load order; body handles may not exist when the component is deserialized.
+/// </remarks>
 public abstract class ConstraintComponentBase : EntityComponent
 {
     protected static Logger Logger = GlobalLogger.GetLogger(nameof(ConstraintComponentBase));
@@ -20,6 +27,12 @@ public abstract class ConstraintComponentBase : EntityComponent
     private bool _enabled = true;
     private readonly BodyComponent?[] _bodies;
 
+    /// <summary>
+    /// Enables or disables runtime attachment for this constraint description.
+    /// </summary>
+    /// <remarks>
+    /// Changing this value does not mutate serialized shape; it only asks the runtime to detach or reattach in place.
+    /// </remarks>
     public bool Enabled
     {
         get
@@ -33,6 +46,9 @@ public abstract class ConstraintComponentBase : EntityComponent
         }
     }
 
+    /// <summary>
+    /// Gets the body slots this constraint expects to bind to.
+    /// </summary>
     public ReadOnlySpan<BodyComponent?> Bodies => _bodies;
 
     protected ConstraintComponentBase(int bodies) => _bodies = new BodyComponent?[bodies];
@@ -70,12 +86,24 @@ public abstract class ConstraintComponentBase : EntityComponent
     /// </remarks>
     public abstract float GetAccumulatedForceMagnitude();
 
+    /// <summary>
+    /// Called whenever one of the body slots changes.
+    /// </summary>
+    /// <remarks>
+    /// Implementations should keep this side effect free relative to serialized state and only coordinate runtime registration.
+    /// </remarks>
     protected abstract void BodiesChanged();
 
+    /// <summary>
+    /// Called by <see cref="ConstraintProcessor"/> when the component becomes active in a scene with a Bepu configuration.
+    /// </summary>
     internal abstract void Activate(BepuConfiguration bepuConfig);
 
     internal abstract void Deactivate();
 
+    /// <summary>
+    /// Attempts to detach/rebuild the runtime solver entry from the current serialized component state.
+    /// </summary>
     internal abstract ConstraintState TryReattachConstraint();
 
     internal abstract void DetachConstraint();
