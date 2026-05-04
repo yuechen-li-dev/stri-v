@@ -20,5 +20,12 @@ public sealed record SdslStageMethod(
     string Name,
     string Parameters,
     string Body,
+    IReadOnlyList<BaseCall> BaseCalls,
     IReadOnlyList<string> Modifiers,
+    SourceSpan Span);
+
+public sealed record BaseCall(
+    string MethodName,
+    string ArgumentText,
+    int ArgumentCount,
     SourceSpan Span);

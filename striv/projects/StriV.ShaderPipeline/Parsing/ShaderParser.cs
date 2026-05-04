@@ -51,7 +51,9 @@ public sealed class ShaderParser
         {
             var body = ReadBalancedBlock(source, m.Index + m.Length - 1, out _);
             var span = GetSpan(source, m.Index);
-            methods.Add(new(m.Groups[2].Value, m.Groups[3].Value, m.Groups[4].Value, body[1..^1].Trim(), new[] { "stage", "override" }, span));
+            var bodyText = body[1..^1].Trim();
+            var baseCalls = BaseCallScanner.Scan(bodyText, span);
+            methods.Add(new(m.Groups[2].Value, m.Groups[3].Value, m.Groups[4].Value, bodyText, baseCalls, new[] { "stage", "override" }, span));
         }
 
         return new(new(name, genericParametersText, baseShaders, streams, methods, new[] { "shader" }), diags);

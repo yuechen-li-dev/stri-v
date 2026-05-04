@@ -31,8 +31,17 @@ public sealed class ShaderLowerer
 
         foreach (var method in shader.Methods)
         {
-            if (method.Body.Contains("base.", StringComparison.Ordinal))
-                diags.Add(Diagnostic.Create("SD302", "base call detected but base resolution is not implemented.", method.Span.Line, method.Span.Column));
+            foreach (var baseCall in method.BaseCalls)
+            {
+                var preview = baseCall.ArgumentCount == 0
+                    ? $"base.{baseCall.MethodName}()"
+                    : $"base.{baseCall.MethodName}(...)";
+                diags.Add(Diagnostic.Create(
+                    "SD302",
+                    $"Base call '{preview}' with {baseCall.ArgumentCount} argument(s) in stage method '{method.Name}' cannot be resolved until mixin merge is implemented.",
+                    baseCall.Span.Line,
+                    baseCall.Span.Column));
+            }
 
             if (method.Name == "VSMain")
             {
@@ -83,6 +92,7 @@ public sealed class ShaderLowerer
         sb.AppendLine("StriVStageStreams VSMain()");
         sb.AppendLine("{");
         sb.AppendLine("    StriVStageStreams streams;");
+        EmitBaseCallTodos(sb, method);
         foreach (var line in method.Body.Split('\n')) sb.AppendLine($"    {line.TrimEnd()}");
         sb.AppendLine("    return streams;");
         sb.AppendLine("}");
@@ -95,7 +105,14 @@ public sealed class ShaderLowerer
         var suffix = method.ReturnType == "float4" ? " : SV_Target" : string.Empty;
         sb.AppendLine($"{method.ReturnType} PSMain(StriVStageStreams streams){suffix}");
         sb.AppendLine("{");
+        EmitBaseCallTodos(sb, method);
         foreach (var line in method.Body.Split('\n')) sb.AppendLine($"    {line.TrimEnd()}");
         sb.AppendLine("}");
+    }
+
+    private static void EmitBaseCallTodos(StringBuilder sb, SdslStageMethod method)
+    {
+        foreach (var baseCall in method.BaseCalls)
+            sb.AppendLine($"    // TODO SD302: unresolved base call base.{baseCall.MethodName}(...) with {baseCall.ArgumentCount} argument(s) in {method.Name}; mixin merge not implemented.");
     }
 }
