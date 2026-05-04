@@ -37,6 +37,11 @@ namespace Stride.Core.Mathematics;
 /// <summary>
 /// Represents a four dimensional mathematical quaternion.
 /// </summary>
+/// <remarks>
+/// Refactor invariant: this struct participates in serializer shape, native interop, and
+/// <see cref="Unsafe.BitCast{TFrom,TTo}(TFrom)"/> conversion with <see cref="System.Numerics.Quaternion"/>.
+/// Preserve sequential layout and X/Y/Z/W field order unless a dedicated migration proves compatibility.
+/// </remarks>
 [DataContract("quaternion")]
 [DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
@@ -181,6 +186,10 @@ public struct Quaternion : IEquatable<Quaternion>, ISpanFormattable
     /// <summary>
     /// Gets a value indicting whether this instance is normalized.
     /// </summary>
+    /// <remarks>
+    /// Normalization-sensitive code paths (slerp, rotation extraction, direction transforms) assume unit quaternions;
+    /// forwarding to BCL helpers must preserve current tolerance behavior (<see cref="MathUtil.ZeroTolerance"/>).
+    /// </remarks>
     public bool IsNormalized
     {
         get { return MathF.Abs((X * X) + (Y * Y) + (Z * Z) + (W * W) - 1f) < MathUtil.ZeroTolerance; }

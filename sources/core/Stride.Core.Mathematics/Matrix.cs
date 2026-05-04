@@ -40,6 +40,11 @@ namespace Stride.Core.Mathematics;
 /// <summary>
 /// Represents a 4x4 mathematical matrix.
 /// </summary>
+/// <remarks>
+/// Refactor invariant: this type has layout and serialized-shape coupling. <see cref="StructLayoutAttribute"/>,
+/// field order, and the current set of matrix fields are consumed by interop and content serialization paths;
+/// keep the existing shape stable unless a dedicated compatibility proof/migration pass is performed.
+/// </remarks>
 [DataContract("float4x4")]
 [DataStyle(DataStyle.Compact)]
 [StructLayout(LayoutKind.Sequential, Pack = 4)]
@@ -48,6 +53,7 @@ public struct Matrix : IEquatable<Matrix>, ISpanFormattable
     /// <summary> Are matrix row or column major </summary>
     /// <remarks>
     /// Dotnet's <see cref="System.Numerics.Matrix4x4"/> are row major.
+    /// Preserve this convention when touching multiplication/transform code or introducing System.Numerics forwarding.
     /// </remarks>
     public const bool LayoutIsRowMajor = false;
 
