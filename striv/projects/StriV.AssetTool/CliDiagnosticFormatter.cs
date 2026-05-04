@@ -23,6 +23,16 @@ public static class CliDiagnosticFormatter
         };
     }
 
+
+    public static string FormatArtifactRecord(string shaderId, string manifestPath)
+        => JsonSerializer.Serialize(new
+        {
+            kind = "artifact",
+            id = shaderId,
+            manifestPath,
+            fatal = false
+        });
+
     public static object ToRecord(AssetDiagnostic diagnostic)
         => new
         {

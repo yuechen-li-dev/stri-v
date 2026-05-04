@@ -9,6 +9,7 @@ var diagnosticsOption = new Option<DiagnosticFormat>("--diagnostics") { Descript
 var strictDxcOption = new Option<bool>("--strict-dxc") { Description = "Require DXC to be available and emit DXIL diagnostics as fatal." };
 var noDxcOption = new Option<bool>("--no-dxc") { Description = "Disable strict DXC checks even if strict mode was requested by defaults." };
 var verboseOption = new Option<bool>("--verbose") { Description = "Emit per-artifact build lines." };
+var quietOption = new Option<bool>("--quiet") { Description = "Suppress non-diagnostic success output." };
 
 var buildAssetsCommand = new Command("build-assets") { Description = "Build shader assets from an asset manifest." };
 buildAssetsCommand.Options.Add(manifestOption);
@@ -17,6 +18,7 @@ buildAssetsCommand.Options.Add(diagnosticsOption);
 buildAssetsCommand.Options.Add(strictDxcOption);
 buildAssetsCommand.Options.Add(noDxcOption);
 buildAssetsCommand.Options.Add(verboseOption);
+buildAssetsCommand.Options.Add(quietOption);
 
 buildAssetsCommand.SetAction(parseResult =>
 {
@@ -26,6 +28,7 @@ buildAssetsCommand.SetAction(parseResult =>
     var strictDxc = parseResult.GetValue(strictDxcOption);
     var noDxc = parseResult.GetValue(noDxcOption);
     var verbose = parseResult.GetValue(verboseOption);
+    var quiet = parseResult.GetValue(quietOption);
     var effectiveStrictDxc = strictDxc && !noDxc;
 
     var manifestPath = manifestFile.FullName;
@@ -51,8 +54,17 @@ buildAssetsCommand.SetAction(parseResult =>
     else
         WriteDiagnostics(result.Diagnostics, diagnosticsFormat);
 
-    foreach (var built in result.Built.Where(_ => verbose || diagnosticsFormat == DiagnosticFormat.Text))
-        Console.WriteLine($"OK {built.ShaderId} -> {built.ManifestPath}");
+    if (!quiet)
+    {
+        foreach (var built in result.Built.Where(_ => verbose || diagnosticsFormat == DiagnosticFormat.Text))
+            Console.WriteLine($"OK {built.ShaderId} -> {built.ManifestPath}");
+
+        if (diagnosticsFormat == DiagnosticFormat.Jsonl)
+        {
+            foreach (var built in result.Built)
+                Console.WriteLine(CliDiagnosticFormatter.FormatArtifactRecord(built.ShaderId, built.ManifestPath));
+        }
+    }
 
     if (result.Diagnostics.Any(d => d.Fatal))
     {
@@ -60,7 +72,9 @@ buildAssetsCommand.SetAction(parseResult =>
         return 1;
     }
 
-    Console.WriteLine($"SUCCESS: built {result.Built.Count} shader assets.");
+    if (!quiet)
+        Console.WriteLine($"SUCCESS: built {result.Built.Count} shader assets.");
+
     return 0;
 });
 
