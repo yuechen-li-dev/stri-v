@@ -19,8 +19,10 @@
     <Project Path="projects/StriV.CoreSmoke/StriV.CoreSmoke.csproj" />
     <Project Path="projects/StriV.ShaderPipeline/StriV.ShaderPipeline.csproj" />
     <Project Path="projects/StriV.AssetPipeline/StriV.AssetPipeline.csproj" />
+    <Project Path="projects/StriV.AssetTool/StriV.AssetTool.csproj" />
     <Project Path="tests/StriV.AssetPipeline.Tests/StriV.AssetPipeline.Tests.csproj" />
     <Project Path="tests/StriV.ShaderPipeline.Tests/StriV.ShaderPipeline.Tests.csproj" />
     <Project Path="tests/StriV.CleanGraph.Tests/StriV.CleanGraph.Tests.csproj" />
+    <Project Path="tests/StriV.AssetTool.Tests/StriV.AssetTool.Tests.csproj" />
   </Folder>
 </Solution>

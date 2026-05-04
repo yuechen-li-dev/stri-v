@@ -1,0 +1,5 @@
+[[shader]]
+id = "shader.invalid"
+source = "../../shader_manifest/shaders/sprite_batch.sdsl"
+backend = "vulkan"
+profile = "default"
