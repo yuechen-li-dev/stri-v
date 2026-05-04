@@ -1,5 +1,24 @@
 # Stri-V Core M1a bootstrap build
 
+## Current primary path
+
+As of M3, the clean SDK-style graph under `striv/` is the primary Stri-V Core path.
+
+Build:
+```bash
+./striv/build/striv-build-core.sh
+```
+
+Test:
+```bash
+dotnet test striv/tests/StriV.CleanGraph.Tests/StriV.CleanGraph.Tests.csproj --no-build -v minimal
+```
+
+Run smoke:
+```bash
+xvfb-run -a ./striv/build/striv-run-coresmoke.sh
+```
+
 ## What Stri-V Core M1a is
 
 Stri-V Core M1a is the current foundational core-only build slice for the Stri-V hardfork. It is intentionally minimal and is scoped to foundational projects collected in `build/StriV.Core.M1a.slnf`.
