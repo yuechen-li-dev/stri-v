@@ -79,7 +79,10 @@ namespace Stride.Input
 
         private readonly Dictionary<Type, IInputEventRouter> eventRouters = new Dictionary<Type, IInputEventRouter>();
 
-        private GameContext gameContext;
+        // Set by Initialize() before source creation/update is allowed.
+        // Keep this lifecycle explicit when tightening nullability; construction-time defaults
+        // would blur the game-context ownership boundary.
+        private GameContext? gameContext;
 
         private Dictionary<IInputSource, EventHandler<TrackingCollectionChangedEventArgs>> devicesCollectionChangedActions = new Dictionary<IInputSource, EventHandler<TrackingCollectionChangedEventArgs>>();
 
@@ -104,7 +107,8 @@ namespace Stride.Input
         /// Gets or sets the configuration for virtual buttons.
         /// </summary>
         /// <value>The current binding.</value>
-        public VirtualButtonConfigSet VirtualButtonConfigSet { get; set; }
+        // Compatibility-only shim surface: this can intentionally be absent.
+        public VirtualButtonConfigSet? VirtualButtonConfigSet { get; set; }
 
         /// <summary>
         /// List of the gestures to recognize.
@@ -593,7 +597,7 @@ namespace Stride.Input
             }
         }
 
-        private void SourcesOnCollectionChanged(object o, TrackingCollectionChangedEventArgs e)
+        private void SourcesOnCollectionChanged(object? o, TrackingCollectionChangedEventArgs e)
         {
             var source = (IInputSource)e.Item;
             switch (e.Action)
@@ -734,7 +738,7 @@ namespace Stride.Input
             }
         }
 
-        private void GesturesOnCollectionChanged(object sender, TrackingCollectionChangedEventArgs trackingCollectionChangedEventArgs)
+        private void GesturesOnCollectionChanged(object? sender, TrackingCollectionChangedEventArgs trackingCollectionChangedEventArgs)
         {
             switch (trackingCollectionChangedEventArgs.Action)
             {
@@ -949,7 +953,7 @@ namespace Stride.Input
             gameControllers.Remove(gameController);
         }
 
-        private void GamePadOnIndexChanged(object sender, GamePadIndexChangedEventArgs e)
+        private void GamePadOnIndexChanged(object? sender, GamePadIndexChangedEventArgs e)
         {
             UpdateGamePadRequestedIndices();
         }
