@@ -49,10 +49,14 @@ fi
 echo "Log path: $log_path"
 
 if [[ $build_exit -ne 0 ]]; then
-  exit $build_exit
+  echo "Focused build failed; returning dotnet build exit code: $build_exit" >&2
+  exit "$build_exit"
 fi
 
-if [[ "$focused_warning_count" -ne 0 ]]; then
+if [[ "$focused_warning_count" -gt 0 ]]; then
+  echo "Focused warning gate failed for $focus_project; returning exit code 4." >&2
   exit 4
 fi
 
+echo "Focused warning gate passed for $focus_project (0 focused warnings)."
+exit 0
