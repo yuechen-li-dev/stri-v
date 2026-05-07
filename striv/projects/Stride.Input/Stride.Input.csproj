@@ -6,7 +6,7 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../../..//sources/engine/Stride.Input/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <Compile Include="**/*.cs" Exclude="**/bin/**;**/obj/**" />
     <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
       <Link>Properties/SharedAssemblyInfo.cs</Link>
     </Compile>
@@ -14,12 +14,8 @@
 
   <ItemGroup>
     <!-- Stri-V clean core is Vulkan-first (Linux + minimal Windows desktop validation); mobile and UWP input backends are out of scope. -->
-    <Compile Remove="../../../sources/engine/Stride.Input/Android/**/*.cs" />
-    <Compile Remove="../../../sources/engine/Stride.Input/UWP/**/*.cs" />
-
-    <!-- Keep minimal Windows desktop keyboard/mouse input (RawInput) for local Vulkan validation. -->
-    <Compile Remove="../../../sources/engine/Stride.Input/InputSourceWindowsDirectInput.cs" />
-    <Compile Remove="../../../sources/engine/Stride.Input/InputSourceWindowsXInput.cs" />
+    <Compile Remove="Windows/InputSourceWindowsDirectInput.cs" />
+    <Compile Remove="Windows/InputSourceWindowsXInput.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Stride.Games/Stride.Games.csproj" />
