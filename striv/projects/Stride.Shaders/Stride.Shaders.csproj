@@ -7,7 +7,7 @@
     <StriVAssemblyProcessorOptions>--serialization --parameter-key --auto-module-initializer</StriVAssemblyProcessorOptions>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../../../sources/engine/Stride.Shaders/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <Compile Include="**/*.cs" Exclude="**/bin/**;**/obj/**" />
     <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
       <Link>Properties/SharedAssemblyInfo.cs</Link>
     </Compile>

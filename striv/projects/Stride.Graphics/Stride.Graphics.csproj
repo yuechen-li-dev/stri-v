@@ -7,7 +7,7 @@
     <DefineConstants>$(DefineConstants);STRIDE_GRAPHICS_NO_DESCRIPTOR_COPIES</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../../..//sources/engine/Stride.Graphics/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <Compile Include="**/*.cs" Exclude="**/bin/**;**/obj/**" />
     <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
       <Link>Properties/SharedAssemblyInfo.cs</Link>
     </Compile>
@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <!-- Stri-V clean core is Linux/Vulkan-first; Windows Mixed Reality presenter is UWP/Direct3D-specific. -->
-    <Compile Remove="../../../sources/engine/Stride.Graphics/WindowsMixedReality/**/*.cs" />
+    <Compile Remove="WindowsMixedReality/**/*.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Stride/Stride.csproj" />
