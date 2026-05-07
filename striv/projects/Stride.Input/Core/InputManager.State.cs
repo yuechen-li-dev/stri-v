@@ -62,7 +62,7 @@ namespace Stride.Input
         /// <summary>
         /// Device that is responsible for setting the current <see cref="MouseDelta"/> and <see cref="MousePosition"/>
         /// </summary>
-        public IPointerDevice LastPointerDevice { get; private set; }
+        public IPointerDevice? LastPointerDevice { get; private set; }
 
         /// <summary>
         /// Determines whether one or more keys are pressed
@@ -73,7 +73,7 @@ namespace Stride.Input
             get
             {
                 if (!HasKeyboard) return false;
-                return Keyboard.PressedKeys.Count > 0;
+                return Keyboard!.PressedKeys.Count > 0;
             }
         }
 
@@ -86,7 +86,7 @@ namespace Stride.Input
             get
             {
                 if (!HasKeyboard) return false;
-                return Keyboard.ReleasedKeys.Count > 0;
+                return Keyboard!.ReleasedKeys.Count > 0;
             }
         }
 
@@ -99,7 +99,7 @@ namespace Stride.Input
             get
             {
                 if (!HasKeyboard) return false;
-                return Keyboard.DownKeys.Count > 0;
+                return Keyboard!.DownKeys.Count > 0;
             }
         }
 
@@ -111,7 +111,7 @@ namespace Stride.Input
             get
             {
                 if (!HasKeyboard) return NoKeys;
-                return Keyboard.PressedKeys;
+                return Keyboard!.PressedKeys;
             }
         }
 
@@ -123,7 +123,7 @@ namespace Stride.Input
             get
             {
                 if (!HasKeyboard) return NoKeys;
-                return Keyboard.ReleasedKeys;
+                return Keyboard!.ReleasedKeys;
             }
         }
 
@@ -135,7 +135,7 @@ namespace Stride.Input
             get
             {
                 if (!HasKeyboard) return NoKeys;
-                return Keyboard.DownKeys;
+                return Keyboard!.DownKeys;
             }
         }
 
@@ -147,7 +147,7 @@ namespace Stride.Input
             get
             {
                 if (!HasMouse) return NoButtons;
-                return Mouse.PressedButtons;
+                return Mouse!.PressedButtons;
             }
         }
 
@@ -159,7 +159,7 @@ namespace Stride.Input
             get
             {
                 if (!HasMouse) return NoButtons;
-                return Mouse.ReleasedButtons;
+                return Mouse!.ReleasedButtons;
             }
         }
 
@@ -171,7 +171,7 @@ namespace Stride.Input
             get
             {
                 if (!HasMouse) return NoButtons;
-                return Mouse.DownButtons;
+                return Mouse!.DownButtons;
             }
         }
 
@@ -184,7 +184,7 @@ namespace Stride.Input
             get
             {
                 if (!HasMouse) return false;
-                return Mouse.PressedButtons.Count > 0;
+                return Mouse!.PressedButtons.Count > 0;
             }
         }
 
@@ -197,7 +197,7 @@ namespace Stride.Input
             get
             {
                 if (!HasMouse) return false;
-                return Mouse.ReleasedButtons.Count > 0;
+                return Mouse!.ReleasedButtons.Count > 0;
             }
         }
 
@@ -210,7 +210,7 @@ namespace Stride.Input
             get
             {
                 if (!HasMouse) return false;
-                return Mouse.DownButtons.Count > 0;
+                return Mouse!.DownButtons.Count > 0;
             }
         }
 
