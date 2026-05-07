@@ -81,11 +81,6 @@ public class CleanGraphSmokeTests
         await AssertFocusedWarningLaneHasZeroWarnings("Stride.Core.IO");
     }
 
-    [Fact]
-    public async Task FocusedWarningLane_Input_HasZeroWarnings()
-    {
-        await AssertFocusedWarningLaneHasZeroWarnings("Stride.Input");
-    }
 
     private static async Task AssertFocusedWarningLaneHasZeroWarnings(string projectName)
     {

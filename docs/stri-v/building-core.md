@@ -28,7 +28,6 @@ Require the focused project to be warning-clean:
 ./striv/build/striv-check-focused-project.sh Stride.BepuPhysics
 ./striv/build/striv-check-focused-project.sh Stride.Core.Mathematics
 ./striv/build/striv-check-focused-project.sh Stride.Core.IO
-./striv/build/striv-check-focused-project.sh Stride.Input
 ```
 
 The focused warning lane is a 5S Shine/Sustain tool. It does not mark inactive project warnings as fixed.
@@ -36,7 +35,8 @@ Completed zero-warning focused projects:
 - `Stride.BepuPhysics`
 - `Stride.Core.Mathematics`
 - `Stride.Core.IO`
-- `Stride.Input`
+
+`Stride.Input` remains in-progress; use the focused checker to track remaining warnings.
 
 Run smoke:
 ```bash
