@@ -81,6 +81,7 @@ public class CleanGraphSmokeTests
         await AssertFocusedWarningLaneHasZeroWarnings("Stride.Core.IO");
     }
 
+
     private static async Task AssertFocusedWarningLaneHasZeroWarnings(string projectName)
     {
         var repoRoot = LocateRepoRoot();

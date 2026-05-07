@@ -27,7 +27,17 @@ dotnet build "$project_path" -c "$configuration" "-p:StriVWarningFocusProject=$f
 build_exit=$?
 set -e
 
-focused_warning_lines="$(awk -v project="$focus_project.csproj" 'index($0, " warning ") && index($0, project) { print }' "$log_path")"
+project_dir="$repo_root/striv/projects/$focus_project"
+project_dir_abs="$(cd "$project_dir" && pwd)/"
+project_dir_rel="striv/projects/$focus_project/"
+project_marker="$focus_project.csproj"
+
+focused_warning_lines="$(awk -v project_abs="$project_dir_abs" -v project_rel="$project_dir_rel" -v marker="$project_marker" '
+  / warning (CS|CA|NU|STRIDE)[0-9]+/ {
+    if (index($0, project_abs) || index($0, project_rel) || index($0, marker))
+      print
+  }
+' "$log_path")"
 focused_warning_count=$(printf '%s\n' "$focused_warning_lines" | sed '/^$/d' | wc -l | tr -d ' ')
 
 echo "Focused project: $focus_project"

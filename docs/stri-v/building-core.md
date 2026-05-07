@@ -36,6 +36,8 @@ Completed zero-warning focused projects:
 - `Stride.Core.Mathematics`
 - `Stride.Core.IO`
 
+`Stride.Input` remains in-progress; use the focused checker to track remaining warnings.
+
 Run smoke:
 ```bash
 xvfb-run -a ./striv/build/striv-run-coresmoke.sh
