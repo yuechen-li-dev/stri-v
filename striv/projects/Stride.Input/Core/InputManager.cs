@@ -123,32 +123,32 @@ namespace Stride.Input
         /// <summary>
         /// Gets the reference to the accelerometer sensor. The accelerometer measures all the acceleration forces applied on the device.
         /// </summary>
-        public IAccelerometerSensor Accelerometer { get; private set; }
+        public IAccelerometerSensor? Accelerometer { get; private set; }
 
         /// <summary>
         /// Gets the reference to the compass sensor. The compass measures the angle between the device top and the north.
         /// </summary>
-        public ICompassSensor Compass { get; private set; }
+        public ICompassSensor? Compass { get; private set; }
 
         /// <summary>
         /// Gets the reference to the gyroscope sensor. The gyroscope measures the rotation speed of the device.
         /// </summary>
-        public IGyroscopeSensor Gyroscope { get; private set; }
+        public IGyroscopeSensor? Gyroscope { get; private set; }
 
         /// <summary>
         /// Gets the reference to the user acceleration sensor. The user acceleration sensor measures the acceleration produce by the user on the device (no gravity).
         /// </summary>
-        public IUserAccelerationSensor UserAcceleration { get; private set; }
+        public IUserAccelerationSensor? UserAcceleration { get; private set; }
 
         /// <summary>
         /// Gets the reference to the gravity sensor. The gravity sensor measures the gravity vector applied to the device.
         /// </summary>
-        public IGravitySensor Gravity { get; private set; }
+        public IGravitySensor? Gravity { get; private set; }
 
         /// <summary>
         /// Gets the reference to the orientation sensor. The orientation sensor measures orientation of device in the world.
         /// </summary>
-        public IOrientationSensor Orientation { get; private set; }
+        public IOrientationSensor? Orientation { get; private set; }
 
         /// <summary>
         /// Gets the value indicating if the mouse position is currently locked or not.
@@ -211,27 +211,27 @@ namespace Stride.Input
         /// <summary>
         /// Gets the first pointer device, or null if there is none
         /// </summary>
-        public IPointerDevice Pointer { get; private set; }
+        public IPointerDevice? Pointer { get; private set; }
 
         /// <summary>
         /// Gets the first mouse pointer device, or null if there is none
         /// </summary>
-        public IMouseDevice Mouse { get; private set; }
+        public IMouseDevice? Mouse { get; private set; }
 
         /// <summary>
         /// Gets the first keyboard device, or null if there is none
         /// </summary>
-        public IKeyboardDevice Keyboard { get; private set; }
+        public IKeyboardDevice? Keyboard { get; private set; }
 
         /// <summary>
         /// First device that supports text input, or null if there is none
         /// </summary>
-        public ITextInputDevice TextInput { get; private set; }
+        public ITextInputDevice? TextInput { get; private set; }
 
         /// <summary>
         /// Gets the first gamepad that was added to the device
         /// </summary>
-        public IGamePadDevice DefaultGamePad { get; private set; }
+        public IGamePadDevice? DefaultGamePad { get; private set; }
 
         /// <summary>
         /// Gets the collection of connected game controllers
@@ -302,17 +302,17 @@ namespace Stride.Input
         /// <summary>
         /// Raised before new input is sent to their respective event listeners
         /// </summary>
-        public event EventHandler<InputPreUpdateEventArgs> PreUpdateInput;
+        public event EventHandler<InputPreUpdateEventArgs>? PreUpdateInput;
 
         /// <summary>
         /// Raised when a device was removed from the system
         /// </summary>
-        public event EventHandler<DeviceChangedEventArgs> DeviceRemoved;
+        public event EventHandler<DeviceChangedEventArgs>? DeviceRemoved;
 
         /// <summary>
         /// Raised when a device was added to the system
         /// </summary>
-        public event EventHandler<DeviceChangedEventArgs> DeviceAdded;
+        public event EventHandler<DeviceChangedEventArgs>? DeviceAdded;
         
         /// <summary>
         /// Helper method to transform mouse and pointer event positions to sub rectangles
@@ -391,7 +391,7 @@ namespace Stride.Input
         /// <param name="gamePadIndex">The index of the gamepad</param>
         /// <returns>The gamepad, or null if no gamepad has this index</returns>
         /// <exception cref="IndexOutOfRangeException">When <paramref name="gamePadIndex"/> is less than 0</exception>
-        public IGamePadDevice GetGamePadByIndex(int gamePadIndex)
+        public IGamePadDevice? GetGamePadByIndex(int gamePadIndex)
         {
             if (gamePadIndex < 0) throw new IndexOutOfRangeException(nameof(gamePadIndex));
             if (gamePadIndex >= gamePadRequestedIndex.Count)
@@ -405,7 +405,7 @@ namespace Stride.Input
         /// <param name="gamePadIndex">The index of the gamepad</param>
         /// <returns>The gamepads, or null if no gamepad has this index</returns>
         /// <exception cref="IndexOutOfRangeException">When <paramref name="gamePadIndex"/> is less than 0</exception>
-        public IEnumerable<IGamePadDevice> GetGamePadsByIndex(int gamePadIndex)
+        public IEnumerable<IGamePadDevice>? GetGamePadsByIndex(int gamePadIndex)
         {
             if (gamePadIndex < 0) throw new IndexOutOfRangeException(nameof(gamePadIndex));
             if (gamePadIndex >= gamePadRequestedIndex.Count)
@@ -680,6 +680,8 @@ namespace Stride.Input
         private void AddSources()
         {
             var context = gameContext;
+            if (context == null)
+                return;
 
             // Add window specific input source (null in headless mode)
             var windowInputSource = InputSourceFactory.NewWindowInputSource(context);
