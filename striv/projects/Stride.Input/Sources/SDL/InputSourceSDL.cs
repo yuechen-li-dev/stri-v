@@ -12,8 +12,12 @@ using Window = Stride.Graphics.SDL.Window;
 namespace Stride.Input
 {
     /// <summary>
-    /// Provides support for mouse/touch/keyboard/gamepads using SDL
+    /// SDL desktop input backend.
     /// </summary>
+    /// <remarks>
+    /// Responsible for SDL-owned device discovery and per-frame device removal bookkeeping.
+    /// DirectInput/XInput backends are intentionally not part of active Stri-V runtime scope.
+    /// </remarks>
     internal unsafe class InputSourceSDL : InputSourceBase
     {
         private static Sdl SDL = Window.SDL;

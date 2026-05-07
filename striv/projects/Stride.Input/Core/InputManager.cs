@@ -14,8 +14,17 @@ using Stride.Games;
 namespace Stride.Input
 {
     /// <summary>
-    /// Manages collecting input from connected input device in the form of <see cref="IInputDevice"/> objects. Also provides some convenience functions for most commonly used devices
+    /// Central coordinator for Stride input runtime state.
     /// </summary>
+    /// <remarks>
+    /// Ownership map for the Set-in-order phase:
+    /// <list type="bullet">
+    /// <item><description><see cref="Sources"/> owns backend registration (SDL, Windows RawInput, Simulated).</description></item>
+    /// <item><description><see cref="Update"/> drives per-frame source polling, event dispatch, and state refresh.</description></item>
+    /// <item><description>Device collections and convenience properties (<see cref="Mouse"/>, <see cref="Keyboard"/>, etc.) are maintained from source device add/remove callbacks.</description></item>
+    /// <item><description>VirtualButton types are compatibility-only shims in this fork; no full VirtualButton runtime subsystem is restored by this class.</description></item>
+    /// </list>
+    /// </remarks>
     public partial class InputManager : ComponentBase
     {
         /// <summary>

@@ -12,6 +12,12 @@ namespace Stride.Input
     /// <summary>
     /// Contains logic to generate pointer events and store the resulting state
     /// </summary>
+    /// <summary>
+    /// Mutable per-frame pointer state cache used by pointer/mouse device implementations.
+    /// </summary>
+    /// <remarks>
+    /// This type is public API surface, but mutation is expected to come from backend device implementations during update.
+    /// </remarks>
     public class PointerDeviceState
     {
         public readonly List<InputEvent> PointerInputEvents = new List<InputEvent>();

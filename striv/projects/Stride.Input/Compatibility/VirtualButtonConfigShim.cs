@@ -3,8 +3,13 @@ using System.Collections.Generic;
 namespace Stride.Input
 {
     /// <summary>
-    /// Minimal shim to keep InputManager virtual-button APIs compile-time compatible while VirtualButton runtime support is out of scope.
+    /// Compatibility-only shim to preserve public virtual-button API surface.
     /// </summary>
+    /// <remarks>
+    /// Stri-V currently has no active VirtualButton runtime subsystem in <c>Stride.Input</c>.
+    /// This type exists to keep build/API compatibility after the VirtualButton cull.
+    /// Do not expand this shim into a new runtime subsystem without an explicit product decision.
+    /// </remarks>
     public class VirtualButtonConfigSet : List<VirtualButtonConfig>
     {
     }

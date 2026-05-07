@@ -9,7 +9,8 @@ using Stride.Core.Mathematics;
 namespace Stride.Input
 {
     /// <summary>
-    /// An extension to <see cref="PointerDeviceState"/> that handle mouse input and translates it to pointer input
+    /// An extension to <see cref="PointerDeviceState"/> that handles mouse input and translates it to pointer input.
+    /// Owned/mutated by <see cref="MouseDeviceBase"/> implementations during each frame update.
     /// </summary>
     public class MouseDeviceState
     {

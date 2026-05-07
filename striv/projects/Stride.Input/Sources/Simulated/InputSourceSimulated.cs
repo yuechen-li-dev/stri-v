@@ -8,8 +8,11 @@ using System.Diagnostics;
 namespace Stride.Input
 {
     /// <summary>
-    /// Provides a virtual mouse and keyboard that generate input events like a normal mouse/keyboard when any of the functions (Simulate...) are called
+    /// Simulated input backend used by tests and tools to inject deterministic input devices/events.
     /// </summary>
+    /// <remarks>
+    /// Owns simulated device lifetimes and registration; event production occurs through explicit Simulate/Add/Remove calls.
+    /// </remarks>
     public class InputSourceSimulated : InputSourceBase
     {
         private List<GamePadSimulated> gamePads = new List<GamePadSimulated>();

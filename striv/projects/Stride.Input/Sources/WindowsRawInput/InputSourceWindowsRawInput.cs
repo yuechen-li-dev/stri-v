@@ -11,8 +11,12 @@ using Stride.Games;
 namespace Stride.Input
 {
     /// <summary>
-    /// Provides support for raw keyboard input on windows
+    /// Windows RawInput backend for desktop keyboard events.
     /// </summary>
+    /// <remarks>
+    /// Handles registration with Win32 raw input and forwards translated key events to managed devices.
+    /// This backend is the active Windows path in Stri-V; DirectInput/XInput controller backends remain obsolete inventory.
+    /// </remarks>
     internal class InputSourceWindowsRawInput : InputSourceBase
     {
         private readonly Control uiControl;
