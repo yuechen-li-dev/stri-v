@@ -16,7 +16,7 @@ namespace Stride.Input
         /// </summary>
         /// <param name="context">The context containing the platform specific window.</param>
         /// <returns>An input source for the window.</returns>
-        public static IInputSource NewWindowInputSource(GameContext context)
+        public static IInputSource? NewWindowInputSource(GameContext context)
         {
             switch (context.ContextType)
             {

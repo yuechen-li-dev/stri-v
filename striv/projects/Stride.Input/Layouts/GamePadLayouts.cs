@@ -42,7 +42,7 @@ namespace Stride.Input
         /// <param name="source">The source that the <paramref name="device"/> came from</param>
         /// <param name="device">The device to find a layout for</param>
         /// <returns>The gamepad layout that was found, or null if none was found</returns>
-        public static GamePadLayout FindLayout(IInputSource source, IGameControllerDevice device)
+        public static GamePadLayout? FindLayout(IInputSource source, IGameControllerDevice device)
         {
             lock (layouts)
             {
