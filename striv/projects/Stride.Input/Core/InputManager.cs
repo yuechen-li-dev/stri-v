@@ -153,7 +153,7 @@ namespace Stride.Input
         /// <summary>
         /// Gets the value indicating if the mouse position is currently locked or not.
         /// </summary>
-        public bool IsMousePositionLocked => HasMouse && Mouse.IsPositionLocked;
+        public bool IsMousePositionLocked => Mouse?.IsPositionLocked ?? false;
 
         /// <summary>
         /// All input events that happened since the last frame
@@ -369,7 +369,7 @@ namespace Stride.Input
             // Lock primary mouse
             if (HasMouse)
             {
-                Mouse.LockPosition(forceCenter);
+                Mouse?.LockPosition(forceCenter);
             }
         }
 
@@ -381,7 +381,7 @@ namespace Stride.Input
         {
             if (HasMouse)
             {
-                Mouse.UnlockPosition();
+                Mouse?.UnlockPosition();
             }
         }
 
@@ -457,8 +457,7 @@ namespace Stride.Input
             // Send events to input listeners
             foreach (var evt in events)
             {
-                IInputEventRouter router;
-                if (!eventRouters.TryGetValue(evt.GetType(), out router))
+                if (!eventRouters.TryGetValue(evt.GetType(), out var router))
                     throw new InvalidOperationException($"The event type {evt.GetType()} was not registered with the input manager and cannot be processed");
 
                 router.RouteEvent(evt);
@@ -599,22 +598,26 @@ namespace Stride.Input
 
         private void SourcesOnCollectionChanged(object? o, TrackingCollectionChangedEventArgs e)
         {
-            var source = (IInputSource)e.Item;
+            if (e.Item is not IInputSource source)
+                throw new InvalidOperationException("Input source collection contained a non-input source item.");
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
                     if (Sources.Count(x => x == source) > 1)
                         throw new InvalidOperationException("Input Source already added");
 
-                    EventHandler<TrackingCollectionChangedEventArgs> eventHandler = (sender, args) => InputDevicesOnCollectionChanged(source, args);
+                    EventHandler<TrackingCollectionChangedEventArgs> eventHandler = (_, args) => InputDevicesOnCollectionChanged(source, args);
                     devicesCollectionChangedActions.Add(source, eventHandler);
                     source.Devices.CollectionChanged += eventHandler;
                     source.Initialize(this);
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     source.Dispose();
-                    source.Devices.CollectionChanged -= devicesCollectionChangedActions[source];
-                    devicesCollectionChangedActions.Remove(source);
+                    if (devicesCollectionChangedActions.TryGetValue(source, out var removeHandler))
+                    {
+                        source.Devices.CollectionChanged -= removeHandler;
+                        devicesCollectionChangedActions.Remove(source);
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(e.Action));
@@ -745,10 +748,12 @@ namespace Stride.Input
             switch (trackingCollectionChangedEventArgs.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    StartGestureRecognition((GestureConfig)trackingCollectionChangedEventArgs.Item);
+                    if (trackingCollectionChangedEventArgs.Item is GestureConfig addConfig)
+                        StartGestureRecognition(addConfig);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    StopGestureRecognition((GestureConfig)trackingCollectionChangedEventArgs.Item);
+                    if (trackingCollectionChangedEventArgs.Item is GestureConfig removeConfig)
+                        StopGestureRecognition(removeConfig);
                     break;
                 case NotifyCollectionChangedAction.Replace:
                 case NotifyCollectionChangedAction.Reset:
@@ -776,7 +781,7 @@ namespace Stride.Input
             // Set mouse position for first mouse device
             if (HasMouse)
             {
-                Mouse.SetPosition(normalizedPosition);
+                Mouse?.SetPosition(normalizedPosition);
             }
         }
 
@@ -785,10 +790,12 @@ namespace Stride.Input
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    OnInputDeviceAdded(source, (IInputDevice)e.Item);
+                    if (e.Item is IInputDevice addedDevice)
+                        OnInputDeviceAdded(source, addedDevice);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    OnInputDeviceRemoved((IInputDevice)e.Item);
+                    if (e.Item is IInputDevice removedDevice)
+                        OnInputDeviceRemoved(removedDevice);
                     break;
                 default:
                     throw new InvalidOperationException("Unsupported collection operation");
