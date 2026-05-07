@@ -25,10 +25,11 @@ namespace Stride.Input
         private readonly HashSet<Guid> devicesToRemove = new HashSet<Guid>();
         private readonly Dictionary<int, Guid> joystickInstanceIdToDeviceId = new Dictionary<int, Guid>();
         private readonly Window uiControl;
-        private MouseSDL mouse;
-        private KeyboardSDL keyboard;
-        private PointerSDL pointer; // Touch
-        private InputManager inputManager;
+        // Initialized during Initialize(), before Scan()/event wiring.
+        private MouseSDL? mouse;
+        private KeyboardSDL? keyboard;
+        private PointerSDL? pointer; // Touch
+        private InputManager? inputManager;
 
         public InputSourceSDL(Window uiControl)
         {
@@ -59,6 +60,12 @@ namespace Stride.Input
         
         public override void Dispose()
         {
+            if (mouse == null || keyboard == null || pointer == null)
+            {
+                base.Dispose();
+                return;
+            }
+
             // Stop handling device changes
             uiControl.JoystickDeviceAdded -= UIControlOnJoystickDeviceAdded;
             uiControl.JoystickDeviceRemoved -= UIControlOnJoystickDeviceRemoved;
@@ -113,6 +120,9 @@ namespace Stride.Input
             var layout = GamePadLayouts.FindLayout(this, controller);
             if (layout != null)
             {
+                if (inputManager == null)
+                    throw new InvalidOperationException("SDL input source must be initialized before opening devices.");
+
                 // Create a gamepad wrapping around the controller
                 var gamePad = new GamePadSDL(this, inputManager, controller, layout);
                 resultingDevice = gamePad; // Register gamepad instead

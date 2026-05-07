@@ -67,7 +67,7 @@ namespace Stride.Input
 
         public override IReadOnlyList<GameControllerDirectionInfo> DirectionInfos => povControllerInfos;
 
-        public event EventHandler Disconnected;
+        public event EventHandler? Disconnected;
 
         public void Dispose()
         {
@@ -76,7 +76,7 @@ namespace Stride.Input
                 SDL.JoystickClose(joystick);
                 if (Disconnected == null)
                     throw new InvalidOperationException("Something should handle controller disconnect");
-                Disconnected.Invoke(this, null);
+                Disconnected.Invoke(this, EventArgs.Empty);
                 disposed = true;
             }
         }

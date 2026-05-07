@@ -26,8 +26,10 @@ namespace Stride.Input
         {
             if (!disposed)
             {
-                // ReSharper disable once PossibleNullReferenceException (checked in constructor)
-                (GameControllerDevice as GameControllerSDL).Dispose();
+                if (GameControllerDevice is GameControllerSDL controller)
+                {
+                    controller.Dispose();
+                }
 
                 disposed = true;
             }
