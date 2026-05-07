@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../build/StriV.Core.Profile.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../projects/Stride.Input/Stride.Input.csproj" />
+    <ProjectReference Include="../../projects/Stride.Games/Stride.Games.csproj" />
+    <ProjectReference Include="../../projects/Stride.Core/Stride.Core.csproj" />
+  </ItemGroup>
+</Project>

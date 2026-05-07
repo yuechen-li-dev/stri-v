@@ -24,5 +24,6 @@
     <Project Path="tests/StriV.ShaderPipeline.Tests/StriV.ShaderPipeline.Tests.csproj" />
     <Project Path="tests/StriV.CleanGraph.Tests/StriV.CleanGraph.Tests.csproj" />
     <Project Path="tests/StriV.AssetTool.Tests/StriV.AssetTool.Tests.csproj" />
+    <Project Path="tests/Stride.Input.Tests/Stride.Input.Tests.csproj" />
   </Folder>
 </Solution>
