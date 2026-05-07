@@ -7,7 +7,7 @@
     <StriVAssemblyProcessorOptions>--auto-module-initializer</StriVAssemblyProcessorOptions>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../../..//sources/core/Stride.Core.MicroThreading/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <Compile Include="**/*.cs" Exclude="**/bin/**;**/obj/**" />
     <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
       <Link>Properties/SharedAssemblyInfo.cs</Link>
     </Compile>

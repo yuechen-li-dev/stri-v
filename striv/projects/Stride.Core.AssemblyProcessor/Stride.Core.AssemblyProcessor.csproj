@@ -7,7 +7,7 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../../..//sources/core/Stride.Core.AssemblyProcessor/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <Compile Include="**/*.cs" Exclude="**/bin/**;**/obj/**" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Mono.Cecil" />

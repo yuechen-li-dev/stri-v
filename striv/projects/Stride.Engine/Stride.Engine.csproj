@@ -7,7 +7,7 @@
     <StriVAssemblyProcessorOptions>--parameter-key --auto-module-initializer --serialization</StriVAssemblyProcessorOptions>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../../..//sources/engine/Stride.Engine/**/*.cs" Exclude="**/bin/**;**/obj/**" />
+    <Compile Include="**/*.cs" Exclude="**/bin/**;**/obj/**" />
     <Compile Include="../../../sources/shared/SharedAssemblyInfo.cs">
       <Link>Properties/SharedAssemblyInfo.cs</Link>
     </Compile>
@@ -24,16 +24,16 @@
   </ItemGroup>
   <ItemGroup>
     <!-- Stri-V Core excludes editor-only compositor glue from the clean runtime graph. -->
-    <Compile Remove="../../../sources/engine/Stride.Engine/Rendering/Compositing/EditorTopLevelCompositor.cs" />
+    <Compile Remove="Rendering/Compositing/EditorTopLevelCompositor.cs" />
     <!-- Stri-V Core is desktop Vulkan-first and currently excludes VR-specific runtime helpers. -->
-    <Compile Remove="../../../sources/engine/Stride.Engine/Rendering/Compositing/ForwardRenderer.VRUtils.cs" />
-    <Compile Remove="../../../sources/engine/Stride.Engine/Shaders.Compiler/**/*.cs" />
-    <Compile Remove="../../../sources/engine/Stride.Engine/Audio/*.cs" />
-    <Compile Remove="../../../sources/engine/Stride.Engine/Engine/AudioEmitterComponent.cs" />
-    <Compile Remove="../../../sources/engine/Stride.Engine/Engine/AudioListenerComponent.cs" />
-    <Compile Remove="../../../sources/engine/Stride.Engine/Rendering/Compositing/VRDeviceDescription.cs" />
-    <Compile Remove="../../../sources/engine/Stride.Engine/Rendering/Compositing/VROverlayRenderer.cs" />
-    <Compile Remove="../../../sources/engine/Stride.Engine/Rendering/Compositing/VRRendererSettings.cs" />
+    <Compile Remove="Rendering/Compositing/ForwardRenderer.VRUtils.cs" />
+    <Compile Remove="Shaders.Compiler/**/*.cs" />
+    <Compile Remove="Audio/*.cs" />
+    <Compile Remove="Engine/AudioEmitterComponent.cs" />
+    <Compile Remove="Engine/AudioListenerComponent.cs" />
+    <Compile Remove="Rendering/Compositing/VRDeviceDescription.cs" />
+    <Compile Remove="Rendering/Compositing/VROverlayRenderer.cs" />
+    <Compile Remove="Rendering/Compositing/VRRendererSettings.cs" />
   </ItemGroup>
   <Import Project="../../build/StriV.AssemblyProcessor.targets" />
 </Project>
