@@ -23,7 +23,7 @@ mkdir -p "$log_dir"
 log_path="$log_dir/focused-build-${focus_project//./_}-$(date -u +%Y%m%dT%H%M%SZ).log"
 
 set +e
-dotnet build "$project_path" -c "$configuration" "-p:StriVWarningFocusProject=$focus_project" >"$log_path" 2>&1
+dotnet build "$project_path" -c "$configuration" --no-incremental "-p:StriVWarningFocusProject=$focus_project" >"$log_path" 2>&1
 build_exit=$?
 set -e
 
@@ -32,12 +32,7 @@ project_dir_abs="$(cd "$project_dir" && pwd)/"
 project_dir_rel="striv/projects/$focus_project/"
 project_marker="$focus_project.csproj"
 
-focused_warning_lines="$(awk -v project_abs="$project_dir_abs" -v project_rel="$project_dir_rel" -v marker="$project_marker" '
-  / warning (CS|CA|NU|STRIDE)[0-9]+/ {
-    if (index($0, project_abs) || index($0, project_rel) || index($0, marker))
-      print
-  }
-' "$log_path")"
+focused_warning_lines="$(grep -E 'warning (CS|CA|NU|STRIDE)[0-9]+' "$log_path" | grep -E "$project_dir_abs|$project_dir_rel|$project_marker" || true)"
 focused_warning_count=$(printf '%s\n' "$focused_warning_lines" | sed '/^$/d' | wc -l | tr -d ' ')
 
 echo "Focused project: $focus_project"
