@@ -35,8 +35,8 @@ namespace Stride.Engine.Design
     public class EntityCloner
     {
         private static readonly CloneContext cloneContext = new CloneContext();
-        private static SerializerSelector cloneSerializerSelector = null;
-        private static SerializerSelector entitySerializerSelector = null;
+        private static SerializerSelector? cloneSerializerSelector = null;
+        private static SerializerSelector? entitySerializerSelector = null;
         public static readonly PropertyKey<CloneContext> CloneContextProperty = new PropertyKey<CloneContext>("CloneContext", typeof(EntityCloner));
 
         // CloneObject TLS used to clone entities, so that we don't create one everytime we clone
@@ -157,12 +157,15 @@ namespace Stride.Engine.Design
                     cloneContext.SerializedObjects.Clear();
 
                     // Deserialize
-                    T result = null;
+                    T? result = default;
                     memoryStream.Seek(0, SeekOrigin.Begin);
                     var reader = new BinarySerializationReader(memoryStream);
                     reader.Context.SerializerSelector = cloneSerializerSelector;
                     reader.Context.Set(CloneContextProperty, cloneContext);
                     reader.SerializeExtended(ref result, ArchiveMode.Deserialize, null);
+
+                    if (result is null)
+                        throw new InvalidOperationException("Entity cloning deserialization returned null unexpectedly.");
 
                     return result;
                 }
@@ -192,14 +195,14 @@ namespace Stride.Engine.Design
 
             public MemoryStream MemoryStream = new MemoryStream(4096);
 
-            public TryGetValueFunction<object, object> MappedObjects;
+            public TryGetValueFunction<object, object>? MappedObjects;
 
             public readonly HashSet<object> SerializedObjects = new HashSet<object>();
 
             /// <summary>
             /// Lists objects that should be cloned.
             /// </summary>
-            public HashSet<object> ClonedObjects;
+            public HashSet<object>? ClonedObjects;
 
             /// <summary>
             /// Stores objects that should be reused in the new cloned instance.
@@ -209,7 +212,7 @@ namespace Stride.Engine.Design
             /// <summary>
             /// Special serializer that goes through <see cref="EntitySerializerSelector"/> and <see cref="CloneEntityComponentSerializer{T}"/>.
             /// </summary>
-            public SerializerSelector EntitySerializerSelector;
+            public SerializerSelector? EntitySerializerSelector;
         }
     }
 }
