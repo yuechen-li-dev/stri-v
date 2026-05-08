@@ -18,7 +18,7 @@ namespace Stride.Engine
     public sealed class InstanceComponent : ActivableEntityComponent
     {
         private InstancingComponent master;
-        private InstancingEntityTransform? connectedInstancing;
+        private InstancingEntityTransform connectedInstancing;
 
         /// <summary>
         /// Gets or sets the referenced <see cref="InstancingComponent"/> to instance.

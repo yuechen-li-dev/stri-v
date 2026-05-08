@@ -39,7 +39,7 @@ namespace Stride.Engine
 
         private readonly Dictionary<TypeInfo, RegisteredRenderProcessors> registeredRenderProcessorTypes = new Dictionary<TypeInfo, RegisteredRenderProcessors>();
 
-        private Scene? rootScene;
+        private Scene rootScene;
 
         public TrackingCollection<VisibilityGroup> VisibilityGroups { get; }
 
@@ -65,7 +65,7 @@ namespace Stride.Engine
         /// <exception cref="System.ArgumentNullException">services
         /// or
         /// rootScene</exception>
-        public SceneInstance(IServiceRegistry services, Scene? rootScene, ExecutionMode executionMode = ExecutionMode.Runtime) : base(services)
+        public SceneInstance(IServiceRegistry services, Scene rootScene, ExecutionMode executionMode = ExecutionMode.Runtime) : base(services)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
@@ -80,7 +80,7 @@ namespace Stride.Engine
         /// Gets the scene.
         /// </summary>
         /// <value>The scene.</value>
-        public Scene? RootScene
+        public Scene RootScene
         {
             get { return rootScene; }
             set

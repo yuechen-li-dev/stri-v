@@ -30,7 +30,7 @@ namespace Stride.Engine
         // This is useful for scenario such as binding a node to a bone, where it first need to run TransformProcessor for the hierarchy,
         // run MeshProcessor to update ModelViewHierarchy, copy Node/Bone transformation to another Entity with special root and then update its children transformations.
         private bool useTRS = true;
-        private TransformComponent? parent;
+        private TransformComponent parent;
 
         internal bool IsMovingInsideRootScene;
 
@@ -80,7 +80,7 @@ namespace Stride.Engine
         public Vector3 Scale;
 
         [DataMemberIgnore]
-        public TransformLink? TransformLink;
+        public TransformLink TransformLink;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TransformComponent" /> class.
@@ -217,7 +217,7 @@ namespace Stride.Engine
         /// The parent.
         /// </value>
         [DataMemberIgnore]
-        public TransformComponent? Parent
+        public TransformComponent Parent
         {
             get { return parent; }
             set

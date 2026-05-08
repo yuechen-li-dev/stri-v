@@ -23,7 +23,7 @@ namespace Stride.Engine
         /// The owner entity.
         /// </value>
         [DataMemberIgnore]
-        public Entity? Entity { get; internal set; }
+        public Entity Entity { get; internal set; }
 
         /// <summary>
         /// The unique identifier of this component.

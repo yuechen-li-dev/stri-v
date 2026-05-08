@@ -19,7 +19,7 @@ namespace Stride.Engine
     [ReferenceSerializer, DataSerializerGlobal(typeof(ReferenceSerializer<Scene>), Profile = "Content")]
     public sealed class Scene : ComponentBase, IIdentifiable
     {
-        private Scene? parent;
+        private Scene parent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Scene"/> class.
@@ -41,7 +41,7 @@ namespace Stride.Engine
         /// The parent scene.
         /// </summary>
         [DataMemberIgnore]
-        public Scene? Parent
+        public Scene Parent
         {
             get { return parent; }
             set

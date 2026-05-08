@@ -10,8 +10,8 @@ namespace Stride.Animations
     {
         // Used internally by animation system
         // TODO: Stored in AnimationProcessor?
-        internal AnimationClipEvaluator? Evaluator;
-        internal TaskCompletionSource<bool>? EndedTCS;
+        internal AnimationClipEvaluator Evaluator;
+        internal TaskCompletionSource<bool> EndedTCS;
 
         internal PlayingAnimation(string name, AnimationClip clip) : this()
         {
