@@ -31,7 +31,7 @@ namespace Stride.Engine
     public sealed class Entity : ComponentBase, IEnumerable<EntityComponent>, IIdentifiable
     {
         internal TransformComponent TransformValue;
-        internal Scene SceneValue;
+        internal Scene? SceneValue;
 
         /// <summary>
         /// Create a new <see cref="Entity"/> instance.
@@ -57,7 +57,7 @@ namespace Stride.Engine
         /// <param name="position">The initial position of the entity</param>
         /// <param name="rotation">The initial rotation of the entity</param>
         /// <param name="scale">The initial scale of the entity</param>
-        public Entity(string name = null, Vector3 position = default, Quaternion? rotation = null, Vector3? scale = null)
+        public Entity(string? name = null, Vector3 position = default, Quaternion? rotation = null, Vector3? scale = null)
             : this(name, false)
         {
             Id = Guid.NewGuid();
@@ -70,7 +70,7 @@ namespace Stride.Engine
         /// </summary>
         /// <param name="name">Name of this component, might be null</param>
         /// <param name="notUsed">This parameter is not used</param>
-        private Entity(string name, bool notUsed) : base(name)
+        private Entity(string? name, bool notUsed) : base(name)
         {
             Components = new EntityComponentCollection(this);
         }
@@ -97,7 +97,7 @@ namespace Stride.Engine
         /// Setting this to null will remove the entity from the scene and detach it from its parent if it has one.
         /// </summary>
         [DataMemberIgnore]
-        public Scene Scene
+        public Scene? Scene
         {
             get
             {
