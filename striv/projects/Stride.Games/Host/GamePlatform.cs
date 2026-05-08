@@ -93,7 +93,7 @@ namespace Stride.Games
         {
             get
             {
-                return gameWindow!;
+                return gameWindow ?? throw new InvalidOperationException("Game window has not been created. Call Run/CreateWindow before using window-dependent graphics operations.");
             }
         }
 
@@ -349,19 +349,20 @@ namespace Stride.Games
 
         public virtual GraphicsDevice CreateDevice(GraphicsDeviceInformation deviceInformation)
         {
-            var graphicsDevice = GraphicsDevice.New(deviceInformation.Adapter, deviceInformation.DeviceCreationFlags, gameWindow.NativeWindow, deviceInformation.GraphicsProfile);
+            var window = MainWindow;
+            var graphicsDevice = GraphicsDevice.New(deviceInformation.Adapter, deviceInformation.DeviceCreationFlags, window.NativeWindow, deviceInformation.GraphicsProfile);
             graphicsDevice.ColorSpace = deviceInformation.PresentationParameters.ColorSpace;
 
 #if STRIDE_GRAPHICS_API_DIRECT3D11 && STRIDE_PLATFORM_UWP
             if (game.Context is GameContextUWPCoreWindow context && context.IsWindowsMixedReality)
             {
-                graphicsDevice.Recreate(deviceInformation.Adapter, new[] { deviceInformation.GraphicsProfile }, deviceInformation.DeviceCreationFlags |= DeviceCreationFlags.BgraSupport, gameWindow.NativeWindow);
+                graphicsDevice.Recreate(deviceInformation.Adapter, new[] { deviceInformation.GraphicsProfile }, deviceInformation.DeviceCreationFlags |= DeviceCreationFlags.BgraSupport, window.NativeWindow);
                 graphicsDevice.Presenter = new WindowsMixedRealityGraphicsPresenter(graphicsDevice, deviceInformation.PresentationParameters);
             }
             else
 #endif
             {
-                graphicsDevice.Presenter = gameWindow is GameWindowHeadless
+                graphicsDevice.Presenter = window is GameWindowHeadless
                     ? new HeadlessGraphicsPresenter(graphicsDevice, deviceInformation.PresentationParameters)
                     : new SwapChainGraphicsPresenter(graphicsDevice, deviceInformation.PresentationParameters);
             }
@@ -371,14 +372,15 @@ namespace Stride.Games
 
         public virtual void RecreateDevice(GraphicsDevice currentDevice, GraphicsDeviceInformation deviceInformation)
         {
+            var window = MainWindow;
             currentDevice.ColorSpace = deviceInformation.PresentationParameters.ColorSpace;
-            currentDevice.Recreate(deviceInformation.Adapter ?? GraphicsAdapterFactory.DefaultAdapter, new[] { deviceInformation.GraphicsProfile }, deviceInformation.DeviceCreationFlags, gameWindow.NativeWindow);
+            currentDevice.Recreate(deviceInformation.Adapter ?? GraphicsAdapterFactory.DefaultAdapter, new[] { deviceInformation.GraphicsProfile }, deviceInformation.DeviceCreationFlags, window.NativeWindow);
         }
 
         public virtual void DeviceChanged(GraphicsDevice currentDevice, GraphicsDeviceInformation deviceInformation)
         {
             // Force to resize the gameWindow
-            gameWindow.Resize(deviceInformation.PresentationParameters.BackBufferWidth, deviceInformation.PresentationParameters.BackBufferHeight);
+            MainWindow.Resize(deviceInformation.PresentationParameters.BackBufferWidth, deviceInformation.PresentationParameters.BackBufferHeight);
         }
 
         public virtual GraphicsDevice ChangeOrCreateDevice(GraphicsDevice? currentDevice, GraphicsDeviceInformation deviceInformation)

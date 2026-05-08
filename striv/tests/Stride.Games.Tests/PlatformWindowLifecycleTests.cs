@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Stride.Games.Tests;
 
-public class PlatformWindowLifecycleTests
+public partial class PlatformWindowLifecycleTests
 {
     [Fact]
     public void GameWindow_DefaultLifecycle_AllowsNoNativeHandle()
@@ -76,5 +76,60 @@ public class PlatformWindowLifecycleTests
             OnDisableFullScreen(this, EventArgs.Empty);
             OnClosing(this, EventArgs.Empty);
         }
+    }
+}
+
+public partial class PlatformWindowLifecycleTests
+{
+    [Fact]
+    public void GamePlatform_MainWindow_BeforeCreateWindow_ThrowsInvalidOperationException()
+    {
+        var platform = new ProbeGamePlatform(new ProbeGameBase());
+
+        Assert.Throws<InvalidOperationException>(() => _ = platform.MainWindow);
+    }
+
+    [Fact]
+    public void GamePlatform_Exit_BeforeCreateWindow_DoesNotThrow()
+    {
+        var platform = new ProbeGamePlatform(new ProbeGameBase());
+
+        var ex = Record.Exception(platform.Exit);
+
+        Assert.Null(ex);
+    }
+
+    [Fact]
+    public void GamePlatform_PostCreateWindow_DeviceChanged_UsesCreatedWindow()
+    {
+        var platform = new ProbeGamePlatform(new ProbeGameBase());
+        var window = new FakeGameWindow();
+        platform.AttachWindow(window);
+        var info = new GraphicsDeviceInformation();
+        info.PresentationParameters.BackBufferWidth = 800;
+        info.PresentationParameters.BackBufferHeight = 600;
+
+        var ex = Record.Exception(() => platform.DeviceChanged(null!, info));
+
+        Assert.Null(ex);
+    }
+
+    private sealed class ProbeGamePlatform : GamePlatform
+    {
+        public ProbeGamePlatform(GameBase game)
+            : base(game)
+        {
+        }
+
+        public override string DefaultAppDirectory => "/tmp";
+
+        internal override GameWindow GetSupportedGameWindow(AppContextType type) => new FakeGameWindow();
+
+        public void AttachWindow(GameWindow window) => gameWindow = window;
+    }
+
+    private sealed class ProbeGameBase : GameBase
+    {
+        public override void ConfirmRenderingSettings(bool gameCreation) { }
     }
 }
