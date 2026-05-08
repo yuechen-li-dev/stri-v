@@ -2,6 +2,10 @@
 
 Stri-V is a hard fork of the Stride Engine. The original Stride code contained within the repository should be considered legacy content used for reference only. See /striv folder for the current project workspace.
 
+## Dominatus
+
+Read ARCHITECTURE.md and AUTHORING_GUIDE.md under /striv/external/Dominatus/ before writing Dominatus related code for guidance.
+
 ## Convergence rule
 
 Every substantial task must end in exactly one of three states:
