@@ -837,7 +837,7 @@ namespace Stride.Games
                 GraphicsContext.CommandList.Flush();
 
                 // Present (if necessary)
-                graphicsDeviceManager.EndDraw(present);
+                graphicsDeviceManager?.EndDraw(present);
 
                 beginDrawOk = false;
             }
@@ -988,6 +988,11 @@ namespace Stride.Games
 
         private void GraphicsDeviceService_DeviceCreated(object? sender, EventArgs e)
         {
+            if (graphicsDeviceService?.GraphicsDevice == null)
+            {
+                return;
+            }
+
             GraphicsDevice = graphicsDeviceService.GraphicsDevice;
 
             if (GameSystems.State != GameSystemState.ContentLoaded)
@@ -1012,8 +1017,8 @@ namespace Stride.Games
         {
             if (!IsExiting)
             {
-                resumeManager.OnReload();
-                resumeManager.OnRecreate();
+                resumeManager?.OnReload();
+                resumeManager?.OnRecreate();
             }
         }
 
