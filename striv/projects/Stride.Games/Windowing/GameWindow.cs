@@ -40,7 +40,7 @@ namespace Stride.Games
     {
         #region Fields
 
-        private string title;
+        private string title = string.Empty;
 
         #endregion
 
@@ -54,32 +54,32 @@ namespace Stride.Games
         /// <summary>
         /// Occurs when this window is activated.
         /// </summary>
-        public event EventHandler<EventArgs> Activated;
+        public event EventHandler<EventArgs>? Activated;
 
         /// <summary>
         /// Occurs when device client size is changed.
         /// </summary>
-        public event EventHandler<EventArgs> ClientSizeChanged;
+        public event EventHandler<EventArgs>? ClientSizeChanged;
 
         /// <summary>
         /// Occurs when this window is deactivated.
         /// </summary>
-        public event EventHandler<EventArgs> Deactivated;
+        public event EventHandler<EventArgs>? Deactivated;
 
         /// <summary>
         /// Occurs when device orientation is changed.
         /// </summary>
-        public event EventHandler<EventArgs> OrientationChanged;
+        public event EventHandler<EventArgs>? OrientationChanged;
 
         /// <summary>
         /// Occurs when device fullscreen mode is changed.
         /// </summary>
-        public event EventHandler<EventArgs> FullscreenChanged;
+        public event EventHandler<EventArgs>? FullscreenChanged;
 
         /// <summary>
         /// Occurs before the window gets destroyed.
         /// </summary>
-        public event EventHandler<EventArgs> Closing;
+        public event EventHandler<EventArgs>? Closing;
 
         #endregion
 
@@ -240,11 +240,11 @@ namespace Stride.Games
 
         internal bool Exiting;
 
-        internal Action InitCallback;
+        internal Action? InitCallback;
 
-        internal Action RunCallback;
+        internal Action? RunCallback;
 
-        internal Action ExitCallback;
+        internal Action? ExitCallback;
         
         private bool isFullscreen;
 
@@ -272,7 +272,7 @@ namespace Stride.Games
             throw new PlatformNotSupportedException();
         }
 
-        internal IServiceRegistry Services { get; set; }
+        internal IServiceRegistry? Services { get; set; }
 
         protected internal abstract void SetSupportedOrientations(DisplayOrientation orientations);
 
@@ -357,7 +357,7 @@ namespace Stride.Games
             }
         }
 
-        internal GameContext<TK> GameContext;
+        internal GameContext<TK>? GameContext;
 
         protected abstract void Initialize(GameContext<TK> context);
     }

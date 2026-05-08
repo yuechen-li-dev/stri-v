@@ -47,7 +47,7 @@ namespace Stride.Games
 
         protected readonly IServiceRegistry Services;
 
-        protected GameWindow gameWindow;
+        protected GameWindow? gameWindow;
 
         public string FullName { get; protected set; } = string.Empty;
 
@@ -73,27 +73,27 @@ namespace Stride.Games
 
         public abstract string DefaultAppDirectory { get; }
 
-        public object WindowContext { get; set; }
+        public object? WindowContext { get; set; }
 
-        public event EventHandler<EventArgs> Activated;
+        public event EventHandler<EventArgs>? Activated;
 
-        public event EventHandler<EventArgs> Deactivated;
+        public event EventHandler<EventArgs>? Deactivated;
 
-        public event EventHandler<EventArgs> Exiting;
+        public event EventHandler<EventArgs>? Exiting;
 
-        public event EventHandler<EventArgs> Idle;
+        public event EventHandler<EventArgs>? Idle;
 
-        public event EventHandler<EventArgs> Resume;
+        public event EventHandler<EventArgs>? Resume;
 
-        public event EventHandler<EventArgs> Suspend;
+        public event EventHandler<EventArgs>? Suspend;
 
-        public event EventHandler<EventArgs> WindowCreated;
+        public event EventHandler<EventArgs>? WindowCreated;
 
         public GameWindow MainWindow
         {
             get
             {
-                return gameWindow;
+                return gameWindow!;
             }
         }
 
@@ -101,6 +101,8 @@ namespace Stride.Games
 
         public virtual GameWindow CreateWindow(GameContext? gameContext)
         {
+            if (gameContext == null) throw new ArgumentNullException(nameof(gameContext));
+
             var window = GetSupportedGameWindow(gameContext.ContextType);
             if (window != null)
             {
@@ -205,7 +207,8 @@ namespace Stride.Games
         public virtual void Exit()
         {
             // Notifies that the GameWindow should exit.
-            gameWindow.Exiting = true;
+            if (gameWindow != null)
+                gameWindow.Exiting = true;
         }
 
         protected void OnActivated(object? source, EventArgs e)
@@ -241,7 +244,7 @@ namespace Stride.Games
         protected void AddDevice(DisplayMode mode,  GraphicsDeviceInformation deviceBaseInfo, GameGraphicsParameters preferredParameters, List<GraphicsDeviceInformation> graphicsDeviceInfos)
         {
             // TODO: Temporary woraround
-            if (mode == null)
+            if (mode.RefreshRate == default)
                 mode = new DisplayMode(PixelFormat.R8G8B8A8_UNorm, 800, 480, new Rational(60, 1));
 
             var deviceInfo = deviceBaseInfo.Clone();
