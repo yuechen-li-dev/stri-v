@@ -47,9 +47,9 @@ namespace Stride.Games
         #region Fields
 
         private readonly GamePlatform gamePlatform;
-        private IGraphicsDeviceService graphicsDeviceService;
-        protected IGraphicsDeviceManager graphicsDeviceManager;
-        private ResumeManager resumeManager;
+        private IGraphicsDeviceService? graphicsDeviceService;
+        protected IGraphicsDeviceManager? graphicsDeviceManager;
+        private ResumeManager? resumeManager;
         private bool isEndRunRequired;
         private bool suppressDraw;
         private bool beginDrawOk;
@@ -125,24 +125,24 @@ namespace Stride.Games
         /// <summary>
         /// Occurs when [activated].
         /// </summary>
-        public event EventHandler<EventArgs> Activated;
+        public event EventHandler<EventArgs>? Activated;
 
         /// <summary>
         /// Occurs when [deactivated].
         /// </summary>
-        public event EventHandler<EventArgs> Deactivated;
+        public event EventHandler<EventArgs>? Deactivated;
 
         /// <summary>
         /// Occurs when [exiting].
         /// </summary>
-        public event EventHandler<EventArgs> Exiting;
+        public event EventHandler<EventArgs>? Exiting;
 
         /// <summary>
         /// Occurs when [window created].
         /// </summary>
-        public event EventHandler<EventArgs> WindowCreated;
+        public event EventHandler<EventArgs>? WindowCreated;
 
-        public event EventHandler<GameUnhandledExceptionEventArgs> UnhandledException;
+        public event EventHandler<GameUnhandledExceptionEventArgs>? UnhandledException;
 
         #endregion
 
@@ -173,7 +173,7 @@ namespace Stride.Games
         /// <summary>
         /// Gets the <see cref="ContentManager"/>.
         /// </summary>
-        public ContentManager Content { get; private set; }
+        public ContentManager Content { get; private set; } = null!;
 
         /// <summary>
         /// Gets the game components registered by this game.
@@ -185,15 +185,15 @@ namespace Stride.Games
         /// Gets the game context.
         /// </summary>
         /// <value>The game context.</value>
-        public GameContext Context { get; private set; }
+        public GameContext Context { get; private set; } = null!;
 
         /// <summary>
         /// Gets the graphics device.
         /// </summary>
         /// <value>The graphics device.</value>
-        public GraphicsDevice GraphicsDevice { get; private set; }
+        public GraphicsDevice GraphicsDevice { get; private set; } = null!;
 
-        public GraphicsContext GraphicsContext { get; private set; }
+        public GraphicsContext GraphicsContext { get; private set; } = null!;
 
         /// <summary>
         /// Gets or sets the time between each <see cref="Tick"/> when <see cref="IsActive"/> is false.
@@ -317,7 +317,7 @@ namespace Stride.Games
                 {
                     return gamePlatform.MainWindow;
                 }
-                return null;
+                throw new InvalidOperationException("Game platform is unavailable.");
             }
         }
 
@@ -330,7 +330,7 @@ namespace Stride.Games
 
         #endregion
 
-        internal EventHandler<GameUnhandledExceptionEventArgs> UnhandledExceptionInternal
+        internal EventHandler<GameUnhandledExceptionEventArgs>? UnhandledExceptionInternal
         {
             get { return UnhandledException; }
         }
@@ -416,7 +416,7 @@ namespace Stride.Games
         /// </summary>
         /// <param name="gameContext">The window Context for this game.</param>
         /// <exception cref="System.InvalidOperationException">Cannot run this instance while it is already running</exception>
-        public void Run(GameContext gameContext = null)
+        public void Run(GameContext? gameContext = null)
         {
             if (IsRunning)
             {
@@ -1003,7 +1003,7 @@ namespace Stride.Games
                 UnloadContent();
             }
 
-            resumeManager.OnDestroyed();
+            resumeManager?.OnDestroyed();
 
             GraphicsDevice = null;
         }
@@ -1019,7 +1019,7 @@ namespace Stride.Games
 
         private void GraphicsDeviceService_DeviceResetting(object? sender, EventArgs e)
         {
-            resumeManager.OnDestroyed();
+            resumeManager?.OnDestroyed();
         }
 
         #endregion
