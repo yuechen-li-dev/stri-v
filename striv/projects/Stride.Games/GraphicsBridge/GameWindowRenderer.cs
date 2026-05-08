@@ -164,7 +164,8 @@ namespace Stride.Games
             GameContext.RequestedWidth = PreferredBackBufferWidth;
             GameContext.RequestedHeight = PreferredBackBufferHeight;
 
-            Window = gamePlatform.CreateWindow(GameContext);
+            Window = gamePlatform.CreateWindow(GameContext)
+                ?? throw new InvalidOperationException("No game window was created for the requested context.");
             Window.Visible = true;
 
             Window.ClientSizeChanged += WindowOnClientSizeChanged;

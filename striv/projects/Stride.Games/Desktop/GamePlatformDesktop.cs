@@ -69,7 +69,7 @@ namespace Stride.Games
             {
                 var appPath = PlatformFolders.ApplicationExecutablePath ?? PlatformFolders.ApplicationBinaryDirectory;
                 var assemblyUri = new Uri(appPath);
-                return Path.GetDirectoryName(assemblyUri.LocalPath);
+                return Path.GetDirectoryName(assemblyUri.LocalPath) ?? string.Empty;
             }
         }
 

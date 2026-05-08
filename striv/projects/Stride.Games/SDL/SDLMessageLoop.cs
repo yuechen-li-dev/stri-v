@@ -30,7 +30,7 @@ namespace Stride.Games
     {
         private static Sdl SDL => Window.SDL;
 
-        private Window control;
+        private Window? control;
         private bool isControlAlive;
         private bool switchControl;
 
@@ -47,7 +47,7 @@ namespace Stride.Games
         /// </summary>
         /// <value>The control.</value>
         /// <exception cref="System.InvalidOperationException">Control is already disposed</exception>
-        public Window Control
+        public Window? Control
         {
             get
             {
