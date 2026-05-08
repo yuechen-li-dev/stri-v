@@ -82,6 +82,51 @@ public partial class PlatformWindowLifecycleTests
 public partial class PlatformWindowLifecycleTests
 {
     [Fact]
+    public void GameBase_Constructs_WithStablePreRunDefaults()
+    {
+        var game = new ProbeGameBase();
+
+        Assert.NotNull(game.Services);
+        Assert.NotNull(game.GameSystems);
+        Assert.NotNull(game.UpdateTime);
+        Assert.NotNull(game.DrawTime);
+        Assert.False(game.IsRunning);
+        Assert.False(game.IsExiting);
+        Assert.Null(game.Content);
+        Assert.Null(game.Context);
+        Assert.Null(game.GraphicsDevice);
+        Assert.Null(game.GraphicsContext);
+    }
+
+    [Fact]
+    public void GameBase_PreRunLifecycleMethods_WithNoSubscribers_DoNotThrow()
+    {
+        var game = new ProbeGameBase();
+
+        var ex = Record.Exception(() =>
+        {
+            game.TriggerActivated();
+            game.TriggerDeactivated();
+            game.TriggerExiting();
+            game.TriggerWindowCreated();
+        });
+
+        Assert.Null(ex);
+    }
+
+    [Fact]
+    public void GameBase_Exit_BeforeRun_SetsIsExiting_AndDoesNotThrow()
+    {
+        var game = new ProbeGameBase();
+
+        var ex = Record.Exception(game.Exit);
+
+        Assert.Null(ex);
+        Assert.True(game.IsExiting);
+        Assert.False(game.IsRunning);
+    }
+
+    [Fact]
     public void GamePlatform_MainWindow_BeforeCreateWindow_ThrowsInvalidOperationException()
     {
         var platform = new ProbeGamePlatform(new ProbeGameBase());
@@ -131,5 +176,10 @@ public partial class PlatformWindowLifecycleTests
     private sealed class ProbeGameBase : GameBase
     {
         public override void ConfirmRenderingSettings(bool gameCreation) { }
+
+        public void TriggerActivated() => OnActivated(this, EventArgs.Empty);
+        public void TriggerDeactivated() => OnDeactivated(this, EventArgs.Empty);
+        public void TriggerExiting() => OnExiting(this, EventArgs.Empty);
+        public void TriggerWindowCreated() => OnWindowCreated();
     }
 }
