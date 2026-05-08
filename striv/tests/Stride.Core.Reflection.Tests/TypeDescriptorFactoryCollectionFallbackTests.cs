@@ -52,11 +52,26 @@ public class TypeDescriptorFactoryCollectionFallbackTests
     }
 
     [Fact]
-    public void OldCollectionDescriptor_IsNotSelected_ForKnownFallbackShapes()
+    public void TypeDescriptorFactory_NonGenericCollectionShape_CurrentFallback_IsDocumented()
     {
-        var descriptor = TypeDescriptorFactory.Default.Find(typeof(LegacyIntCollection));
+        var descriptor = Assert.IsType<OldCollectionDescriptor>(TypeDescriptorFactory.Default.Find(typeof(NonGenericListCollection)));
+        var collection = new NonGenericListCollection();
 
-        Assert.IsNotType<OldCollectionDescriptor>(descriptor);
+        descriptor.Add(collection, 10);
+        descriptor.Add(collection, 20);
+
+        Assert.Equal(2, descriptor.GetCollectionCount(collection));
+        Assert.Equal(typeof(object), descriptor.ElementType);
+        Assert.True(descriptor.HasIndexerAccessors);
+    }
+
+    [Fact]
+    public void OldCollectionDescriptor_NoLongerSelected_ForKnownModernShapes()
+    {
+        Assert.IsNotType<OldCollectionDescriptor>(TypeDescriptorFactory.Default.Find(typeof(List<int>)));
+        Assert.IsNotType<OldCollectionDescriptor>(TypeDescriptorFactory.Default.Find(typeof(Dictionary<string, int>)));
+        Assert.IsNotType<OldCollectionDescriptor>(TypeDescriptorFactory.Default.Find(typeof(HashSet<int>)));
+        Assert.IsNotType<OldCollectionDescriptor>(TypeDescriptorFactory.Default.Find(typeof(LegacyIntCollection)));
     }
 
     private sealed class LegacyIntCollection : ICollection<int>
@@ -80,5 +95,9 @@ public class TypeDescriptorFactoryCollectionFallbackTests
         public int Count => inner.Count;
 
         public bool IsReadOnly => false;
+    }
+
+    private sealed class NonGenericListCollection : ArrayList
+    {
     }
 }

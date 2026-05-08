@@ -103,7 +103,7 @@ public class TypeDescriptorFactory : ITypeDescriptorFactory
         else if (CollectionDescriptor.IsCollection(type))
         {
             // Generic ICollection<T> fallback should prefer a modern descriptor.
-            // Keep OldCollectionDescriptor as a last-resort compatibility path.
+            // Keep OldCollectionDescriptor as a last-resort compatibility path for non-generic IList implementations.
             descriptor = type.GetInterface(typeof(ICollection<>)) is not null
                 ? new GenericCollectionDescriptor(this, type, emitDefaultValues, namingConvention)
                 : new OldCollectionDescriptor(this, type, emitDefaultValues, namingConvention);
