@@ -8,6 +8,13 @@ namespace Stride.Core.MicroThreading;
 /// <summary>
 /// Provides microthread-local storage of data.
 /// </summary>
+/// <remarks>
+/// Stri-V legacy compatibility note:
+/// This type is retained to support inherited Stride runtime paths while the engine
+/// transitions toward explicit Dominatus and Channel/Task-based scheduling. New Stri-V code
+/// should not add dependencies on MicroThreading without an explicit migration decision.
+/// </remarks>
+
 /// <typeparam name="T">Type of data stored.</typeparam>
 public class MicroThreadLocal<T> where T : class
 {

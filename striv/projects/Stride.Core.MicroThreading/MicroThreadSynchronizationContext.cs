@@ -3,6 +3,15 @@
 
 namespace Stride.Core.MicroThreading;
 
+/// <summary>
+/// Synchronization context used to marshal continuations to a <see cref="MicroThread"/>.
+/// </summary>
+/// <remarks>
+/// Stri-V legacy compatibility note:
+/// This type is retained to support inherited Stride runtime paths while the engine
+/// transitions toward explicit Dominatus and Channel/Task-based scheduling. New Stri-V code
+/// should not add dependencies on MicroThreading without an explicit migration decision.
+/// </remarks>
 public class MicroThreadSynchronizationContext : SynchronizationContext, IMicroThreadSynchronizationContext
 {
     private readonly MicroThread microThread;
