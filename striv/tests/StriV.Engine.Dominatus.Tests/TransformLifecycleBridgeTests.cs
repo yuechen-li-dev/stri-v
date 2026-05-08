@@ -2,6 +2,7 @@ using Stride.Engine;
 using StriV.Engine.Dominatus.Actuators;
 using StriV.Engine.Dominatus.Events;
 using StriV.Engine.Dominatus.Nodes;
+using StriV.Engine.Dominatus.Transitions;
 using Xunit;
 
 namespace StriV.Engine.Dominatus.Tests;
@@ -68,18 +69,100 @@ public sealed class TransformLifecycleBridgeTests
         Assert.Same(child, detach.Child);
     }
 
+    [Fact]
+    public async Task TransformLifecycleTransition_AttachParent_InvokesActuatorAndReturnsAttachedEvent()
+    {
+        var parent = new Entity("Parent");
+        var child = new Entity("Child");
+        var actuator = new FakeTransformLifecycleActuator();
+        var request = new TransformParentAttachRequested(child, parent);
+
+        var completed = await TransformLifecycleTransition.AttachParentAsync(request, actuator);
+
+        Assert.Same(child, completed.Child);
+        Assert.Same(parent, completed.Parent);
+        Assert.Same(parent.Transform, child.Transform.Parent);
+        Assert.Contains(child.Transform, parent.Transform.Children);
+        Assert.Equal(1, actuator.AttachCallCount);
+    }
+
+    [Fact]
+    public async Task TransformLifecycleTransition_DetachParent_InvokesActuatorAndReturnsDetachedEvent()
+    {
+        var parent = new Entity("Parent");
+        var child = new Entity("Child");
+        var actuator = new FakeTransformLifecycleActuator();
+
+        await actuator.AttachParentAsync(child, parent);
+        var request = new TransformParentDetachRequested(child);
+
+        var completed = await TransformLifecycleTransition.DetachParentAsync(request, actuator);
+
+        Assert.Same(child, completed.Child);
+        Assert.Null(child.Transform.Parent);
+        Assert.DoesNotContain(child.Transform, parent.Transform.Children);
+        Assert.Equal(1, actuator.DetachCallCount);
+    }
+
+    [Fact]
+    public async Task TransformLifecycleTransition_AttachParent_PropagatesActuatorFailure()
+    {
+        var parent = new Entity("Parent");
+        var child = new Entity("Child");
+        var request = new TransformParentAttachRequested(child, parent);
+
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await TransformLifecycleTransition.AttachParentAsync(request, new ThrowingTransformLifecycleActuator()));
+
+        Assert.Equal("attach-failed", ex.Message);
+    }
+
+    [Fact]
+    public async Task TransformLifecycleTransition_RejectsNullActuator()
+    {
+        var parent = new Entity("Parent");
+        var child = new Entity("Child");
+        var attachRequest = new TransformParentAttachRequested(child, parent);
+        var detachRequest = new TransformParentDetachRequested(child);
+
+        await Assert.ThrowsAsync<ArgumentNullException>(
+            async () => await TransformLifecycleTransition.AttachParentAsync(attachRequest, actuator: null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(
+            async () => await TransformLifecycleTransition.DetachParentAsync(detachRequest, actuator: null!));
+    }
+
     private sealed class FakeTransformLifecycleActuator : ITransformLifecycleActuator
     {
+        public int AttachCallCount { get; private set; }
+        public int DetachCallCount { get; private set; }
+
         public ValueTask AttachParentAsync(Entity child, Entity parent, CancellationToken cancellationToken = default)
         {
+            AttachCallCount++;
             child.Transform.Parent = parent.Transform;
             return ValueTask.CompletedTask;
         }
 
         public ValueTask DetachParentAsync(Entity child, CancellationToken cancellationToken = default)
         {
-            child.Transform.Parent = null;
+            DetachCallCount++;
+            DetachFromParent(child);
             return ValueTask.CompletedTask;
         }
+
+        private static void DetachFromParent(Entity child)
+        {
+            // Legacy Stride detach API: null parent means detach. Kept inside fake actuator boundary.
+            child.Transform.Parent = null!;
+        }
+    }
+
+    private sealed class ThrowingTransformLifecycleActuator : ITransformLifecycleActuator
+    {
+        public ValueTask AttachParentAsync(Entity child, Entity parent, CancellationToken cancellationToken = default)
+            => throw new InvalidOperationException("attach-failed");
+
+        public ValueTask DetachParentAsync(Entity child, CancellationToken cancellationToken = default)
+            => throw new InvalidOperationException("detach-failed");
     }
 }
