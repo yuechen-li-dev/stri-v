@@ -42,7 +42,7 @@ namespace Stride.Games
         private int preferredBackBufferWidth;
         private ColorSpaceType preferredOutputColorSpace = ColorSpaceType.Rgb_Full_G22_None_P709;
 
-        private GraphicsPresenter savedPresenter;
+        private GraphicsPresenter? savedPresenter;
 
         private bool isBackBufferToResize;
         private bool isColorSpaceToChange;
@@ -69,12 +69,12 @@ namespace Stride.Games
         /// <summary>
         ///   Gets the window where the Game is rendered.
         /// </summary>
-        public GameWindow Window { get; private set; }
+        public GameWindow? Window { get; private set; }
 
         /// <summary>
         ///   Gets or sets the presenter that is used to render the Game to the window.
         /// </summary>
-        public GraphicsPresenter Presenter { get; protected set; }
+        public GraphicsPresenter? Presenter { get; protected set; }
 
         /// <summary>
         ///   Gets or sets the preferred format for the Back-Buffer.
