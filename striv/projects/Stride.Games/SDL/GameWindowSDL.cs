@@ -23,9 +23,9 @@ namespace Stride.Games
 
         private bool isMouseCurrentlyHidden;
 
-        private Window window;
+        private Window window = default!;
 
-        private WindowHandle windowHandle;
+        private WindowHandle windowHandle = default!;
 
         private bool isFullScreenMaximized;
         private Point savedFormLocation;
@@ -141,7 +141,10 @@ namespace Stride.Games
             // Initialize the init callback
             InitCallback();
 
-            var context = (GameContextSDL)GameContext;
+            if (GameContext is not GameContextSDL context)
+            {
+                throw new InvalidOperationException("GameContext must be GameContextSDL for GameWindowSDL.");
+            }
             if (context.IsUserManagingRun)
             {
                 context.RunCallback = RunCallback;

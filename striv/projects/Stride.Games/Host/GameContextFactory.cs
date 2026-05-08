@@ -77,9 +77,9 @@ namespace Stride.Games
             if (Platform.Type != PlatformType.Windows)
                 return null;
 #if STRIDE_UI_SDL && !STRIDE_UI_WINFORMS && !STRIDE_UI_WPF
-            return new GameContextSDL(null, requestedWidth, requestedHeight, isUserManagingRun);
+            return new GameContextSDL(default, requestedWidth, requestedHeight, isUserManagingRun);
 #elif (STRIDE_UI_WINFORMS || STRIDE_UI_WPF)
-            return new GameContextWinforms(null, requestedWidth, requestedHeight, isUserManagingRun);
+            return new GameContextWinforms(default, requestedWidth, requestedHeight, isUserManagingRun);
 #else
             return null;
 #endif
@@ -106,7 +106,7 @@ namespace Stride.Games
         public static GameContext? NewGameContextSDL(int requestedWidth = 0, int requestedHeight = 0, bool isUserManagingRun = false)
         {
 #if STRIDE_UI_SDL
-            return new GameContextSDL(null, requestedWidth, requestedHeight, isUserManagingRun);
+            return new GameContextSDL(default, requestedWidth, requestedHeight, isUserManagingRun);
 #else
             return null;
 #endif

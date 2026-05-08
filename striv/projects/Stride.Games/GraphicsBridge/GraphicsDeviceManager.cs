@@ -590,7 +590,7 @@ namespace Stride.Games
                 if (GraphicsDevice.Presenter is not null)
                 {
                     GraphicsDevice.Presenter.Dispose();
-                    GraphicsDevice.Presenter = null;
+                    GraphicsDevice.Presenter = default!;
                 }
 
                 //GraphicsDevice.DeviceResetting -= GraphicsDevice_DeviceResetting;
@@ -599,7 +599,7 @@ namespace Stride.Games
 
                 GraphicsDevice.Dispose();
                 GraphicsDevice.Disposing -= GraphicsDevice_Disposing;
-                GraphicsDevice = null;
+                GraphicsDevice = default!;
             }
 
             base.Destroy();
@@ -987,7 +987,9 @@ namespace Stride.Games
                 hasWindowClientSizeChanged = true;
 
             else if (ProcessClientSizeChanged())
+            {
                 ApplyChanges();
+            }
         }
 
         /// <summary>
@@ -1032,7 +1034,9 @@ namespace Stride.Games
                 hasWindowOrientationChanged = true;
 
             else if (ProcessOrientationChanged())
+            {
                 ApplyChanges();
+            }
         }
 
         /// <summary>
