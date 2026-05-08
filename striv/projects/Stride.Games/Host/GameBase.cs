@@ -64,6 +64,9 @@ namespace Stride.Games
 
         private bool isMouseVisible;
 
+        private GraphicsDevice? graphicsDevice;
+        private GraphicsContext? graphicsContext;
+
         internal object TickLock = new object();
 
         #endregion
@@ -96,7 +99,8 @@ namespace Stride.Games
             Services = new ServiceRegistry();
 
             // Database file provider
-            Services.AddService<IDatabaseFileProviderService>(new DatabaseFileProviderService(null));
+            // FileProvider remains unbound until a runtime database is attached during startup.
+            Services.AddService<IDatabaseFileProviderService>(new DatabaseFileProviderService(null!));
 
             LaunchParameters = new LaunchParameters();
             GameSystems = new GameSystemCollection(Services);
@@ -191,9 +195,17 @@ namespace Stride.Games
         /// Gets the graphics device.
         /// </summary>
         /// <value>The graphics device.</value>
-        public GraphicsDevice GraphicsDevice { get; private set; } = null!;
+        public GraphicsDevice GraphicsDevice
+        {
+            get => graphicsDevice!;
+            private set => graphicsDevice = value;
+        }
 
-        public GraphicsContext GraphicsContext { get; private set; } = null!;
+        public GraphicsContext GraphicsContext
+        {
+            get => graphicsContext!;
+            private set => graphicsContext = value;
+        }
 
         /// <summary>
         /// Gets or sets the time between each <see cref="Tick"/> when <see cref="IsActive"/> is false.
@@ -364,6 +376,11 @@ namespace Stride.Games
                     Initialize();
 
                     // Make sure that the device is already created
+                    if (graphicsDeviceManager == null)
+                    {
+                        throw new InvalidOperationException("No GraphicsDeviceManager found");
+                    }
+
                     graphicsDeviceManager.CreateDevice();
 
                     // Gets the graphics device service
@@ -738,7 +755,7 @@ namespace Stride.Games
                 }
 
                 // Reset graphics context
-                GraphicsContext = null;
+                graphicsContext = null;
 
                 var disposableGraphicsManager = graphicsDeviceManager as IDisposable;
                 if (disposableGraphicsManager != null)
@@ -982,7 +999,7 @@ namespace Stride.Games
                 graphicsDeviceService.DeviceResetting -= GraphicsDeviceService_DeviceResetting;
                 graphicsDeviceService.DeviceReset -= GraphicsDeviceService_DeviceReset;
                 graphicsDeviceService.DeviceDisposing -= GraphicsDeviceService_DeviceDisposing;
-                GraphicsDevice = null;
+                graphicsDevice = null;
             }
         }
 
@@ -1010,7 +1027,7 @@ namespace Stride.Games
 
             resumeManager?.OnDestroyed();
 
-            GraphicsDevice = null;
+            graphicsDevice = null;
         }
 
         private void GraphicsDeviceService_DeviceReset(object? sender, EventArgs e)
