@@ -13,6 +13,12 @@ namespace Stride.Core.MicroThreading;
 /// <remarks>
 /// Microthreading provides a way to execute many small execution contexts who cooperatively yield to each others.
 /// </remarks>
+/// <remarks>
+/// Stri-V legacy compatibility note:
+/// This type is retained to support inherited Stride runtime paths while the engine
+/// transitions toward explicit Dominatus and Channel/Task-based scheduling. New Stri-V code
+/// should not add dependencies on MicroThreading without an explicit migration decision.
+/// </remarks>
 public class Scheduler : IDisposable
 {
     /// <summary>

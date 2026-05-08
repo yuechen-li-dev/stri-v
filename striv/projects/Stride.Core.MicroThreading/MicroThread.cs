@@ -11,6 +11,12 @@ namespace Stride.Core.MicroThreading;
 /// <summary>
 /// Represents an execution context managed by a <see cref="Scheduler"/>, that can cooperatively yield execution to another <see cref="MicroThread"/> at any point (usually using async calls).
 /// </summary>
+/// <remarks>
+/// Stri-V legacy compatibility note:
+/// This type is retained to support inherited Stride runtime paths while the engine
+/// transitions toward explicit Dominatus and Channel/Task-based scheduling. New Stri-V code
+/// should not add dependencies on MicroThreading without an explicit migration decision.
+/// </remarks>
 public class MicroThread
 {
     internal ProfilingKey? ProfilingKey;
