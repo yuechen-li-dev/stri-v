@@ -53,7 +53,7 @@ public partial class PlatformWindowLifecycleTests
         public override bool IsMinimized => false;
         public override bool Focused => true;
         public override bool IsMouseVisible { get; set; }
-        public override WindowHandle NativeWindow => null;
+        public override WindowHandle NativeWindow => null!; // test probe intentionally models absent native handle
         public override bool Visible { get; set; }
         public override double Opacity { get; set; } = 1.0;
         public override bool IsBorderLess { get; set; }
@@ -126,6 +126,32 @@ public partial class PlatformWindowLifecycleTests
         Assert.False(game.IsRunning);
     }
 
+
+    [Fact]
+    public void GameBase_DisposeBeforeRun_ThrowsInvalidOperationExceptionUntilWindowExists()
+    {
+        var game = new ProbeGameBase();
+
+        var ex = Record.Exception(() => game.Dispose());
+
+        var invalidOperation = Assert.IsType<InvalidOperationException>(ex);
+        Assert.Contains("Game window has not been created", invalidOperation.Message);
+    }
+
+    [Fact]
+    public void GameBase_GraphicsDeviceEventHandlers_BeforeSetup_DoNotThrow()
+    {
+        var game = new ProbeGameBase();
+
+        var ex = Record.Exception(() =>
+        {
+            game.InvokeGraphicsDeviceCreated();
+            game.InvokeGraphicsDeviceReset();
+        });
+
+        Assert.Null(ex);
+    }
+
     [Fact]
     public void GamePlatform_MainWindow_BeforeCreateWindow_ThrowsInvalidOperationException()
     {
@@ -175,11 +201,16 @@ public partial class PlatformWindowLifecycleTests
 
     private sealed class ProbeGameBase : GameBase
     {
+        private static readonly System.Reflection.MethodInfo DeviceCreatedMethod = typeof(GameBase).GetMethod("GraphicsDeviceService_DeviceCreated", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+        private static readonly System.Reflection.MethodInfo DeviceResetMethod = typeof(GameBase).GetMethod("GraphicsDeviceService_DeviceReset", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+
         public override void ConfirmRenderingSettings(bool gameCreation) { }
 
         public void TriggerActivated() => OnActivated(this, EventArgs.Empty);
         public void TriggerDeactivated() => OnDeactivated(this, EventArgs.Empty);
         public void TriggerExiting() => OnExiting(this, EventArgs.Empty);
         public void TriggerWindowCreated() => OnWindowCreated();
+        public void InvokeGraphicsDeviceCreated() => DeviceCreatedMethod.Invoke(this, new object?[] { this, EventArgs.Empty });
+        public void InvokeGraphicsDeviceReset() => DeviceResetMethod.Invoke(this, new object?[] { this, EventArgs.Empty });
     }
 }
