@@ -30,7 +30,7 @@ namespace Stride.Engine
     [DataContract("Entity")]
     public sealed class Entity : ComponentBase, IEnumerable<EntityComponent>, IIdentifiable
     {
-        internal TransformComponent TransformValue;
+        internal TransformComponent? TransformValue;
         internal Scene? SceneValue;
 
         /// <summary>
@@ -128,14 +128,14 @@ namespace Stride.Engine
         /// The entity manager which processes this entity.
         /// </summary>
         [DataMemberIgnore]
-        public EntityManager EntityManager { get; internal set; }
+        public EntityManager? EntityManager { get; internal set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Transform"/> associated to this entity.
         /// Added for convenience over usual Get/Set method.
         /// </summary>
         [DataMemberIgnore]
-        public TransformComponent Transform => TransformValue;
+        public TransformComponent Transform => TransformValue!;
 
         /// <summary>
         /// The components stored in this entity.

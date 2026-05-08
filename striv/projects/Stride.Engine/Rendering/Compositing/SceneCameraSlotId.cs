@@ -23,7 +23,7 @@ namespace Stride.Rendering.Compositing
         /// <summary>
         /// The <see cref="GraphicsCompositor"/> on which the camera containing this <see cref="SceneCameraSlotId"/> is currently attached.
         /// </summary>
-        internal GraphicsCompositor AttachedCompositor;
+        internal GraphicsCompositor? AttachedCompositor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SceneCameraSlotId"/> class.

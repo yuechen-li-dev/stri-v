@@ -45,7 +45,7 @@ namespace Stride.Engine
         /// </summary>
         /// <value>The scene</value>
         /// <exception cref="System.ArgumentNullException">Scene cannot be null</exception>
-        public SceneInstance SceneInstance { get; set; }
+        public SceneInstance? SceneInstance { get; set; }
 
         /// <summary>
         /// URL of the scene loaded at initialization.
@@ -77,7 +77,7 @@ namespace Stride.Engine
         /// </summary>
         public bool SplashScreenEnabled { get; set; }
 
-        public GraphicsCompositor GraphicsCompositor { get; set; }
+        public GraphicsCompositor? GraphicsCompositor { get; set; }
 
         private Task<Scene> sceneTask;
         private Task<GraphicsCompositor> compositorTask;
