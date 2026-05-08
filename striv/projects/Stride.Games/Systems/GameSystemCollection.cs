@@ -386,7 +386,7 @@ namespace Stride.Games
         {
             lock (gameSystems)
             {
-                var gameSystemKey = new KeyValuePair<T, ProfilingKey>(gameSystem, null);
+                KeyValuePair<T, ProfilingKey>? gameSystemKey = null;
 
                 // Find this gameSystem
                 int index = -1;
@@ -410,15 +410,17 @@ namespace Stride.Games
                 }
                 else
                 {
-                    gameSystemKey = new KeyValuePair<T, ProfilingKey>(gameSystemKey.Key, new ProfilingKey(parentProfilingKey, gameSystem.GetType().Name));
+                    gameSystemKey = new KeyValuePair<T, ProfilingKey>(gameSystem, new ProfilingKey(parentProfilingKey, gameSystem.GetType().Name));
                 }
 
                 if (index == -1)
                 {
-                    // we want to insert right after all other systems with same draw/update order
-                    index = gameSystems.UpperBound(gameSystemKey, comparer, 0, gameSystems.Count);
+                    var keyedGameSystem = gameSystemKey ?? new KeyValuePair<T, ProfilingKey>(gameSystem, new ProfilingKey(parentProfilingKey, gameSystem.GetType().Name));
 
-                    gameSystems.Insert(index, gameSystemKey);
+                    // we want to insert right after all other systems with same draw/update order
+                    index = gameSystems.UpperBound(keyedGameSystem, comparer, 0, gameSystems.Count);
+
+                    gameSystems.Insert(index, keyedGameSystem);
 
                     // True, the system was inserted
                     return true;

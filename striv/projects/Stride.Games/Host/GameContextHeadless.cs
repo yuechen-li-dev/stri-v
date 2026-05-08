@@ -11,7 +11,7 @@ namespace Stride.Games;
 /// This context intentionally bypasses interactive window ownership and is intended for deterministic/non-window hosts.
 /// Future lifecycle policy layers should preserve this as the canonical non-UI context path.
 /// </remarks>
-public class GameContextHeadless : GameContext<object>
+public class GameContextHeadless : GameContext<object?>
 {
     /// <inheritdoc/>
     public GameContextHeadless(int requestedWidth = 0, int requestedHeight = 0)
