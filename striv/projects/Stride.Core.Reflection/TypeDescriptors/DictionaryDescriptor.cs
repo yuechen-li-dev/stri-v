@@ -24,7 +24,7 @@ public class DictionaryDescriptor : ObjectDescriptor
     Func<object, IEnumerable<KeyValuePair<object, object?>>> getEnumeratorMethod;
     Action<object> clearMethod;
 
-    #pragma warning disable CS8618
+#pragma warning disable CS8618
     // This warning is disabled because the necessary initialization will occur 
     // in the CreateDictionaryDelegates<T>() method, not in the constructor.
     public DictionaryDescriptor(ITypeDescriptorFactory factory, Type type, bool emitDefaultValues, IMemberNamingConvention namingConvention)
