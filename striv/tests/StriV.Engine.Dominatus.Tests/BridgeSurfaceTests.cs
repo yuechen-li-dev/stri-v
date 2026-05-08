@@ -15,6 +15,7 @@ public sealed class BridgeSurfaceTests
         _ = new EngineStarting();
         _ = new EngineStopping();
         _ = new SceneLoading("BootScene");
+        _ = new TransformParentAttachRequested(new Stride.Engine.Entity("Child"), new Stride.Engine.Entity("Parent"));
     }
 
     [Fact]
@@ -37,6 +38,8 @@ public sealed class BridgeSurfaceTests
         Assert.NotNull(typeof(EngineLifecycleNode).GetMethod(nameof(EngineLifecycleNode.Idle)));
         Assert.NotNull(typeof(SceneLifecycleNode).GetMethod(nameof(SceneLifecycleNode.Idle)));
         Assert.NotNull(typeof(EntityAttachmentNode).GetMethod(nameof(EntityAttachmentNode.Idle)));
+        Assert.NotNull(typeof(EntityAttachmentNode).GetMethod(nameof(EntityAttachmentNode.RequestTransformAttach)));
+        Assert.NotNull(typeof(EntityAttachmentNode).GetMethod(nameof(EntityAttachmentNode.RequestTransformDetach)));
         Assert.NotNull(typeof(ProcessorLifecycleNode).GetMethod(nameof(ProcessorLifecycleNode.Idle)));
     }
 
