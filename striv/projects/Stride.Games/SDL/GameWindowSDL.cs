@@ -388,7 +388,7 @@ namespace Stride.Games
             if (window != null)
             {
                 window.Dispose();
-                window = null;
+                window = default!;
             }
 
             base.Destroy();

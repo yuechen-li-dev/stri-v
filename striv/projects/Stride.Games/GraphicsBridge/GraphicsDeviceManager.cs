@@ -115,6 +115,7 @@ namespace Stride.Games
                 ?? throw new InvalidOperationException("IGraphicsDeviceFactory is not registered as a service");
 
             game.WindowCreated += GameOnWindowCreated;
+            GraphicsDevice = null!;
         }
 
 
@@ -985,11 +986,6 @@ namespace Stride.Games
 
             if (DelayWindowEvents)
                 hasWindowClientSizeChanged = true;
-
-            else if (ProcessClientSizeChanged())
-            {
-                ApplyChanges();
-            }
         }
 
         /// <summary>
@@ -1032,11 +1028,6 @@ namespace Stride.Games
 
             if (DelayWindowEvents)
                 hasWindowOrientationChanged = true;
-
-            else if (ProcessOrientationChanged())
-            {
-                ApplyChanges();
-            }
         }
 
         /// <summary>
@@ -1077,11 +1068,6 @@ namespace Stride.Games
             {
                 if (DelayWindowEvents)
                     hasWindowFullscreenChanged = true;
-                else
-                {
-                    ProcessFullscreenChanged(window);
-                    ApplyChanges();
-                }
             }
         }
 
