@@ -42,7 +42,7 @@ public class NullableDescriptor : ObjectDescriptor
     /// <returns><c>true</c> if the specified type is nullable; otherwise, <c>false</c>.</returns>
     public static bool IsNullable(Type type)
     {
-        return type.IsNullable();
+        return Nullable.GetUnderlyingType(type) is not null;
     }
 
     protected override List<IMemberDescriptor> PrepareMembers()

@@ -102,7 +102,8 @@ public class TypeDescriptorFactory : ITypeDescriptorFactory
         }
         else if (CollectionDescriptor.IsCollection(type))
         {
-            // ICollection
+            // Legacy ICollection fallback path.
+            // Keep this for serialization/AP compatibility until OldCollectionDescriptor consumers are fully migrated.
             descriptor = new OldCollectionDescriptor(this, type, emitDefaultValues, namingConvention);
         }
         else if (type.IsArray)
