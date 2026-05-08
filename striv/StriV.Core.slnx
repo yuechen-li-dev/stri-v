@@ -7,6 +7,7 @@
     <Project Path="projects/Stride.Core.MicroThreading/Stride.Core.MicroThreading.csproj" />
     <Project Path="projects/Stride.Core.Reflection/Stride.Core.Reflection.csproj" />
     <Project Path="projects/Stride.Core.Serialization/Stride.Core.Serialization.csproj" />
+    <Project Path="projects/Stride.Core.Serialization.Generator/Stride.Core.Serialization.Generator.csproj" />
     <Project Path="projects/Stride.Core/Stride.Core.csproj" />
     <Project Path="projects/Stride.Engine/Stride.Engine.csproj" />
     <Project Path="projects/Stride.FreeImage/Stride.FreeImage.csproj" />
@@ -25,5 +26,6 @@
     <Project Path="tests/StriV.CleanGraph.Tests/StriV.CleanGraph.Tests.csproj" />
     <Project Path="tests/StriV.AssetTool.Tests/StriV.AssetTool.Tests.csproj" />
     <Project Path="tests/Stride.Input.Tests/Stride.Input.Tests.csproj" />
+    <Project Path="tests/Stride.Core.Serialization.Generator.Tests/Stride.Core.Serialization.Generator.Tests.csproj" />
   </Folder>
 </Solution>
