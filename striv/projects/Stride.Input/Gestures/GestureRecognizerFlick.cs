@@ -57,7 +57,7 @@ namespace Stride.Input
                 var translDist = (currPos - startPos).Length();
                 if (translDist > ConfigFlick.MinimumFlickLength && translDist / ElapsedSinceBeginning.TotalSeconds > ConfigFlick.MinimumAverageSpeed)
                 {
-                    var evt = CurrentGestureEvents.Add() as GestureEventFlick;
+                    var evt = (GestureEventFlick)CurrentGestureEvents.Add();
                     evt.Set(ConfigFlick.RequiredNumberOfFingers, ElapsedSinceBeginning, ConfigFlick.FlickShape, NormalizeVector(startPos), NormalizeVector(currPos));
                     HasGestureStarted = false;
                 }

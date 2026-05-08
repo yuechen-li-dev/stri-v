@@ -14,7 +14,7 @@ namespace Stride.Input
     /// <typeparam name="TEventType">The type of event to pool</typeparam>
     public static class InputEventPool<TEventType> where TEventType : InputEvent, new()
     {
-        private static ThreadLocal<Pool> pool;
+        private static readonly ThreadLocal<Pool> pool;
 
         static InputEventPool()
         {
@@ -25,7 +25,7 @@ namespace Stride.Input
         /// <summary>
         /// The number of events in circulation, if this number keeps increasing, Enqueue is possible not called somewhere
         /// </summary>
-        public static int ActiveObjects => pool.Value.ActiveObjects;
+        public static int ActiveObjects => pool.Value!.ActiveObjects;
 
         private static TEventType CreateEvent()
         {
@@ -39,7 +39,7 @@ namespace Stride.Input
         /// <returns>An event</returns>
         public static TEventType GetOrCreate(IInputDevice device)
         {
-            return pool.Value.GetOrCreate(device);
+            return pool.Value!.GetOrCreate(device);
         }
         
         /// <summary>
@@ -48,7 +48,7 @@ namespace Stride.Input
         /// <param name="item">The event to reuse</param>
         public static void Enqueue(TEventType item)
         {
-            pool.Value.Enqueue(item);
+            pool.Value!.Enqueue(item);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Stride.Input
             
             public void Enqueue(TEventType item)
             {
-                item.Device = null;
+                item.Device = null!;
                 pool.Remove(item);
             }
         }
