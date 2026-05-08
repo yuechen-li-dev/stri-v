@@ -246,7 +246,7 @@ public class OldCollectionDescriptor : CollectionDescriptor
         return collection == null || getCollectionCountMethod == null ? -1 : getCollectionCountMethod(collection);
     }
 
-    protected override bool PrepareMember(MemberDescriptorBase member, MemberInfo metadataClassMemberInfo)
+    protected override bool PrepareMember(MemberDescriptorBase member, MemberInfo? metadataClassMemberInfo)
     {
         // Filter members
         if (member is PropertyDescriptor && ListOfMembersToRemove.Contains(member.OriginalName))

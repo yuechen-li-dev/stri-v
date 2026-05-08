@@ -274,6 +274,9 @@ public sealed class MemberPath
             for (int i = 0; i < items.Count - 1; i++)
             {
                 var item = items[i];
+                if (nextObject is null)
+                    throw new NullReferenceException();
+
                 nextObject = item.GetValue(nextObject);
                 stack.Add(nextObject);
             }
@@ -295,14 +298,20 @@ public sealed class MemberPath
             switch (actionType)
             {
                 case MemberPathAction.ValueSet:
+                    if (nextObject is null)
+                        throw new NullReferenceException();
                     lastItem.SetValue(stack, stack.Count - 1, nextObject, value);
                     break;
 
                 case MemberPathAction.DictionaryRemove:
+                    if (nextObject is null)
+                        throw new NullReferenceException();
                     ((DictionaryPathItem)lastItem).Descriptor.Remove(nextObject, ((DictionaryPathItem)lastItem).Key);
                     break;
 
                 case MemberPathAction.CollectionAdd:
+                    if (nextObject is null)
+                        throw new NullReferenceException();
                     ((CollectionPathItem)lastItem).Descriptor.Add(nextObject, value);
                     break;
 
@@ -432,13 +441,13 @@ public sealed class MemberPath
     {
         public MemberPathItem? Parent { get; set; }
 
-        public abstract IMemberDescriptor MemberDescriptor { get; }
+        public abstract IMemberDescriptor? MemberDescriptor { get; }
 
-        public virtual ITypeDescriptor? TypeDescriptor => MemberDescriptor.TypeDescriptor;
+        public virtual ITypeDescriptor? TypeDescriptor => MemberDescriptor?.TypeDescriptor;
 
         public abstract object? GetValue(object thisObj);
 
-        public abstract void SetValue(List<object> stack, int objectIndex, object thisObject, object? value);
+        public abstract void SetValue(List<object?> stack, int objectIndex, object thisObject, object? value);
 
         public virtual object? GetIndex() => null;
 
@@ -466,13 +475,16 @@ public sealed class MemberPath
             return descriptor.Get(thisObj);
         }
 
-        public override void SetValue(List<object> stack, int objectIndex, object thisObject, object? value)
+        public override void SetValue(List<object?> stack, int objectIndex, object thisObject, object? value)
         {
             descriptor.Set(thisObject, value);
 
             if (isValueType)
             {
-                Parent?.SetValue(stack, objectIndex - 1, stack[objectIndex - 1], thisObject);
+                var parentObject = stack[objectIndex - 1];
+                if (parentObject is null)
+                    throw new NullReferenceException();
+                Parent?.SetValue(stack, objectIndex - 1, parentObject, thisObject);
             }
         }
 
@@ -528,13 +540,16 @@ public sealed class MemberPath
             return descriptor.Get(thisObj);
         }
 
-        public override void SetValue(List<object> stack, int objectIndex, object thisObject, object? value)
+        public override void SetValue(List<object?> stack, int objectIndex, object thisObject, object? value)
         {
             descriptor.Set(thisObject, value);
 
             if (isValueType)
             {
-                Parent?.SetValue(stack, objectIndex - 1, stack[objectIndex - 1], thisObject);
+                var parentObject = stack[objectIndex - 1];
+                if (parentObject is null)
+                    throw new NullReferenceException();
+                Parent?.SetValue(stack, objectIndex - 1, parentObject, thisObject);
             }
         }
 
@@ -573,7 +588,7 @@ public sealed class MemberPath
 
     public abstract class SpecialMemberPathItemBase : MemberPathItem
     {
-        public override IMemberDescriptor MemberDescriptor => null;
+        public override IMemberDescriptor? MemberDescriptor => null;
     }
 
     public sealed class ArrayPathItem : SpecialMemberPathItemBase, IEquatable<ArrayPathItem>
@@ -595,7 +610,7 @@ public sealed class MemberPath
             return ((Array)thisObj).GetValue(Index);
         }
 
-        public override void SetValue(List<object> stack, int objectIndex, object thisObject, object? value)
+        public override void SetValue(List<object?> stack, int objectIndex, object thisObject, object? value)
         {
             ((Array)thisObject).SetValue(value, Index);
         }
@@ -654,7 +669,7 @@ public sealed class MemberPath
             return Descriptor.GetValue(thisObj, Index);
         }
 
-        public override void SetValue(List<object> stack, int objectIndex, object thisObject, object? value)
+        public override void SetValue(List<object?> stack, int objectIndex, object thisObject, object? value)
         {
             Descriptor.SetValue(thisObject, Index, value);
         }
@@ -719,7 +734,7 @@ public sealed class MemberPath
             return Descriptor.GetValue(thisObj, Key);
         }
 
-        public override void SetValue(List<object> stack, int objectIndex, object thisObject, object? value)
+        public override void SetValue(List<object?> stack, int objectIndex, object thisObject, object? value)
         {
             Descriptor.SetValue(thisObject, Key, value);
         }
@@ -781,7 +796,7 @@ public sealed class MemberPath
             return Descriptor.GetValue(thisObj, Index);
         }
 
-        public override void SetValue(List<object> stack, int objectIndex, object thisObject, object? value)
+        public override void SetValue(List<object?> stack, int objectIndex, object thisObject, object? value)
         {
             Descriptor.SetValue(thisObject, Index, value);
         }

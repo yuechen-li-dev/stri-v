@@ -82,7 +82,7 @@ public class GenericCollectionDescriptor : CollectionDescriptor
     public override void Clear(object collection) => clearMethod(collection);
     public override int GetCollectionCount(object? collection) => collection == null ? -1 : getCollectionCountMethod(collection);
 
-    protected override bool PrepareMember(MemberDescriptorBase member, MemberInfo metadataClassMemberInfo)
+    protected override bool PrepareMember(MemberDescriptorBase member, MemberInfo? metadataClassMemberInfo)
     {
         if (member is PropertyDescriptor && ListOfMembersToRemove.Contains(member.OriginalName))
             return false;

@@ -232,7 +232,7 @@ public class DictionaryDescriptor : ObjectDescriptor
         return dictionary.Select(keyValue => new KeyValuePair<object, object?>(keyValue.Key!, keyValue.Value));
     }
 
-    protected override bool PrepareMember(MemberDescriptorBase member, MemberInfo metadataClassMemberInfo)
+    protected override bool PrepareMember(MemberDescriptorBase member, MemberInfo? metadataClassMemberInfo)
     {
         // Filter members
         if (member is PropertyDescriptor && ListOfMembersToRemove.Contains(member.OriginalName))
