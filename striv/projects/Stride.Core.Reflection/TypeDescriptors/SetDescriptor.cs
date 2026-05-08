@@ -202,7 +202,7 @@ public class SetDescriptor : CollectionDescriptor
         return false;
     }
 
-    protected override bool PrepareMember(MemberDescriptorBase member, MemberInfo metadataClassMemberInfo)
+    protected override bool PrepareMember(MemberDescriptorBase member, MemberInfo? metadataClassMemberInfo)
     {
         // Filter members
         if (member is PropertyDescriptor && ListOfMembersToRemove.Contains(member.OriginalName))

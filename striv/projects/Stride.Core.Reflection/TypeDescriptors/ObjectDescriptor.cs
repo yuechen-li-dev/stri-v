@@ -257,7 +257,7 @@ public class ObjectDescriptor : ITypeDescriptor
         return backingField != null;
     }
 
-    protected virtual bool PrepareMember(MemberDescriptorBase member, MemberInfo metadataClassMemberInfo)
+    protected virtual bool PrepareMember(MemberDescriptorBase member, MemberInfo? metadataClassMemberInfo)
     {
         var memberType = member.Type;
 
