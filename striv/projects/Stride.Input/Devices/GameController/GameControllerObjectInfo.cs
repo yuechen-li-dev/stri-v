@@ -11,7 +11,7 @@ namespace Stride.Input
         /// <summary>
         /// The name of the object, reported by the device
         /// </summary>
-        public string Name;
+        public string Name = string.Empty;
 
         public override string ToString()
         {

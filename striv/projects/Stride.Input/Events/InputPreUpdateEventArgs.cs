@@ -14,6 +14,7 @@ namespace Stride.Input
         /// <summary>
         /// The game time passed to <see cref="InputManager.Update"/>
         /// </summary>
-        public GameTime GameTime;
+        // Populated by InputManager before raising the pre-update event.
+        public GameTime GameTime = null!;
     }
 }

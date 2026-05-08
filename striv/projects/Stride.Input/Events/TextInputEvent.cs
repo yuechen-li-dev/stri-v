@@ -11,7 +11,7 @@ namespace Stride.Input
         /// <summary>
         /// The text that was entered
         /// </summary>
-        public string Text;
+        public string Text = string.Empty;
 
         /// <summary>
         /// The type of text input event

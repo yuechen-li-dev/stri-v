@@ -18,9 +18,10 @@ namespace Stride.Input
 
         private readonly List<InputEvent> events = new List<InputEvent>();
 
-        protected bool[] ButtonStates;
-        protected float[] AxisStates;
-        protected Direction[] DirectionStates;
+        // Initialized by derived implementations via InitializeButtonStates() before any input state reads.
+        protected bool[] ButtonStates = null!;
+        protected float[] AxisStates = null!;
+        protected Direction[] DirectionStates = null!;
 
         protected GameControllerDeviceBase()
         {

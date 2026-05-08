@@ -33,7 +33,8 @@ namespace Stride.Input
         /// <summary>
         /// The device to which this pointer belongs
         /// </summary>
-        public IPointerDevice Pointer;
+        // Assigned by PointerDeviceState when pointer data is created.
+        public IPointerDevice Pointer = null!;
 
         public override string ToString()
         {
