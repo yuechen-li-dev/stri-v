@@ -24,17 +24,18 @@ public class TypeDescriptorFactoryCollectionFallbackTests
     }
 
     [Fact]
-    public void TypeDescriptorFactory_UsesOldCollectionDescriptor_OnlyForLegacyFallbackShape()
+    public void TypeDescriptorFactory_UsesModernDescriptor_ForLegacyICollectionShape()
     {
         var descriptor = TypeDescriptorFactory.Default.Find(typeof(LegacyIntCollection));
 
-        Assert.IsType<OldCollectionDescriptor>(descriptor);
+        Assert.IsType<GenericCollectionDescriptor>(descriptor);
+        Assert.IsNotType<OldCollectionDescriptor>(descriptor);
     }
 
     [Fact]
-    public void OldCollectionDescriptor_FallbackBehavior_IsDocumented()
+    public void ModernCollectionDescriptor_FallbackBehavior_MatchesLegacyICollectionShape()
     {
-        var descriptor = Assert.IsType<OldCollectionDescriptor>(TypeDescriptorFactory.Default.Find(typeof(LegacyIntCollection)));
+        var descriptor = Assert.IsType<GenericCollectionDescriptor>(TypeDescriptorFactory.Default.Find(typeof(LegacyIntCollection)));
         var collection = new LegacyIntCollection();
 
         descriptor.Add(collection, 10);
@@ -48,6 +49,14 @@ public class TypeDescriptorFactoryCollectionFallbackTests
         Assert.Equal(0, descriptor.GetCollectionCount(collection));
         Assert.Equal(typeof(int), descriptor.ElementType);
         Assert.False(descriptor.HasIndexerAccessors);
+    }
+
+    [Fact]
+    public void OldCollectionDescriptor_IsNotSelected_ForKnownFallbackShapes()
+    {
+        var descriptor = TypeDescriptorFactory.Default.Find(typeof(LegacyIntCollection));
+
+        Assert.IsNotType<OldCollectionDescriptor>(descriptor);
     }
 
     private sealed class LegacyIntCollection : ICollection<int>
