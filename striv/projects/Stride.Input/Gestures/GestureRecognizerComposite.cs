@@ -85,7 +85,7 @@ namespace Stride.Input
         {
             var deltaRotation = currentRotation - lastRotation;
             var deltaScale = currentScale - lastScale;
-            var evt = CurrentGestureEvents.Add() as GestureEventComposite;
+            var evt = (GestureEventComposite)CurrentGestureEvents.Add();
             evt.Set(state, ElapsedSinceLast, ElapsedSinceBeginning, deltaRotation, currentRotation, deltaScale, currentScale,
                                                                NormalizeVector(beginCenter), NormalizeVector(lastCenter), NormalizeVector(currentCenter));
 

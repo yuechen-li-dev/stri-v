@@ -33,7 +33,7 @@ namespace Stride.Input
             if (HasGestureStarted && ElapsedSinceBeginning >= ConfigLongPress.RequiredPressTime)
             {
                 var avgPosition = ComputeMeanPosition(FingerIdToBeginPositions.Values);
-                var evt = CurrentGestureEvents.Add() as GestureEventLongPress;
+                var evt = (GestureEventLongPress)CurrentGestureEvents.Add();
                 evt.Set(ConfigLongPress.RequiredNumberOfFingers, ElapsedSinceBeginning, NormalizeVector(avgPosition));
                 HasGestureStarted = false;
             }

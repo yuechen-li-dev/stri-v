@@ -136,11 +136,11 @@ namespace Stride.Input
         {
             if (fingerIdsToLastMovePos.Count > 0)
             {
-                FingerIdsCache.Value.Clear();
-                FingerIdsCache.Value.AddRange(fingerIdsToLastMovePos.Keys);
+                FingerIdsCache.Value!.Clear();
+                FingerIdsCache.Value!.AddRange(fingerIdsToLastMovePos.Keys);
 
                 // Unnormalizes vectors here before utilization
-                foreach (var id in FingerIdsCache.Value)
+                foreach (var id in FingerIdsCache.Value!)
                     fingerIdsToLastMovePos[id] = UnnormalizeVector(fingerIdsToLastMovePos[id]);
 
                 ProcessMoveEventPointers(fingerIdsToLastMovePos);

@@ -137,7 +137,7 @@ namespace Stride.Input
             if (currentNumberOfTaps == ConfigTap.RequiredNumberOfTaps)
             {
                 var tapMeanPosition = ComputeMeanPosition(FingerIdToBeginPositions.Values);
-                var evt = CurrentGestureEvents.Add() as GestureEventTap;
+                var evt = (GestureEventTap)CurrentGestureEvents.Add();
                 evt.Set(ElapsedSinceBeginning, ConfigTap.RequiredNumberOfFingers, currentNumberOfTaps, NormalizeVector(tapMeanPosition));
             }
 

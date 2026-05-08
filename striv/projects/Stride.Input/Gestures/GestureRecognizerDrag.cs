@@ -64,7 +64,7 @@ namespace Stride.Input
         protected override void AddGestureEventToCurrentList(GestureState state)
         {
             var deltaTrans = currPosition - lastPosition;
-            var evt = CurrentGestureEvents.Add() as GestureEventDrag;
+            var evt = (GestureEventDrag)CurrentGestureEvents.Add();
             evt.Set(state, ConfigDrag.RequiredNumberOfFingers, ElapsedSinceLast, ElapsedSinceBeginning, ConfigDrag.DragShape,
                                                           NormalizeVector(startPosition), NormalizeVector(currPosition), NormalizeVector(deltaTrans));
 
