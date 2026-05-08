@@ -30,9 +30,12 @@ using Stride.Graphics;
 namespace Stride.Games
 {
     /// <summary>
-    ///   Contains context used to render the Game (i.e. it abstracts a Windows Forms <c>Control</c>,
-    ///   or a <c>DrawingSurface</c> for UWP, etc.)
+    ///   Describes host context requested by <see cref="GameBase.Run(GameContext)"/> (windowed, headless, toolkit-owned, etc.).
     /// </summary>
+    /// <remarks>
+    ///   This is a host descriptor only; it does not run the loop itself.
+    ///   The selected <see cref="GamePlatform"/> interprets this contract and creates an appropriate <see cref="GameWindow"/>.
+    /// </remarks>
     public abstract class GameContext
     {
         /// <summary>

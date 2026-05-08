@@ -35,8 +35,13 @@ using Stride.Graphics;
 namespace Stride.Games
 {
     /// <summary>
-    /// The game.
+    /// Central host runtime type that owns game lifecycle, timing, and the update/draw run loop.
     /// </summary>
+    /// <remarks>
+    /// In Stri-V this class is the desktop-first lifecycle owner for <c>Stride.Games</c>.
+    /// Future lifecycle integrations (including Dominatus policy layers) must preserve the
+    /// initialization and run ordering contracts implemented here.
+    /// </remarks>
     public abstract class GameBase : ComponentBase, IGame
     {
         #region Fields
@@ -86,6 +91,8 @@ namespace Stride.Games
             isMouseVisible = true;
 
             // Externals
+            // NOTE(striv-m12c): service registration order is part of runtime host assumptions:
+            // systems/services are established before platform creation and before Run().
             Services = new ServiceRegistry();
 
             // Database file provider
@@ -96,6 +103,7 @@ namespace Stride.Games
             Services.AddService<IGameSystemCollection>(GameSystems);
 
             // Create Platform
+            // NOTE(striv-m12c): GamePlatform is the host bridge and owns GameWindow creation/message loop hookup.
             gamePlatform = GamePlatform.Create(this);
             gamePlatform.Activated += GamePlatform_Activated;
             gamePlatform.Deactivated += GamePlatform_Deactivated;

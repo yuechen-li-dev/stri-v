@@ -30,8 +30,12 @@ using Stride.Graphics;
 namespace Stride.Games
 {
     /// <summary>
-    /// An abstract window.
+    /// Abstract game-window contract consumed by host/platform code.
     /// </summary>
+    /// <remarks>
+    /// <see cref="GamePlatform"/> owns creation and loop integration of this window contract.
+    /// Concrete desktop backends (SDL, WinForms) implement this boundary and are likely split to dedicated modules later.
+    /// </remarks>
     public abstract class GameWindow : ComponentBase
     {
         #region Fields

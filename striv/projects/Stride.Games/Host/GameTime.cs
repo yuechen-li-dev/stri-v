@@ -28,6 +28,10 @@ namespace Stride.Games
     /// <summary>
     /// Current timing used for variable-step (real time) or fixed-step (game time) games.
     /// </summary>
+    /// <remarks>
+    /// Instances are populated by the host loop in <see cref="GameBase"/> and passed into systems/update/draw code.
+    /// Timing semantics here are part of host-loop compatibility and should remain behaviorally stable.
+    /// </remarks>
     public class GameTime
     {
         private TimeSpan accumulatedElapsedTime;

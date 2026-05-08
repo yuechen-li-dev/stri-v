@@ -37,6 +37,11 @@ namespace Stride.Games
     ///   Manages the <see cref="GraphicsDevice"/> life-cycle, providing access to it and events that can be
     ///   subscribed to be notified of when the device is created, reset, or disposed.
     /// </summary>
+    /// <remarks>
+    /// In Stri-V this type is intentionally parked in <c>Stride.Games</c> as a host/graphics bridge.
+    /// It is not guaranteed to remain the final ownership location (possible future split to graphics/presentation modules).
+    /// Device creation/reset/presenter sequencing here is compatibility-sensitive and must not be behaviorally changed in set-in-order passes.
+    /// </remarks>
     public class GraphicsDeviceManager : ComponentBase, IGraphicsDeviceManager, IGraphicsDeviceService
     {
         // Switch to indicate if window events should be delayed until the beginning of frames,
