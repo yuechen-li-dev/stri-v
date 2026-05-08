@@ -7,6 +7,11 @@ using Stride.Core.Yaml.Serialization;
 
 namespace Stride.Core.Reflection;
 
+// Stri-V compatibility fallback:
+// retained only for legacy collection shapes that are not handled by
+// ListDescriptor/SetDescriptor/DictionaryDescriptor/ArrayDescriptor.
+// Do not add new callsites; remove once fallback tests prove no active consumers.
+
 /// <summary>
 /// The old descriptor, kept here to avoid compatibility error.
 /// Provides a descriptor for a <see cref="ICollection"/>.
