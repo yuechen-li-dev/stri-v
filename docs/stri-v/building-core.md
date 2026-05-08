@@ -25,7 +25,7 @@ Build one project with inactive warning noise suppressed:
 Require a focused project to be warning-clean:
 
 ```bash
-./striv/build/striv-check-focused-project.sh Stride.Input
+./striv/build/striv-check-focused-project.sh Stride.Games
 ```
 
 Run all completed active focused warning-clean projects as a build/script gate:
@@ -35,7 +35,8 @@ Run all completed active focused warning-clean projects as a build/script gate:
   Stride.BepuPhysics \
   Stride.Core.Mathematics \
   Stride.Core.IO \
-  Stride.Input
+  Stride.Input \
+  Stride.Games
 ```
 
 The focused warning lane is a 5S Shine/Sustain build-quality gate. It does not mark inactive project warnings as fixed, and it must run outside `dotnet test` (unit tests must not spawn nested focused builds).
@@ -45,6 +46,7 @@ Completed zero-warning focused active projects:
 - `Stride.Core.Mathematics`
 - `Stride.Core.IO`
 - `Stride.Input`
+- `Stride.Games`
 
 Legacy bridge exception (policy exception, nullable disabled):
 - `Stride.FreeImage`
