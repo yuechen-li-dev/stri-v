@@ -51,7 +51,7 @@ namespace Stride.Games
         private int updateOrder;
         private bool visible;
 
-        private IGraphicsDeviceService graphicsDeviceService;
+        private IGraphicsDeviceService? graphicsDeviceService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GameSystemBase" /> class.
@@ -63,7 +63,7 @@ namespace Stride.Games
         protected GameSystemBase([NotNull] IServiceRegistry registry)
         {
             Services = registry ?? throw new ArgumentNullException(nameof(registry));
-            Game = (GameBase)Services.GetService<IGame>();
+            Game = Services.GetService<IGame>() as GameBase;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Stride.Games
         ///   Gets the Graphics Device.
         /// </summary>
         /// <value>The Graphics Device. This can be <see langword="null"/> if it has not been initialized yet.</value>
-        protected GraphicsDevice GraphicsDevice => graphicsDeviceService?.GraphicsDevice;
+        protected GraphicsDevice? GraphicsDevice => graphicsDeviceService?.GraphicsDevice;
 
         #region IDrawable Members
 

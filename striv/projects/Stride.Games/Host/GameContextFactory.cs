@@ -17,7 +17,7 @@ namespace Stride.Games
         /// <returns></returns>
         public static GameContext NewGameContext(AppContextType type, int requestedWidth = 0, int requestedHeight = 0, bool isUserManagingRun = false)
         {
-            GameContext res = null;
+            GameContext? res = null;
             switch (type)
             {
                 case AppContextType.Android:

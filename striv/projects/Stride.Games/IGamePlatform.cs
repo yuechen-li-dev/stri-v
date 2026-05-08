@@ -27,6 +27,6 @@ namespace Stride.Games
         /// <remarks>
         /// This is currently only supported on Windows Desktop. The window context supported on windows is a subclass of System.Windows.Forms.Control (or null and a default GameForm will be created).
         /// </remarks>
-        GameWindow CreateWindow(GameContext gameContext = null);
+        GameWindow CreateWindow(GameContext? gameContext = null);
     }
 }
