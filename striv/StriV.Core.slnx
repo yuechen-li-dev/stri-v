@@ -27,6 +27,7 @@
     <Project Path="tests/StriV.AssetTool.Tests/StriV.AssetTool.Tests.csproj" />
     <Project Path="tests/Stride.Input.Tests/Stride.Input.Tests.csproj" />
     <Project Path="tests/Stride.Core.Serialization.Generator.Tests/Stride.Core.Serialization.Generator.Tests.csproj" />
+    <Project Path="tests/Stride.Core.Reflection.Tests/Stride.Core.Reflection.Tests.csproj" />
     <Project Path="tests/Stride.Games.Tests/Stride.Games.Tests.csproj" />
   </Folder>
 </Solution>
