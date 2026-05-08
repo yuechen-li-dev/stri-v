@@ -27,7 +27,8 @@ internal class GameWindowHeadless : GameWindow<object>
 
     public override bool IsMouseVisible { get; set; }
 
-    public override WindowHandle NativeWindow => null;
+    // Headless mode intentionally has no native OS window handle.
+    public override WindowHandle NativeWindow => null!;
 
     public override bool Visible { get; set; }
 

@@ -95,9 +95,9 @@ namespace Stride.Games
         #region IDrawable Members
 
         /// <inheritdoc/>
-        public event EventHandler<EventArgs> DrawOrderChanged;
+        public event EventHandler<EventArgs>? DrawOrderChanged;
         /// <inheritdoc/>
-        public event EventHandler<EventArgs> VisibleChanged;
+        public event EventHandler<EventArgs>? VisibleChanged;
 
         /// <inheritdoc/>
         public virtual bool BeginDraw()
@@ -167,9 +167,9 @@ namespace Stride.Games
 
         #region IUpdateable Members
 
-        public event EventHandler<EventArgs> EnabledChanged;
+        public event EventHandler<EventArgs>? EnabledChanged;
 
-        public event EventHandler<EventArgs> UpdateOrderChanged;
+        public event EventHandler<EventArgs>? UpdateOrderChanged;
 
         public virtual void Update(GameTime gameTime)
         {
