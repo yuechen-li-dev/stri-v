@@ -45,32 +45,32 @@ namespace Stride.Games
         /// <summary>
         /// Occurs when [app activated].
         /// </summary>
-        public event EventHandler<EventArgs> AppActivated;
+        public event EventHandler<EventArgs>? AppActivated;
 
         /// <summary>
         /// Occurs when [app deactivated].
         /// </summary>
-        public event EventHandler<EventArgs> AppDeactivated;
+        public event EventHandler<EventArgs>? AppDeactivated;
 
         /// <summary>
         /// Occurs when the application should stop rendering.
         /// </summary>
-        public event EventHandler<EventArgs> PauseRendering;
+        public event EventHandler<EventArgs>? PauseRendering;
 
         /// <summary>
         /// Occurs when the application should resume rendering, if it is paused.
         /// </summary>
-        public event EventHandler<EventArgs> ResumeRendering;
+        public event EventHandler<EventArgs>? ResumeRendering;
 
         /// <summary>
         /// Occurs when the size of the window has changed.
         /// </summary>
-        public event EventHandler<EventArgs> SizeChanged;
+        public event EventHandler<EventArgs>? SizeChanged;
 
         /// <summary>
         /// Occurs when alt-enter key combination has been pressed.
         /// </summary>
-        public event EventHandler<EventArgs> FullscreenToggle;
+        public event EventHandler<EventArgs>? FullscreenToggle;
 
         #endregion
 
