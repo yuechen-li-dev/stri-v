@@ -99,7 +99,7 @@ namespace Stride.Games
 
         internal abstract GameWindow GetSupportedGameWindow(AppContextType type);
 
-        public virtual GameWindow CreateWindow(GameContext gameContext)
+        public virtual GameWindow CreateWindow(GameContext? gameContext)
         {
             var window = GetSupportedGameWindow(gameContext.ContextType);
             if (window != null)
