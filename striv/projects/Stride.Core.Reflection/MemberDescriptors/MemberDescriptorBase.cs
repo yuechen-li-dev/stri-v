@@ -16,6 +16,11 @@ public abstract class MemberDescriptorBase : IMemberDescriptor
 
         Name = name;
         OriginalName = name;
+        DeclaringType = typeof(object);
+        MemberInfo = typeof(object).GetMember(nameof(ToString))[0];
+        DefaultNameComparer = StringComparer.Ordinal;
+        ShouldSerialize = ObjectDescriptor.ShouldSerializeDefault;
+        AlternativeNames = [];
     }
 
     protected MemberDescriptorBase(MemberInfo memberInfo, StringComparer defaultNameComparer)
@@ -25,6 +30,8 @@ public abstract class MemberDescriptorBase : IMemberDescriptor
         OriginalName = Name;
         DeclaringType = memberInfo.DeclaringType!;
         DefaultNameComparer = defaultNameComparer;
+        ShouldSerialize = ObjectDescriptor.ShouldSerializeDefault;
+        AlternativeNames = [];
     }
 
     // TODO: turn the public setters internal or protected
@@ -76,11 +83,11 @@ public abstract class MemberDescriptorBase : IMemberDescriptor
 
     public ShouldSerializePredicate ShouldSerialize { get; set; }
 
-    public System.ComponentModel.DefaultValueAttribute DefaultValueAttribute { get; set; }
+    public System.ComponentModel.DefaultValueAttribute? DefaultValueAttribute { get; set; }
     public bool HasDefaultValue => DefaultValueAttribute != null;
     public object? DefaultValue => DefaultValueAttribute?.Value;
 
     public List<string> AlternativeNames { get; set; }
 
-    public object Tag { get; set; }
+    public object Tag { get; set; } = null!;
 }

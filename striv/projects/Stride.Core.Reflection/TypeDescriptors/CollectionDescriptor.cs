@@ -51,7 +51,7 @@ public abstract class CollectionDescriptor : ObjectDescriptor
     /// Gets or sets the type of the element.
     /// </summary>
     /// <value>The type of the element.</value>
-    public Type ElementType { get; protected set; }
+    public Type ElementType { get; protected set; } = typeof(object);
 
     /// <summary>
     /// Gets a value indicating whether this instance is a pure collection (no public property/field)
