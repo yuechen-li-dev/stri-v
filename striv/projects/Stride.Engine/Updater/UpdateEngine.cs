@@ -191,7 +191,7 @@ namespace Stride.Updater
 
                         // T[], IList<T>, etc...
                         // Try to resolve using custom resolver
-                        UpdatableMember updatableMember = null;
+                        UpdatableMember? updatableMember = null;
                         var parentType = containerType;
                         while (parentType != null)
                         {
@@ -264,7 +264,7 @@ namespace Stride.Updater
                         }
                         else
                         {
-                            UpdatableMember updatableMember = null;
+                            UpdatableMember? updatableMember = null;
 
                             // Parse until end next group (or end)
                             state.ParseElementEnd = animationPath.Name.IndexOfAny(PathGroupDelimiters, state.ParseElementStart + 1);

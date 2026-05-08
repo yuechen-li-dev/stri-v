@@ -122,7 +122,7 @@ namespace Stride.Animations
         internal void AddChannel(ref AnimationBlender.Channel channel)
         {
             AnimationClip.Channel clipChannel;
-            AnimationCurve curve = null;
+            AnimationCurve? curve = null;
 
             // Try to find curve and create evaluator
             // (if curve doesn't exist, Evaluator will be null).

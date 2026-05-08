@@ -99,7 +99,7 @@ namespace Stride.Engine.Network
 
                     // Deserialize as an object
                     var binaryReader = new BinarySerializationReader(new MemoryStream(buffer));
-                    object obj = null;
+                    object? obj = null;
                     binaryReader.Context.SerializerSelector = SerializerSelector.AssetWithReuse;
                     binaryReader.SerializeExtended<object>(ref obj, ArchiveMode.Deserialize, null);
 
