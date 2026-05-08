@@ -29,7 +29,7 @@ namespace Stride.Input
         public Core.Collections.IReadOnlySet<PointerPoint> PressedPointers => PointerState.PressedPointers;
         public Core.Collections.IReadOnlySet<PointerPoint> ReleasedPointers => PointerState.ReleasedPointers;
         public Core.Collections.IReadOnlySet<PointerPoint> DownPointers => PointerState.DownPointers;
-        public event EventHandler<SurfaceSizeChangedEventArgs> SurfaceSizeChanged;
+        public event EventHandler<SurfaceSizeChangedEventArgs>? SurfaceSizeChanged;
 
         public int Priority { get; set; }
 

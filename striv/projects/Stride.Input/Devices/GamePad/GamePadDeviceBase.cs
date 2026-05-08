@@ -38,7 +38,7 @@ namespace Stride.Input
 
         public abstract IInputSource Source { get; }
 
-        public event EventHandler<GamePadIndexChangedEventArgs> IndexChanged;
+        public event EventHandler<GamePadIndexChangedEventArgs>? IndexChanged;
 
         public abstract void Update(List<InputEvent> inputEvents);
         public abstract void SetVibration(float smallLeft, float smallRight, float largeLeft, float largeRight);

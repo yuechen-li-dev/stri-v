@@ -9,6 +9,7 @@ namespace Stride.Input
     public abstract class InputEvent : IInputEventArgs
     {
         /// <inheritdoc/>
-        public IInputDevice Device { get; protected internal set; }
+        // Set by input producers (or InputEventPool.GetOrCreate(device)) before dispatch.
+        public IInputDevice Device { get; protected internal set; } = null!;
     }
 }

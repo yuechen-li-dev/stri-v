@@ -10,6 +10,7 @@ namespace Stride.Input
     {
         public GamePadSimulated(InputSourceSimulated source)
         {
+            Name = "Simulated GamePad";
             ProductId = new Guid("B540474D-F8CC-4D27-B57E-7E87272FD9E6");
             Id = Guid.NewGuid();
             Source = source;

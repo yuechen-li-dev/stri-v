@@ -13,12 +13,14 @@ namespace Stride.Input
         /// <summary>
         /// The input source this device belongs to
         /// </summary>
-        public IInputSource Source;
+        // Populated by InputManager before the event is raised.
+        public IInputSource Source = null!;
 
         /// <summary>
         /// The device that changed
         /// </summary>
-        public IInputDevice Device;
+        // Populated by InputManager before the event is raised.
+        public IInputDevice Device = null!;
 
         /// <summary>
         /// The type of change that happened
