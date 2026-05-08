@@ -104,9 +104,11 @@ public class TypeDescriptorFactory : ITypeDescriptorFactory
         {
             // Generic ICollection<T> fallback should prefer a modern descriptor.
             // Keep OldCollectionDescriptor as a last-resort compatibility path for non-generic IList implementations.
+#pragma warning disable CS0618 // Stri-V compatibility fallback: OldCollectionDescriptor remains intentionally for legacy non-generic IList/ArrayList behavior.
             descriptor = type.GetInterface(typeof(ICollection<>)) is not null
                 ? new GenericCollectionDescriptor(this, type, emitDefaultValues, namingConvention)
                 : new OldCollectionDescriptor(this, type, emitDefaultValues, namingConvention);
+#pragma warning restore CS0618
         }
         else if (type.IsArray)
         {

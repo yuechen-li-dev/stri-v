@@ -24,12 +24,12 @@ public class OldCollectionDescriptor : CollectionDescriptor
 
     private readonly Func<object, bool> isReadOnlyMethod;
     private readonly Func<object, int> getCollectionCountMethod;
-    private readonly Func<object, int, object?> getIndexedItemMethod;
-    private readonly Action<object, int, object?> setIndexedItemMethod;
-    private readonly Action<object, object?> addMethod;
-    private readonly Action<object, int, object?> insertMethod;
-    private readonly Action<object, int> removeAtMethod;
-    private readonly Action<object, object?> removeMethod;
+    private readonly Func<object, int, object?>? getIndexedItemMethod;
+    private readonly Action<object, int, object?>? setIndexedItemMethod;
+    private readonly Action<object, object?>? addMethod;
+    private readonly Action<object, int, object?>? insertMethod;
+    private readonly Action<object, int>? removeAtMethod;
+    private readonly Action<object, object?>? removeMethod;
     private readonly Action<object> clearMethod;
 
     /// <summary>
@@ -160,7 +160,7 @@ public class OldCollectionDescriptor : CollectionDescriptor
     public override object? GetValue(object list, int index)
     {
         ArgumentNullException.ThrowIfNull(list);
-        return getIndexedItemMethod(list, index);
+        return getIndexedItemMethod!(list, index);
     }
 
     public override void SetValue(object list, object index, object? value)
@@ -173,7 +173,7 @@ public class OldCollectionDescriptor : CollectionDescriptor
     public void SetValue(object list, int index, object? value)
     {
         ArgumentNullException.ThrowIfNull(list);
-        setIndexedItemMethod(list, index, value);
+        setIndexedItemMethod!(list, index, value);
     }
 
     /// <summary>
@@ -192,7 +192,7 @@ public class OldCollectionDescriptor : CollectionDescriptor
     /// <param name="value">The value to add to this collection.</param>
     public override void Add(object collection, object? value)
     {
-        addMethod(collection, value);
+        addMethod!(collection, value);
     }
 
     /// <summary>
@@ -203,7 +203,7 @@ public class OldCollectionDescriptor : CollectionDescriptor
     /// <param name="value">The value to insert to this collection.</param>
     public override void Insert(object collection, int index, object? value)
     {
-        insertMethod(collection, index, value);
+        insertMethod!(collection, index, value);
     }
 
     /// <summary>
@@ -213,7 +213,7 @@ public class OldCollectionDescriptor : CollectionDescriptor
     /// <param name="index">The index of the item to remove from this collection.</param>
     public override void RemoveAt(object collection, int index)
     {
-        removeAtMethod(collection, index);
+        removeAtMethod!(collection, index);
     }
 
     /// <summary>
@@ -223,7 +223,7 @@ public class OldCollectionDescriptor : CollectionDescriptor
     /// <param name="item"></param>
     public override void Remove(object collection, object? item)
     {
-        removeMethod(collection, item);
+        removeMethod!(collection, item);
     }
 
     /// <summary>

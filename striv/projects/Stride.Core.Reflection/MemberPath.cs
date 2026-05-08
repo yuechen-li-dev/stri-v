@@ -283,9 +283,9 @@ public sealed class MemberPath
 
             if (actionType == MemberPathAction.ValueClear)
             {
-                if (lastItem is CollectionPathItem)
+                if (lastItem is CollectionPathItem collectionPathItem)
                 {
-                    actionType = lastItem.TypeDescriptor.Category == DescriptorCategory.Set
+                    actionType = collectionPathItem.TypeDescriptor.Category == DescriptorCategory.Set
                         ? MemberPathAction.ValueSet
                         : MemberPathAction.CollectionRemove;
                 }

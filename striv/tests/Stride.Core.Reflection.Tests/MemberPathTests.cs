@@ -49,6 +49,21 @@ public class MemberPathTests
         Assert.Null(root.Child);
     }
 
+
+    [Fact]
+    public void MemberPath_ValueClear_ClearsNestedProperty()
+    {
+        var root = new PathRoot { Child = new PathChild { Name = "before" } };
+        var descriptor = TypeDescriptorFactory.Default.Find(typeof(PathRoot));
+        var childDescriptor = TypeDescriptorFactory.Default.Find(typeof(PathChild));
+
+        var path = new MemberPath();
+        path.Push(descriptor[nameof(PathRoot.Child)]);
+        path.Push(childDescriptor[nameof(PathChild.Name)]);
+
+        Assert.True(path.Apply(root, MemberPathAction.ValueClear, null));
+        Assert.Null(root.Child!.Name);
+    }
     [Fact]
     public void MemberPath_CollectionAdd_AddsItem()
     {

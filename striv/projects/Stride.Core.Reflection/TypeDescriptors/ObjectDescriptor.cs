@@ -19,9 +19,9 @@ public class ObjectDescriptor : ITypeDescriptor
     private static readonly List<IMemberDescriptor> EmptyMembers = [];
 
     private readonly ITypeDescriptorFactory factory;
-    private IMemberDescriptor[] members;
-    private Dictionary<string, IMemberDescriptor> mapMembers;
-    private HashSet<string> remapMembers;
+    private IMemberDescriptor[] members = [];
+    private Dictionary<string, IMemberDescriptor> mapMembers = [];
+    private HashSet<string> remapMembers = [];
     private static readonly object[] EmptyObjectArray = [];
     private readonly bool emitDefaultValues;
 
@@ -72,9 +72,9 @@ public class ObjectDescriptor : ITypeDescriptor
 
     public IEnumerable<IMemberDescriptor> Members => members;
 
-    public int Count => members?.Length ?? 0;
+    public int Count => members.Length;
 
-    public bool HasMembers => members?.Length > 0;
+    public bool HasMembers => members.Length > 0;
 
     public virtual DescriptorCategory Category => DescriptorCategory.Object;
 
@@ -97,23 +97,21 @@ public class ObjectDescriptor : ITypeDescriptor
 
     public bool IsMemberRemapped(string name)
     {
-        return remapMembers?.Contains(name) == true;
+        return remapMembers.Contains(name);
     }
 
     public IMemberDescriptor this[string name]
     {
         get
         {
-            if (mapMembers == null)
+            if (!mapMembers.TryGetValue(name, out var member))
                 throw new KeyNotFoundException();
-            return mapMembers[name];
+            return member;
         }
     }
 
     public IMemberDescriptor? TryGetMember(string name)
     {
-        if (mapMembers == null)
-            return null;
         mapMembers.TryGetValue(name, out var member);
         return member;
     }
@@ -125,7 +123,7 @@ public class ObjectDescriptor : ITypeDescriptor
 
     public virtual void Initialize(IComparer<object> keyComparer)
     {
-        if (members != null)
+        if (members.Length != 0)
             return;
 
         var memberList = PrepareMembers();
