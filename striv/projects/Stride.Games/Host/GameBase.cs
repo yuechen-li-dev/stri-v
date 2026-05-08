@@ -870,7 +870,7 @@ namespace Stride.Games
         /// </summary>
         /// <param name="sender">The Game.</param>
         /// <param name="args">Arguments for the Activated event.</param>
-        protected virtual void OnActivated(object sender, EventArgs args)
+        protected virtual void OnActivated(object? sender, EventArgs args)
         {
             Activated?.Invoke(this, args);
         }
@@ -880,7 +880,7 @@ namespace Stride.Games
         /// </summary>
         /// <param name="sender">The Game.</param>
         /// <param name="args">Arguments for the Deactivated event.</param>
-        protected virtual void OnDeactivated(object sender, EventArgs args)
+        protected virtual void OnDeactivated(object? sender, EventArgs args)
         {
             Deactivated?.Invoke(this, args);
         }
@@ -890,7 +890,7 @@ namespace Stride.Games
         /// </summary>
         /// <param name="sender">The Game.</param>
         /// <param name="args">Arguments for the Exiting event.</param>
-        protected virtual void OnExiting(object sender, EventArgs args)
+        protected virtual void OnExiting(object? sender, EventArgs args)
         {
             Exiting?.Invoke(this, args);
         }
@@ -900,7 +900,7 @@ namespace Stride.Games
             WindowCreated?.Invoke(this, EventArgs.Empty);
         }
 
-        private void GamePlatformOnWindowCreated(object sender, EventArgs eventArgs)
+        private void GamePlatformOnWindowCreated(object? sender, EventArgs eventArgs)
         {
             Window.IsMouseVisible = isMouseVisible;
             if (MakeWindowVisibleOnRun && !Context.IsUserManagingRun)
@@ -926,7 +926,7 @@ namespace Stride.Games
             GameSystems.UnloadContent();
         }
 
-        private void GamePlatform_Activated(object sender, EventArgs e)
+        private void GamePlatform_Activated(object? sender, EventArgs e)
         {
             if (!IsActive)
             {
@@ -935,7 +935,7 @@ namespace Stride.Games
             }
         }
 
-        private void GamePlatform_Deactivated(object sender, EventArgs e)
+        private void GamePlatform_Deactivated(object? sender, EventArgs e)
         {
             if (IsActive)
             {
@@ -944,7 +944,7 @@ namespace Stride.Games
             }
         }
 
-        private void GamePlatform_Exiting(object sender, EventArgs e)
+        private void GamePlatform_Exiting(object? sender, EventArgs e)
         {
             OnExiting(this, EventArgs.Empty);
         }
@@ -986,7 +986,7 @@ namespace Stride.Games
             }
         }
 
-        private void GraphicsDeviceService_DeviceCreated(object sender, EventArgs e)
+        private void GraphicsDeviceService_DeviceCreated(object? sender, EventArgs e)
         {
             GraphicsDevice = graphicsDeviceService.GraphicsDevice;
 
@@ -996,7 +996,7 @@ namespace Stride.Games
             }
         }
 
-        private void GraphicsDeviceService_DeviceDisposing(object sender, EventArgs e)
+        private void GraphicsDeviceService_DeviceDisposing(object? sender, EventArgs e)
         {
             if (GameSystems.State == GameSystemState.ContentLoaded)
             {
@@ -1008,7 +1008,7 @@ namespace Stride.Games
             GraphicsDevice = null;
         }
 
-        private void GraphicsDeviceService_DeviceReset(object sender, EventArgs e)
+        private void GraphicsDeviceService_DeviceReset(object? sender, EventArgs e)
         {
             if (!IsExiting)
             {
@@ -1017,7 +1017,7 @@ namespace Stride.Games
             }
         }
 
-        private void GraphicsDeviceService_DeviceResetting(object sender, EventArgs e)
+        private void GraphicsDeviceService_DeviceResetting(object? sender, EventArgs e)
         {
             resumeManager.OnDestroyed();
         }

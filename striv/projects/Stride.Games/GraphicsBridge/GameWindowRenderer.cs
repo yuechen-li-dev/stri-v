@@ -174,7 +174,7 @@ namespace Stride.Games
             //
             // Handler for the window's client size changed event to track user resizing.
             //
-            void WindowOnClientSizeChanged(object sender, EventArgs eventArgs)
+            void WindowOnClientSizeChanged(object? sender, EventArgs eventArgs)
             {
                 windowUserResized = true;
             }

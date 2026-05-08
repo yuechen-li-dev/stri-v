@@ -208,32 +208,32 @@ namespace Stride.Games
             gameWindow.Exiting = true;
         }
 
-        protected void OnActivated(object source, EventArgs e)
+        protected void OnActivated(object? source, EventArgs e)
         {
             Activated?.Invoke(this, e);
         }
 
-        protected void OnDeactivated(object source, EventArgs e)
+        protected void OnDeactivated(object? source, EventArgs e)
         {
             Deactivated?.Invoke(this, e);
         }
 
-        protected void OnExiting(object source, EventArgs e)
+        protected void OnExiting(object? source, EventArgs e)
         {
             Exiting?.Invoke(this, e);
         }
 
-        protected void OnIdle(object source, EventArgs e)
+        protected void OnIdle(object? source, EventArgs e)
         {
             Idle?.Invoke(this, e);
         }
 
-        protected void OnResume(object source, EventArgs e)
+        protected void OnResume(object? source, EventArgs e)
         {
             Resume?.Invoke(this, e);
         }
 
-        protected void OnSuspend(object source, EventArgs e)
+        protected void OnSuspend(object? source, EventArgs e)
         {
             Suspend?.Invoke(this, e);
         }
@@ -378,7 +378,7 @@ namespace Stride.Games
             gameWindow.Resize(deviceInformation.PresentationParameters.BackBufferWidth, deviceInformation.PresentationParameters.BackBufferHeight);
         }
 
-        public virtual GraphicsDevice ChangeOrCreateDevice(GraphicsDevice currentDevice, GraphicsDeviceInformation deviceInformation)
+        public virtual GraphicsDevice ChangeOrCreateDevice(GraphicsDevice? currentDevice, GraphicsDeviceInformation deviceInformation)
         {
             if (currentDevice == null)
             {
