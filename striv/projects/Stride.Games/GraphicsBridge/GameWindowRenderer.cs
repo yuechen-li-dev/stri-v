@@ -159,7 +159,8 @@ namespace Stride.Games
         /// <inheritdoc/>
         public override void Initialize()
         {
-            var gamePlatform = Services.GetService<IGamePlatform>();
+            var gamePlatform = Services.GetService<IGamePlatform>()
+                ?? throw new InvalidOperationException("IGamePlatform service is required before initializing GameWindowRenderer.");
 
             GameContext.RequestedWidth = PreferredBackBufferWidth;
             GameContext.RequestedHeight = PreferredBackBufferHeight;

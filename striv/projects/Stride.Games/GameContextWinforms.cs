@@ -33,7 +33,7 @@ namespace Stride.Games
     {
         /// <inheritDoc/>
         /// <param name="isUserManagingRun">Is user managing event processing of <paramref name="control"/>?</param>
-        public GameContextWinforms(Control control, int requestedWidth = 0, int requestedHeight = 0, bool isUserManagingRun = false)
+        public GameContextWinforms(Control? control, int requestedWidth = 0, int requestedHeight = 0, bool isUserManagingRun = false)
             : base(control ?? CreateForm(), requestedWidth, requestedHeight, isUserManagingRun)
         {
             ContextType = AppContextType.DesktopWinForms;

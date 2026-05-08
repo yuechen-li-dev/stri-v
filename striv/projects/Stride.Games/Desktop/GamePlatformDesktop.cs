@@ -74,7 +74,7 @@ namespace Stride.Games
         }
 
         /// <inheritdoc/>
-        internal override GameWindow GetSupportedGameWindow(AppContextType type)
+        internal override GameWindow? GetSupportedGameWindow(AppContextType type)
         {
             switch (type)
             {
