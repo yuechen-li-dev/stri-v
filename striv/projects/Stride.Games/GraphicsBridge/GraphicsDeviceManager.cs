@@ -145,7 +145,7 @@ namespace Stride.Games
         /// <summary>
         ///   Method called when the game window is created. It subscribes to the resizing and orientation events.
         /// </summary>
-        private void GameOnWindowCreated(object sender, EventArgs eventArgs)
+        private void GameOnWindowCreated(object? sender, EventArgs eventArgs)
         {
             // Place ourselves first (in case drawing/present is after, we better rebuild device before that if necessary)
             if (DelayWindowEvents)
@@ -892,7 +892,7 @@ namespace Stride.Games
         ///   Method called when the Graphics Device is created.
         ///   Invokes the <see cref="DeviceCreated"/> event.
         /// </summary>
-        protected virtual void OnDeviceCreated(object sender, EventArgs args)
+        protected virtual void OnDeviceCreated(object? sender, EventArgs args)
         {
             DeviceCreated?.Invoke(sender, args);
         }
@@ -901,7 +901,7 @@ namespace Stride.Games
         ///   Method called when the Graphics Device is about to be disposed.
         ///   Invokes the <see cref="DeviceDisposing"/> event.
         /// </summary>
-        protected virtual void OnDeviceDisposing(object sender, EventArgs args)
+        protected virtual void OnDeviceDisposing(object? sender, EventArgs args)
         {
             DeviceDisposing?.Invoke(sender, args);
         }
@@ -910,7 +910,7 @@ namespace Stride.Games
         ///   Method called when the Graphics Device is reset.
         ///   Invokes the <see cref="DeviceReset"/> event.
         /// </summary>
-        protected virtual void OnDeviceReset(object sender, EventArgs args)
+        protected virtual void OnDeviceReset(object? sender, EventArgs args)
         {
             DeviceReset?.Invoke(sender, args);
         }
@@ -919,7 +919,7 @@ namespace Stride.Games
         ///   Method called when the Graphics Device is resetting, but before it is actually reset.
         ///   Invokes the <see cref="DeviceResetting"/> event.
         /// </summary>
-        protected virtual void OnDeviceResetting(object sender, EventArgs args)
+        protected virtual void OnDeviceResetting(object? sender, EventArgs args)
         {
             DeviceResetting?.Invoke(sender, args);
         }
@@ -929,7 +929,7 @@ namespace Stride.Games
         ///   examine or modify the device settings before the device is created or reset.
         ///   Invokes the <see cref="PreparingDeviceSettings"/> event.
         /// </summary>
-        protected virtual void OnPreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs args)
+        protected virtual void OnPreparingDeviceSettings(object? sender, PreparingDeviceSettingsEventArgs args)
         {
             PreparingDeviceSettings?.Invoke(sender, args);
         }
@@ -977,7 +977,7 @@ namespace Stride.Games
         /// <exception cref="InvalidOperationException">
         ///   Thrown if the Graphics Device could not be created or reconfigured.
         /// </exception>
-        private void Window_ClientSizeChanged(object sender, EventArgs e)
+        private void Window_ClientSizeChanged(object? sender, EventArgs e)
         {
             // Ignore changes while we are changing the device
             if (isChangingDevice)
@@ -1022,7 +1022,7 @@ namespace Stride.Games
         ///   Method called when the Window's orientation changes, which may require a device reinitialization
         ///   with a new Back-Buffer size if the orientation allows it.
         /// </summary>
-        private void Window_OrientationChanged(object sender, EventArgs e)
+        private void Window_OrientationChanged(object? sender, EventArgs e)
         {
             // Ignore changes while we are changing the device
             if (isChangingDevice)
@@ -1067,7 +1067,7 @@ namespace Stride.Games
         /// <summary>
         ///   Method called when the Window's full-screen state changes, whick may require a resize of the Back-Buffer.
         /// </summary>
-        private void Window_FullscreenChanged(object sender, EventArgs eventArgs)
+        private void Window_FullscreenChanged(object? sender, EventArgs eventArgs)
         {
             if (sender is GameWindow window)
             {
@@ -1105,7 +1105,7 @@ namespace Stride.Games
         /// <summary>
         ///   Method called when the Graphics Device is being reset, but before it is actually reset.
         /// </summary>
-        private void GraphicsDevice_DeviceResetting(object sender, EventArgs e)
+        private void GraphicsDevice_DeviceResetting(object? sender, EventArgs e)
         {
             // TODO: What to do?
         }
@@ -1113,7 +1113,7 @@ namespace Stride.Games
         /// <summary>
         ///   Method called when the Graphics Device has been reset.
         /// </summary>
-        private void GraphicsDevice_DeviceReset(object sender, EventArgs e)
+        private void GraphicsDevice_DeviceReset(object? sender, EventArgs e)
         {
             // TODO: What to do?
         }
@@ -1121,7 +1121,7 @@ namespace Stride.Games
         /// <summary>
         ///   Method called when the Graphics Device has been lost, meaning it is currently unavailable
         /// </summary>
-        private void GraphicsDevice_DeviceLost(object sender, EventArgs e)
+        private void GraphicsDevice_DeviceLost(object? sender, EventArgs e)
         {
             // TODO: What to do?
         }
@@ -1129,7 +1129,7 @@ namespace Stride.Games
         /// <summary>
         ///   Method called when the Graphics Device is being disposed.
         /// </summary>
-        private void GraphicsDevice_Disposing(object sender, EventArgs e)
+        private void GraphicsDevice_Disposing(object? sender, EventArgs e)
         {
             OnDeviceDisposing(sender, e);
         }

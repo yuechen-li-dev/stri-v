@@ -54,7 +54,7 @@ namespace Stride.Games
             return res;
         }
 
-        public static GameContext NewGameContextiOS()
+        public static GameContext? NewGameContextiOS()
         {
 #if STRIDE_PLATFORM_IOS
             return new GameContextiOS(null);
@@ -63,7 +63,7 @@ namespace Stride.Games
 #endif
         }
 
-        public static GameContext NewGameContextAndroid()
+        public static GameContext? NewGameContextAndroid()
         {
 #if STRIDE_PLATFORM_ANDROID
             return new GameContextAndroid(null, null);
@@ -72,7 +72,7 @@ namespace Stride.Games
 #endif
         }
 
-        public static GameContext NewGameContextDesktop(int requestedWidth = 0, int requestedHeight = 0, bool isUserManagingRun = false)
+        public static GameContext? NewGameContextDesktop(int requestedWidth = 0, int requestedHeight = 0, bool isUserManagingRun = false)
         {
             if (Platform.Type != PlatformType.Windows)
                 return null;
@@ -85,7 +85,7 @@ namespace Stride.Games
 #endif
         }
 
-        public static GameContext NewGameContextUWPXaml(int requestedWidth = 0, int requestedHeight = 0)
+        public static GameContext? NewGameContextUWPXaml(int requestedWidth = 0, int requestedHeight = 0)
         {
 #if STRIDE_PLATFORM_UWP
             return new GameContextUWPXaml(null, requestedWidth, requestedHeight);
@@ -94,7 +94,7 @@ namespace Stride.Games
 #endif
         }
 
-        public static GameContext NewGameContextUWPCoreWindow(int requestedWidth = 0, int requestedHeight = 0)
+        public static GameContext? NewGameContextUWPCoreWindow(int requestedWidth = 0, int requestedHeight = 0)
         {
 #if STRIDE_PLATFORM_UWP
             return new GameContextUWPCoreWindow(null, requestedWidth, requestedHeight);
@@ -103,7 +103,7 @@ namespace Stride.Games
 #endif
         }
 
-        public static GameContext NewGameContextSDL(int requestedWidth = 0, int requestedHeight = 0, bool isUserManagingRun = false)
+        public static GameContext? NewGameContextSDL(int requestedWidth = 0, int requestedHeight = 0, bool isUserManagingRun = false)
         {
 #if STRIDE_UI_SDL
             return new GameContextSDL(null, requestedWidth, requestedHeight, isUserManagingRun);
@@ -112,7 +112,7 @@ namespace Stride.Games
 #endif
         }
 
-        public static GameContext NewGameContextWpf(int requestedWidth = 0, int requestedHeight = 0, bool isUserManagingRun = false)
+        public static GameContext? NewGameContextWpf(int requestedWidth = 0, int requestedHeight = 0, bool isUserManagingRun = false)
         {
             // Not supported for now.
             return null;

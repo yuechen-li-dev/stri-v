@@ -106,7 +106,7 @@ namespace Stride.Games
             return isControlAlive || switchControl;
         }
 
-        private void ControlDisposed(object sender, EventArgs e)
+        private void ControlDisposed(object? sender, EventArgs e)
         {
             isControlAlive = false;
         }

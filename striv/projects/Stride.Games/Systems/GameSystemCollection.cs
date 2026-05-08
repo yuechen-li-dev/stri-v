@@ -244,7 +244,7 @@ namespace Stride.Games
             }
         }
 
-        private void GameSystems_CollectionChanged(object sender, TrackingCollectionChangedEventArgs e)
+        private void GameSystems_CollectionChanged(object? sender, TrackingCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -256,7 +256,7 @@ namespace Stride.Games
             }
         }
 
-        private void GameSystems_ItemAdded(object sender, TrackingCollectionChangedEventArgs e)
+        private void GameSystems_ItemAdded(object? sender, TrackingCollectionChangedEventArgs e)
         {
             var gameSystem = (IGameSystemBase)e.Item;
 
@@ -304,7 +304,7 @@ namespace Stride.Games
             }
         }
 
-        private void GameSystems_ItemRemoved(object sender, TrackingCollectionChangedEventArgs e)
+        private void GameSystems_ItemRemoved(object? sender, TrackingCollectionChangedEventArgs e)
         {
             var gameSystem = (IGameSystemBase)e.Item;
 
@@ -365,14 +365,20 @@ namespace Stride.Games
             }
         }
 
-        private void UpdateableGameSystem_UpdateOrderChanged(object sender, EventArgs e)
+        private void UpdateableGameSystem_UpdateOrderChanged(object? sender, EventArgs e)
         {
-            AddGameSystem((IUpdateable)sender, updateableGameSystems, UpdateableComparer.Default, GameProfilingKeys.GameUpdate, true);
+            if (sender is IUpdateable updateableGameSystem)
+            {
+                AddGameSystem(updateableGameSystem, updateableGameSystems, UpdateableComparer.Default, GameProfilingKeys.GameUpdate, true);
+            }
         }
 
-        private void DrawableGameSystem_DrawOrderChanged(object sender, EventArgs e)
+        private void DrawableGameSystem_DrawOrderChanged(object? sender, EventArgs e)
         {
-            AddGameSystem((IDrawable)sender, drawableGameSystems, DrawableComparer.Default, GameProfilingKeys.GameDraw, true);
+            if (sender is IDrawable drawableGameSystem)
+            {
+                AddGameSystem(drawableGameSystem, drawableGameSystems, DrawableComparer.Default, GameProfilingKeys.GameDraw, true);
+            }
         }
 
         private static bool AddGameSystem<T>(T gameSystem, List<KeyValuePair<T, ProfilingKey>> gameSystems, IComparer<KeyValuePair<T, ProfilingKey>> comparer, ProfilingKey parentProfilingKey, bool removePreviousSystem = false)

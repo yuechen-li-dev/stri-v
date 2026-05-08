@@ -276,7 +276,7 @@ namespace Stride.Games
 
         protected internal abstract void SetSupportedOrientations(DisplayOrientation orientations);
 
-        protected void OnActivated(object source, EventArgs e)
+        protected void OnActivated(object? source, EventArgs e)
         {
             IsActivated = true;
 
@@ -284,7 +284,7 @@ namespace Stride.Games
             handler?.Invoke(source, e);
         }
 
-        protected void OnClientSizeChanged(object source, EventArgs e)
+        protected void OnClientSizeChanged(object? source, EventArgs e)
         {
             if (!isFullscreen)
             {
@@ -296,7 +296,7 @@ namespace Stride.Games
             handler?.Invoke(this, e);
         }
 
-        protected void OnDeactivated(object source, EventArgs e)
+        protected void OnDeactivated(object? source, EventArgs e)
         {
             IsActivated = false;
 
@@ -304,23 +304,23 @@ namespace Stride.Games
             handler?.Invoke(source, e);
         }
 
-        protected void OnOrientationChanged(object source, EventArgs e)
+        protected void OnOrientationChanged(object? source, EventArgs e)
         {
             var handler = OrientationChanged;
             handler?.Invoke(this, e);
         }
 
-        protected void OnFullscreenToggle(object source, EventArgs e)
+        protected void OnFullscreenToggle(object? source, EventArgs e)
         {
             IsFullscreen = !IsFullscreen;
         }
 
-        protected void OnDisableFullScreen(object source, EventArgs e)
+        protected void OnDisableFullScreen(object? source, EventArgs e)
         {
             IsFullscreen = false;
         }
 
-        protected void OnClosing(object source, EventArgs e)
+        protected void OnClosing(object? source, EventArgs e)
         {
             var handler = Closing;
             handler?.Invoke(this, e);
