@@ -147,9 +147,21 @@ public partial class PlatformWindowLifecycleTests
         {
             game.InvokeGraphicsDeviceCreated();
             game.InvokeGraphicsDeviceReset();
+            game.InvokeGraphicsDeviceDisposing();
         });
 
         Assert.Null(ex);
+    }
+
+    [Fact]
+    public void GameBase_InitializeBeforeRun_WithoutGraphicsDeviceManager_ThrowsInvalidOperationException()
+    {
+        var game = new ProbeGameBase();
+
+        var ex = Record.Exception(() => game.InvokeInitializeBeforeRun());
+
+        var invalidOperation = Assert.IsType<InvalidOperationException>(ex);
+        Assert.Contains("No GraphicsDeviceManager found", invalidOperation.Message);
     }
 
     [Fact]
@@ -203,6 +215,8 @@ public partial class PlatformWindowLifecycleTests
     {
         private static readonly System.Reflection.MethodInfo DeviceCreatedMethod = typeof(GameBase).GetMethod("GraphicsDeviceService_DeviceCreated", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
         private static readonly System.Reflection.MethodInfo DeviceResetMethod = typeof(GameBase).GetMethod("GraphicsDeviceService_DeviceReset", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+        private static readonly System.Reflection.MethodInfo DeviceDisposingMethod = typeof(GameBase).GetMethod("GraphicsDeviceService_DeviceDisposing", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+        private static readonly System.Reflection.MethodInfo InitializeBeforeRunMethod = typeof(GameBase).GetMethod("InitializeBeforeRun", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
 
         public override void ConfirmRenderingSettings(bool gameCreation) { }
 
@@ -212,5 +226,17 @@ public partial class PlatformWindowLifecycleTests
         public void TriggerWindowCreated() => OnWindowCreated();
         public void InvokeGraphicsDeviceCreated() => DeviceCreatedMethod.Invoke(this, new object?[] { this, EventArgs.Empty });
         public void InvokeGraphicsDeviceReset() => DeviceResetMethod.Invoke(this, new object?[] { this, EventArgs.Empty });
+        public void InvokeGraphicsDeviceDisposing() => DeviceDisposingMethod.Invoke(this, new object?[] { this, EventArgs.Empty });
+        public void InvokeInitializeBeforeRun()
+        {
+            try
+            {
+                InitializeBeforeRunMethod.Invoke(this, Array.Empty<object?>());
+            }
+            catch (System.Reflection.TargetInvocationException ex) when (ex.InnerException != null)
+            {
+                throw ex.InnerException;
+            }
+        }
     }
 }
