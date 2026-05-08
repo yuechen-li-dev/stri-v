@@ -1,4 +1,12 @@
 <Solution>
+  <Folder Name="/external/" />
+  <Folder Name="/external/Dominatus/" />
+  <Folder Name="/external/Dominatus/src/">
+    <Project Path="external/Dominatus/src/Ariadne.OptFlow/Ariadne.OptFlow.csproj" />
+    <Project Path="external/Dominatus/src/Dominatus.Core/Dominatus.Core.csproj" />
+    <Project Path="external/Dominatus/src/Dominatus.OptFlow/Dominatus.OptFlow.csproj" />
+    <Project Path="external/Dominatus/src/Dominatus.UtilityLite/Dominatus.UtilityLite.csproj" />
+  </Folder>
   <Folder Name="/projects/">
     <Project Path="projects/Stride.BepuPhysics/Stride.BepuPhysics.csproj" />
     <Project Path="projects/Stride.Core.AssemblyProcessor/Stride.Core.AssemblyProcessor.csproj" />
