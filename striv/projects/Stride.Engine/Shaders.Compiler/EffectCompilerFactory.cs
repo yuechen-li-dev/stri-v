@@ -21,7 +21,7 @@ namespace Stride.Shaders.Compiler
             TaskSchedulerSelector taskSchedulerSelector = null,
             DatabaseFileProvider database = null)
         {
-            EffectCompilerBase compiler = null;
+            EffectCompilerBase? compiler = null;
 
             if ((effectCompilationMode & EffectCompilationMode.Local) != 0)
             {

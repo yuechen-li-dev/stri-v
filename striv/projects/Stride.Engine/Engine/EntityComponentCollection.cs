@@ -213,7 +213,7 @@ namespace Stride.Engine
 
             var onlySingleComponent = !attributes.AllowMultipleComponents;
 
-            EntityComponent previousItem = null;
+            EntityComponent? previousItem = null;
             for (int i = 0; i < Count; i++)
             {
                 var existingItem = this[i];

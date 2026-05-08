@@ -534,7 +534,7 @@ namespace Stride.Rendering.Compositing
                     }
                 }
 
-                Texture depthStencilSRV = null;
+                Texture? depthStencilSRV = null;
 
                 // Draw [main view | subsurface scattering post process]
                 if (SubsurfaceScatteringBlurEffect != null)

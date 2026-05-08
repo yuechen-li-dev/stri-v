@@ -19,7 +19,7 @@ namespace Stride.Engine.Design
             {
                 // Check against list of items that should be included in the stream (Entity and EntityComponent whose parent is the cloned Entity).
                 // First try MappedObjects, then ClonedObjects.
-                object mappedObject = null;
+                object? mappedObject = null;
                 bool isSharedObject = cloneContext.MappedObjects != null && cloneContext.MappedObjects(obj, out mappedObject);
 
                 if (!isSharedObject && cloneContext.ClonedObjects != null && !cloneContext.ClonedObjects.Contains(obj))
