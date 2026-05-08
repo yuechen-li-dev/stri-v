@@ -105,7 +105,7 @@ public class GameGraphicsParameters
     ///   image quality, and graphics effects complexity. Also, higher profiles may enable advanced
     ///   graphical effects but require modern hardware.
     /// </remarks>
-    public GraphicsProfile[] PreferredGraphicsProfile;
+    public GraphicsProfile[] PreferredGraphicsProfile = [];
 
     /// <summary>
     ///   The preferred refresh rate, in hertz.

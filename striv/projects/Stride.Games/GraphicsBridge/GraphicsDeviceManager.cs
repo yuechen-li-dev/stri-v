@@ -121,26 +121,26 @@ namespace Stride.Games
         /// <summary>
         ///   Occurs when a new Graphics Device is successfully created.
         /// </summary>
-        public event EventHandler<EventArgs> DeviceCreated;
+        public event EventHandler<EventArgs>? DeviceCreated;
         /// <summary>
         ///   Occurs when the Graphics Device is being disposed.
         /// </summary>
-        public event EventHandler<EventArgs> DeviceDisposing;
+        public event EventHandler<EventArgs>? DeviceDisposing;
 
         /// <summary>
         ///   Occurs when the Graphics Device is being reset.
         /// </summary>
-        public event EventHandler<EventArgs> DeviceReset;
+        public event EventHandler<EventArgs>? DeviceReset;
         /// <summary>
         ///   Occurs when the Graphics Device is being reset, but before it is actually reset.
         /// </summary>
-        public event EventHandler<EventArgs> DeviceResetting;
+        public event EventHandler<EventArgs>? DeviceResetting;
 
         /// <summary>
         ///   Occurs when the Graphics Device is being initialized to give a chance to the application at
         ///   adjusting the final settings for the device creation.
         /// </summary>
-        public event EventHandler<PreparingDeviceSettingsEventArgs> PreparingDeviceSettings;
+        public event EventHandler<PreparingDeviceSettingsEventArgs>? PreparingDeviceSettings;
 
         /// <summary>
         ///   Method called when the game window is created. It subscribes to the resizing and orientation events.
@@ -194,7 +194,7 @@ namespace Stride.Games
         ///   If this property is set to a non-<see langword="null"/> <see langword="string"/> the engine will try to
         ///   initialize the Graphics Device to present to an adapter with the same unique Id
         /// </value>
-        public string RequiredAdapterUid { get; set; }
+        public string? RequiredAdapterUid { get; set; }
 
         /// <summary>
         ///   Gets or sets the preferred color space for the Back-Buffers.
