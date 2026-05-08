@@ -208,7 +208,8 @@ namespace Stride.Games
         /// </returns>
         private Int2 GetRequestedSize(out PixelFormat format)
         {
-            var bounds = Window.ClientBounds;
+            var window = Window ?? throw new InvalidOperationException("GameWindowRenderer must be initialized before requesting back-buffer size.");
+            var bounds = window.ClientBounds;
 
             format = PreferredBackBufferFormat == PixelFormat.None ? PixelFormat.R8G8B8A8_UNorm : PreferredBackBufferFormat;
 
@@ -230,7 +231,9 @@ namespace Stride.Games
             if (Presenter is null || isColorSpaceToChange)
             {
                 var size = GetRequestedSize(out PixelFormat resizeFormat);
-                var presentationParameters = new PresentationParameters(size.X, size.Y, Window.NativeWindow, resizeFormat)
+                var window = Window ?? throw new InvalidOperationException("GameWindowRenderer must be initialized before creating a presenter.");
+                var graphicsDevice = GraphicsDevice ?? throw new InvalidOperationException("GameWindowRenderer requires a graphics device before creating a presenter.");
+                var presentationParameters = new PresentationParameters(size.X, size.Y, window.NativeWindow, resizeFormat)
                 {
                     DepthStencilFormat = PreferredDepthStencilFormat,
                     PresentationInterval = PresentInterval.Immediate,
@@ -245,7 +248,7 @@ namespace Stride.Games
                 else
 #endif
                 {
-                    Presenter = new SwapChainGraphicsPresenter(GraphicsDevice, presentationParameters);
+                    Presenter = new SwapChainGraphicsPresenter(graphicsDevice, presentationParameters);
                 }
 
                 isBackBufferToResize = false;
@@ -256,22 +259,30 @@ namespace Stride.Games
         /// <inheritdoc/>
         public override bool BeginDraw()
         {
-            if (GraphicsDevice is not null && Window.Visible)
+            var graphicsDevice = GraphicsDevice;
+            var window = Window;
+
+            if (graphicsDevice is not null && window is not null && window.Visible)
             {
-                savedPresenter = GraphicsDevice.Presenter;
+                savedPresenter = graphicsDevice.Presenter;
 
                 CreateOrUpdatePresenter();
 
                 if (isBackBufferToResize || windowUserResized)
                 {
                     var size = GetRequestedSize(out PixelFormat resizeFormat);
-                    Presenter.Resize(size.X, size.Y, resizeFormat);
+                    Presenter?.Resize(size.X, size.Y, resizeFormat);
 
                     isBackBufferToResize = false;
                     windowUserResized = false;
                 }
 
-                GraphicsDevice.Presenter = Presenter;
+                if (Presenter is null)
+                {
+                    throw new InvalidOperationException("GameWindowRenderer failed to create a graphics presenter.");
+                }
+
+                graphicsDevice.Presenter = Presenter;
 
                 beginDrawOk = true;
                 return true;
@@ -286,9 +297,15 @@ namespace Stride.Games
         {
             if (beginDrawOk && GraphicsDevice is not null)
             {
+                var presenter = Presenter;
+                if (presenter is null)
+                {
+                    return;
+                }
+
                 try
                 {
-                    Presenter.Present();
+                    presenter.Present();
                 }
                 catch (GraphicsDeviceException ex) when (ex.Status is not GraphicsDeviceStatus.Removed and not GraphicsDeviceStatus.Reset)
                 {
