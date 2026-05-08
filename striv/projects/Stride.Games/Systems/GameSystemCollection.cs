@@ -30,7 +30,13 @@ using Stride.Core.Diagnostics;
 
 namespace Stride.Games
 {
-    /// <summary>A collection of game components.</summary>
+    /// <summary>
+    /// A collection of game systems orchestrated by <see cref="GameBase"/> for initialize/load/update/draw sequencing.
+    /// </summary>
+    /// <remarks>
+    /// This type owns registration, ordering, and safe iteration snapshots for update/draw/content operations.
+    /// Update/draw order is a runtime compatibility contract and should not be changed casually.
+    /// </remarks>
     public class GameSystemCollection : TrackingCollection<IGameSystemBase>, IGameSystemCollection, IDisposable
     {
         private readonly List<IGameSystemBase> pendingGameSystems;

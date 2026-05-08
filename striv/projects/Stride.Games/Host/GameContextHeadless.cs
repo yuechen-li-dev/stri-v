@@ -7,6 +7,10 @@ namespace Stride.Games;
 ///   A game context for headless (windowless) operation.
 ///   Used for automated testing with software renderers where no display is available.
 /// </summary>
+/// <remarks>
+/// This context intentionally bypasses interactive window ownership and is intended for deterministic/non-window hosts.
+/// Future lifecycle policy layers should preserve this as the canonical non-UI context path.
+/// </remarks>
 public class GameContextHeadless : GameContext<object>
 {
     /// <inheritdoc/>

@@ -30,6 +30,15 @@ using Stride.Graphics;
 
 namespace Stride.Games
 {
+    /// <summary>
+    /// Host-platform abstraction used by <see cref="GameBase"/> to create a supported <see cref="GameWindow"/>,
+    /// run/pump the message loop, and bridge graphics device factory responsibilities.
+    /// </summary>
+    /// <remarks>
+    /// This type is the platform boundary for <c>Stride.Games</c> runtime hosting.
+    /// Concrete desktop/mobile implementations sit behind this abstraction; call-order and event
+    /// semantics here must stay stable for future host split work.
+    /// </remarks>
     internal abstract class GamePlatform : ReferenceBase, IGraphicsDeviceFactory, IGamePlatform
     {
         private bool hasExitRan = false;
@@ -129,6 +138,8 @@ namespace Stride.Games
 
             WindowCreated?.Invoke(this, EventArgs.Empty);
 
+            // NOTE(striv-m12c): window ownership and message-loop entrypoint are platform responsibilities.
+            // GameBase owns Tick() semantics; GamePlatform owns how/when Tick() gets called.
             gameWindow.Run();
         }
 

@@ -38,6 +38,10 @@ namespace Stride.Games
     ///     If the Game System needs to be updated or drawn, it can implement the <see cref="IUpdateable"/> and <see cref="IDrawable"/>
     ///     interfaces respectively.
     ///   </para>
+    ///   <para>
+    ///     In Stri-V this contract remains in <c>Stride.Games</c> because host-loop orchestration is still local to this project.
+    ///     A future lifecycle/policy split may move orchestration upward, but ordering and initialization semantics must remain equivalent.
+    ///   </para>
     /// </remarks>
     public interface IGameSystemBase : IComponent
     {
