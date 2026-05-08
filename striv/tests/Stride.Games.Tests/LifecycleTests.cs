@@ -44,6 +44,35 @@ public class LifecycleTests
         Assert.Null(context.ExitCallback);
     }
 
+
+    [Fact]
+    public void GameContextHeadless_Defaults_AreStableForContract()
+    {
+        var context = new GameContextHeadless();
+
+        Assert.Equal(AppContextType.Headless, context.ContextType);
+        Assert.False(context.IsUserManagingRun);
+        Assert.Equal(0, context.RequestedWidth);
+        Assert.Equal(0, context.RequestedHeight);
+        Assert.Null(context.Control);
+        Assert.Null(context.RunCallback);
+        Assert.Null(context.ExitCallback);
+        Assert.Null(context.RequestedGraphicsProfile);
+    }
+
+    [Fact]
+    public void GameContextFactory_HeadlessContext_UsesRequestedDimensions_WithoutNativeControl()
+    {
+        var context = GameContextFactory.NewGameContext(AppContextType.Headless, requestedWidth: 320, requestedHeight: 200, isUserManagingRun: true);
+
+        var headless = Assert.IsType<GameContextHeadless>(context);
+        Assert.Equal(AppContextType.Headless, headless.ContextType);
+        Assert.False(headless.IsUserManagingRun);
+        Assert.Equal(320, headless.RequestedWidth);
+        Assert.Equal(200, headless.RequestedHeight);
+        Assert.Null(headless.Control);
+    }
+
     [Fact]
     public void GameWindowHeadless_ConstructsWithoutNativeHandle()
     {

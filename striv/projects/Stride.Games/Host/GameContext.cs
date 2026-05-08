@@ -52,13 +52,13 @@ namespace Stride.Games
         /// Gets the main loop callback to be called when <see cref="IsUserManagingRun"/> is true.
         /// </summary>
         /// <value>The run loop.</value>
-        public Action RunCallback { get; internal set; }
+        public Action? RunCallback { get; internal set; }
 
         /// <summary>
         /// Gets the exit callback to be called when <see cref="IsUserManagingRun"/> is true when exiting the game.
         /// </summary>
         /// <value>The run loop.</value>
-        public Action ExitCallback { get; internal set; }
+        public Action? ExitCallback { get; internal set; }
 
         // TODO: remove these requested values.
 
@@ -85,7 +85,7 @@ namespace Stride.Games
         /// <summary>
         /// The requested graphics profiles.
         /// </summary>
-        internal GraphicsProfile[] RequestedGraphicsProfile;
+        internal GraphicsProfile[]? RequestedGraphicsProfile;
 
         /// <summary>
         /// The device creation flags that will be used to create the <see cref="GraphicsDevice"/>.
