@@ -23,4 +23,24 @@ public static class ProcessorLifecycleDominatusNodes
         yield return Ai.Act(new ProcessorSystemAddRequested(processor, entityManager));
         yield return Ai.Act(new ProcessorEntityAddRequested(processor, entity));
     }
+
+    public static IEnumerator<AiStep> RemoveEntityFromProcessor(EntityProcessor processor, Entity entity)
+    {
+        yield return Ai.Act(new ProcessorEntityRemoveRequested(processor, entity));
+    }
+
+    public static IEnumerator<AiStep> RemoveProcessorFromSystem(EntityProcessor processor, EntityManager entityManager)
+    {
+        yield return Ai.Act(new ProcessorSystemRemoveRequested(processor, entityManager));
+    }
+
+    public static IEnumerator<AiStep> RemoveProcessorAndEntity(EntityProcessor processor, EntityManager entityManager, Entity entity)
+    {
+        ArgumentNullException.ThrowIfNull(processor);
+        ArgumentNullException.ThrowIfNull(entityManager);
+        ArgumentNullException.ThrowIfNull(entity);
+
+        yield return Ai.Act(new ProcessorEntityRemoveRequested(processor, entity));
+        yield return Ai.Act(new ProcessorSystemRemoveRequested(processor, entityManager));
+    }
 }
