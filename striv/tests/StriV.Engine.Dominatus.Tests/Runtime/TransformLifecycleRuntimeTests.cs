@@ -1,9 +1,7 @@
 using Xunit;
-using Dominatus.Core;
-using Dominatus.Core.Hfsm;
-using Dominatus.Core.Runtime;
 
 using Stride.Engine;
+
 using StriV.Engine.Dominatus.Adapters;
 using StriV.Engine.Dominatus.Nodes;
 using StriV.Engine.Dominatus.Runtime;
@@ -18,22 +16,15 @@ public sealed class TransformLifecycleRuntimeTests
         var parent = new Entity("Parent");
         var child = new Entity("Child");
 
-        var graph = new HfsmGraph { Root = new StateId("Attach") };
-        graph.Add(new HfsmStateDef
-        {
-            Id = "Attach",
-            Node = _ => TransformLifecycleDominatusNodes.AttachTransformParent(child, parent),
-        });
+        var harness = new DominatusRuntimeTestHarness()
+            .Register(new TransformParentAttachActuationHandler(new StrideTransformLifecycleActuator()));
 
-        var actuatorHost = new ActuatorHost();
-        actuatorHost.Register(new TransformParentAttachActuationHandler(new StrideTransformLifecycleActuator()));
+        var agent = harness.CreateAgent(
+            "Attach",
+            _ => TransformLifecycleDominatusNodes.AttachTransformParent(child, parent));
 
-        var world = new AiWorld(actuatorHost);
-        var agent = new AiAgent(new HfsmInstance(graph));
-        world.Add(agent);
-        agent.Brain.Initialize(world, agent);
-
-        world.Tick(0.016f);
+        var world = harness.CreateWorld(agent);
+        DominatusRuntimeTestHarness.Tick(world);
 
         Assert.Same(parent.Transform, child.Transform.Parent);
         Assert.Contains(child.Transform, parent.Transform.Children);
