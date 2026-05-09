@@ -12,3 +12,9 @@ public readonly record struct EntitySceneAttached(Entity Entity, Scene Scene);
 
 public readonly record struct EntitySceneDetachRequested(Entity Entity);
 public readonly record struct EntitySceneDetached(Entity Entity);
+
+public readonly record struct RootSceneSetRequested(SceneInstance SceneInstance, Scene RootScene);
+public readonly record struct RootSceneSet(SceneInstance SceneInstance, Scene RootScene);
+
+public readonly record struct RootSceneClearRequested(SceneInstance SceneInstance);
+public readonly record struct RootSceneCleared(SceneInstance SceneInstance);

@@ -129,5 +129,11 @@ public sealed class SceneLifecycleBridgeTests
 
         public ValueTask DetachEntityFromSceneAsync(Entity entity, CancellationToken cancellationToken = default)
             => throw new InvalidOperationException("detach-failed");
+
+        public ValueTask SetRootSceneAsync(SceneInstance sceneInstance, Scene rootScene, CancellationToken cancellationToken = default)
+            => ValueTask.CompletedTask;
+
+        public ValueTask ClearRootSceneAsync(SceneInstance sceneInstance, CancellationToken cancellationToken = default)
+            => ValueTask.CompletedTask;
     }
 }
