@@ -1,4 +1,5 @@
 using Stride.Rendering.Compositing;
+using Stride.Graphics;
 using Xunit;
 
 namespace Stride.Engine.Tests;
@@ -28,5 +29,15 @@ public class ForwardRendererLifecycleTests
         Assert.Null(renderer.PostEffects);
         Assert.Null(renderer.LightShafts);
         Assert.Null(renderer.SubsurfaceScatteringBlurEffect);
+    }
+
+    [Fact]
+    public void ForwardRenderer_DefaultConstruction_DoesNotRequireGraphicsDeviceForConfigurationAccess()
+    {
+        var renderer = new ForwardRenderer();
+
+        Assert.Equal(MultisampleCount.None, renderer.MSAALevel);
+        Assert.True(renderer.BindDepthAsResourceDuringTransparentRendering);
+        Assert.False(renderer.BindOpaqueAsResourceDuringTransparentRendering);
     }
 }
