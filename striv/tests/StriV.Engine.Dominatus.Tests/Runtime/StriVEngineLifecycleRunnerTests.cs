@@ -52,6 +52,30 @@ public sealed class StriVEngineLifecycleRunnerTests
     }
 
     [Fact]
+    public async Task StriVEngineLifecycleRunner_AttachSceneTransformAndProcessor_CanceledBeforeStart_ThrowsOperationCanceledException()
+    {
+        var scene = new Scene();
+        var entityManager = new SceneInstance(new ServiceRegistry());
+        var parent = new Entity("Parent");
+        var child = new Entity("Child");
+        child.Components.Add(new TestComponent());
+        var processor = new RecordingProcessor();
+
+        var runner = new StriVEngineLifecycleRunner();
+        using var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() => runner.AttachSceneTransformAndProcessorAsync(scene, parent, child, entityManager, processor, cancellationTokenSource.Token).AsTask());
+
+        Assert.Null(parent.Scene);
+        Assert.Null(child.Scene);
+        Assert.Null(child.Transform.Parent);
+        Assert.Empty(parent.Transform.Children);
+        Assert.Null(processor.EntityManager);
+        Assert.Empty(processor.AddedEntities);
+    }
+
+    [Fact]
     public async Task StriVEngineLifecycleRunner_CleanupProcessorLifecycle_RunsThroughDominatusRuntime()
     {
         var scene = new Scene();
@@ -89,6 +113,40 @@ public sealed class StriVEngineLifecycleRunnerTests
         await Assert.ThrowsAsync<ArgumentNullException>(() => runner.CleanupProcessorLifecycleAsync(null!, child, processor).AsTask());
         await Assert.ThrowsAsync<ArgumentNullException>(() => runner.CleanupProcessorLifecycleAsync(entityManager, null!, processor).AsTask());
         await Assert.ThrowsAsync<ArgumentNullException>(() => runner.CleanupProcessorLifecycleAsync(entityManager, child, null!).AsTask());
+    }
+
+    [Fact]
+    public async Task StriVEngineLifecycleRunner_CleanupProcessorLifecycle_CanceledBeforeStart_ThrowsOperationCanceledException()
+    {
+        var entityManager = new SceneInstance(new ServiceRegistry());
+        var child = new Entity("Child");
+        child.Components.Add(new TestComponent());
+        var processor = new RecordingProcessor();
+        entityManager.Processors.Add(processor);
+
+        var runner = new StriVEngineLifecycleRunner();
+        using var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.Cancel();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() => runner.CleanupProcessorLifecycleAsync(entityManager, child, processor, cancellationTokenSource.Token).AsTask());
+
+        Assert.Same(entityManager, processor.EntityManager);
+        Assert.Contains(processor, entityManager.Processors);
+        Assert.Empty(processor.RemovedEntities);
+    }
+
+    [Fact]
+    public void StriVEngineLifecycleRunner_InvalidMaxTicks_Throws()
+    {
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => new StriVEngineLifecycleRunner(new StriVEngineLifecycleRunnerOptions { MaxTicks = 0 }));
+        Assert.Equal("options", exception.ParamName);
+    }
+
+    [Fact]
+    public void StriVEngineLifecycleRunner_InvalidFixedDelta_Throws()
+    {
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => new StriVEngineLifecycleRunner(new StriVEngineLifecycleRunnerOptions { FixedDeltaSeconds = 0f }));
+        Assert.Equal("options", exception.ParamName);
     }
 
     private sealed class TestComponent : EntityComponent;
