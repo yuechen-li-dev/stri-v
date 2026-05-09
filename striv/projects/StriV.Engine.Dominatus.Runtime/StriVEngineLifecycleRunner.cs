@@ -7,14 +7,33 @@ using Stride.Engine;
 
 using StriV.Engine.Dominatus.Adapters;
 using StriV.Engine.Dominatus.Nodes;
-using StriV.Engine.Dominatus.Runtime;
 
 namespace StriV.Engine.Dominatus.Runtime;
 
+public sealed record StriVEngineLifecycleRunnerOptions
+{
+    public int MaxTicks { get; init; } = 1;
+    public float FixedDeltaSeconds { get; init; } = 1f / 60f;
+}
+
 public sealed class StriVEngineLifecycleRunner
 {
-    private const int MaxTicks = 1;
-    private const float TickDeltaTime = 0.016f;
+    private readonly int maxTicks;
+    private readonly float fixedDeltaSeconds;
+
+    public StriVEngineLifecycleRunner(StriVEngineLifecycleRunnerOptions? options = null)
+    {
+        var resolvedOptions = options ?? new StriVEngineLifecycleRunnerOptions();
+
+        if (resolvedOptions.MaxTicks <= 0)
+            throw new ArgumentOutOfRangeException(nameof(options), "MaxTicks must be greater than zero.");
+
+        if (resolvedOptions.FixedDeltaSeconds <= 0f)
+            throw new ArgumentOutOfRangeException(nameof(options), "FixedDeltaSeconds must be greater than zero.");
+
+        maxTicks = resolvedOptions.MaxTicks;
+        fixedDeltaSeconds = resolvedOptions.FixedDeltaSeconds;
+    }
 
     public ValueTask AttachSceneTransformAndProcessorAsync(
         Scene scene,
@@ -67,11 +86,13 @@ public sealed class StriVEngineLifecycleRunner
             cancellationToken);
     }
 
-    private static ValueTask RunSingleNodeAsync(
+    private ValueTask RunSingleNodeAsync(
         ActuatorHost actuatorHost,
         AiNode node,
         CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var graph = new HfsmGraph { Root = new StateId("Root") };
         graph.Add(new HfsmStateDef
         {
@@ -79,15 +100,19 @@ public sealed class StriVEngineLifecycleRunner
             Node = node,
         });
 
-        var agent = new AiAgent(new HfsmInstance(graph));
+        var brain = new HfsmInstance(graph);
+        var agent = new AiAgent(brain);
         var world = new AiWorld(actuatorHost);
         world.Add(agent);
-        agent.Brain.Initialize(world, agent);
+        brain.Initialize(world, agent);
 
-        for (var i = 0; i < MaxTicks; i++)
+        for (var i = 0; i < maxTicks; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            world.Tick(TickDeltaTime);
+            world.Tick(fixedDeltaSeconds);
+
+            if (brain.GetActivePath().Count == 0)
+                break;
         }
 
         return ValueTask.CompletedTask;
