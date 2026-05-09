@@ -14,15 +14,15 @@ namespace Stride.Engine
     public abstract class AsyncScript : ScriptComponent
     {
         [DataMemberIgnore]
-        internal MicroThread MicroThread;
+        internal MicroThread? MicroThread;
 
         [DataMemberIgnore]
-        internal CancellationTokenSource CancellationTokenSource;
+        internal CancellationTokenSource? CancellationTokenSource;
 
         /// <summary>
         /// Gets a token indicating if the script execution was canceled.
         /// </summary>
-        public CancellationToken CancellationToken => MicroThread.CancellationToken;
+        public CancellationToken CancellationToken => MicroThread?.CancellationToken ?? default;
 
         /// <summary>
         /// Called once, as a microthread
