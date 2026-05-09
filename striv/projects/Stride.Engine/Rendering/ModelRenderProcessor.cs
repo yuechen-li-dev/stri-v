@@ -15,7 +15,7 @@ namespace Stride.Rendering
 {
     public class ModelRenderProcessor : EntityProcessor<ModelComponent, RenderModel>, IEntityComponentRenderProcessor
     {
-        private Material fallbackMaterial;
+        private Material? fallbackMaterial;
 
         public Dictionary<ModelComponent, RenderModel> RenderModels => ComponentDatas;
 
@@ -61,7 +61,7 @@ namespace Stride.Rendering
                 foreach (var renderMesh in renderModel.Meshes)
                 {
                     // Unregister from render system
-                    VisibilityGroup.RenderObjects.Remove(renderMesh);
+                    VisibilityGroup?.RenderObjects.Remove(renderMesh);
                 }
             }
         }
@@ -118,17 +118,18 @@ namespace Stride.Rendering
             }
         }
 
-        private void UpdateMaterial(RenderMesh renderMesh, MaterialPass materialPass, MaterialInstance modelMaterialInstance, ModelComponent modelComponent, Mesh sourceMesh)
+        private void UpdateMaterial(RenderMesh renderMesh, MaterialPass? materialPass, MaterialInstance? modelMaterialInstance, ModelComponent modelComponent, Mesh sourceMesh)
         {
             var isShadowCaster = modelComponent.IsShadowCaster;
             if (modelMaterialInstance != null)
                 isShadowCaster &= modelMaterialInstance.IsShadowCaster;
 
             if (isShadowCaster != renderMesh.IsShadowCaster
-                || materialPass.HasTransparency != renderMesh.MaterialPass?.HasTransparency)
+                || materialPass?.HasTransparency != renderMesh.MaterialPass?.HasTransparency)
             {
                 renderMesh.IsShadowCaster = isShadowCaster;
-                VisibilityGroup.NeedActiveRenderStageReevaluation = true;
+                if (VisibilityGroup != null)
+                    VisibilityGroup.NeedActiveRenderStageReevaluation = true;
             }
 
             renderMesh.MaterialPass = materialPass;
@@ -136,7 +137,7 @@ namespace Stride.Rendering
             renderMesh.Mesh = sourceMesh;
         }
 
-        private Material FindMaterial(Material materialOverride, MaterialInstance modelMaterialInstance)
+        private Material? FindMaterial(Material? materialOverride, MaterialInstance? modelMaterialInstance)
         {
             return materialOverride ?? modelMaterialInstance?.Material ?? fallbackMaterial;
         }
@@ -189,12 +190,13 @@ namespace Stride.Rendering
             // Remove old meshes
             if (renderModel.Meshes != null)
             {
+                if (VisibilityGroup != null)
                 lock (VisibilityGroup.RenderObjects)
                 {
                     foreach (var renderMesh in renderModel.Meshes)
                     {
                         // Unregister from render system
-                        VisibilityGroup.RenderObjects.Remove(renderMesh);
+                        VisibilityGroup?.RenderObjects.Remove(renderMesh);
                     }
                 }
             }
@@ -244,11 +246,14 @@ namespace Stride.Rendering
             UpdateRenderModel(modelComponent, renderModel);
 
             // Update and register with render system
-            lock (VisibilityGroup.RenderObjects)
+            if (VisibilityGroup != null)
             {
-                foreach (var renderMesh in renderMeshes)
+                lock (VisibilityGroup.RenderObjects)
                 {
-                    VisibilityGroup.RenderObjects.Add(renderMesh);
+                    foreach (var renderMesh in renderMeshes)
+                    {
+                        VisibilityGroup.RenderObjects.Add(renderMesh);
+                    }
                 }
             }
         }
