@@ -109,6 +109,9 @@ namespace Stride.Engine
 
         protected override void Destroy()
         {
+            // STRIV-TODO: Nullability/lifecycle cleanup.
+            // Reason: RootScene uses null as a legacy teardown-state marker during Destroy().
+            // Future direction: Introduce explicit lifecycle state so detach/teardown does not rely on nullable transitions.
             RootScene = null;
 
             // Cleaning processors should not be necessary anymore, but physics are not properly cleaned up otherwise
