@@ -35,7 +35,9 @@ namespace Stride.Engine.Processors
         /// Gets the scheduler.
         /// </summary>
         /// <value>The scheduler.</value>
-        public Scheduler Scheduler { get; private set; }
+        private Scheduler? scheduler;
+
+        public Scheduler Scheduler => scheduler ?? throw new ObjectDisposedException(nameof(ScriptSystem));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GameSystemBase" /> class.
@@ -46,15 +48,18 @@ namespace Stride.Engine.Processors
             : base(registry)
         {
             Enabled = true;
-            Scheduler = new Scheduler();
-            Scheduler.ActionException += Scheduler_ActionException;
+            scheduler = new Scheduler();
+            scheduler.ActionException += Scheduler_ActionException;
         }
 
         protected override void Destroy()
         {
-            Scheduler.ActionException -= Scheduler_ActionException;
-            Scheduler.Dispose();
-            Scheduler = null;
+            if (scheduler is not null)
+            {
+                scheduler.ActionException -= Scheduler_ActionException;
+                scheduler.Dispose();
+                scheduler = null;
+            }
 
             Services.RemoveService<ScriptSystem>();
 
