@@ -19,7 +19,7 @@ namespace Stride.Rendering
 
     public struct ViewObjectPropertyData<T>
     {
-        internal T[] Data;
+        internal T[] Data = Array.Empty<T>();
 
         internal ViewObjectPropertyData(T[] data)
         {
@@ -132,7 +132,7 @@ namespace Stride.Rendering
     }
     public struct ObjectPropertyData<T>
     {
-        internal T[] Data;
+        internal T[] Data = Array.Empty<T>();
 
         internal ObjectPropertyData(T[] data)
         {
@@ -245,7 +245,7 @@ namespace Stride.Rendering
     }
     public struct RenderPropertyData<T>
     {
-        internal T[] Data;
+        internal T[] Data = Array.Empty<T>();
 
         internal RenderPropertyData(T[] data)
         {
@@ -358,7 +358,7 @@ namespace Stride.Rendering
     }
     public struct EffectObjectPropertyData<T>
     {
-        internal T[] Data;
+        internal T[] Data = Array.Empty<T>();
 
         internal EffectObjectPropertyData(T[] data)
         {
@@ -471,7 +471,7 @@ namespace Stride.Rendering
     }
     public struct ViewPropertyData<T>
     {
-        internal T[] Data;
+        internal T[] Data = Array.Empty<T>();
 
         internal ViewPropertyData(T[] data)
         {
@@ -584,7 +584,7 @@ namespace Stride.Rendering
     }
     public struct StaticObjectPropertyData<T>
     {
-        internal T[] Data;
+        internal T[] Data = Array.Empty<T>();
 
         internal StaticObjectPropertyData(T[] data)
         {
