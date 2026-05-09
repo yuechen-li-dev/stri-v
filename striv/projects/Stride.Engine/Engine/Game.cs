@@ -52,7 +52,7 @@ namespace Stride.Engine
 
         private readonly LogListener logListener;
 
-        private DatabaseFileProvider databaseFileProvider;
+        private DatabaseFileProvider? databaseFileProvider;
 
         /// <summary>
         /// Readonly game settings as defined in the GameSettings asset

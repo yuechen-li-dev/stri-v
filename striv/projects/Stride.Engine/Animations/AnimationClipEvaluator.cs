@@ -14,8 +14,8 @@ namespace Stride.Animations
     /// </summary>
     public sealed class AnimationClipEvaluator
     {
-        private AnimationClip clip;
-        internal List<AnimationBlender.Channel> BlenderChannels;
+        private AnimationClip? clip;
+        internal List<AnimationBlender.Channel>? BlenderChannels;
 
         private FastListStruct<AnimationCurveEvaluatorGroup> curveEvaluatorGroups = new FastListStruct<AnimationCurveEvaluatorGroup>(4);
 
@@ -24,7 +24,7 @@ namespace Stride.Animations
 
         public AnimationClip Clip
         {
-            get { return clip; }
+            get { return clip ?? throw new ObjectDisposedException(nameof(AnimationClipEvaluator)); }
         }
 
         internal AnimationClipEvaluator()
@@ -126,7 +126,8 @@ namespace Stride.Animations
 
             // Try to find curve and create evaluator
             // (if curve doesn't exist, Evaluator will be null).
-            bool itemFound = clip.Channels.TryGetValue(channel.PropertyName, out clipChannel);
+            var currentClip = clip ?? throw new ObjectDisposedException(nameof(AnimationClipEvaluator));
+            bool itemFound = currentClip.Channels.TryGetValue(channel.PropertyName, out clipChannel);
 
             if (itemFound)
             {
@@ -138,7 +139,7 @@ namespace Stride.Animations
 
                 if (clipChannel.CurveIndex != -1)
                 {
-                    curve = clip.Curves[clipChannel.CurveIndex];
+                    curve = currentClip.Curves[clipChannel.CurveIndex];
 
                     // TODO: Optimize this search?
                     var curveEvaluatorGroup = curveEvaluatorGroups.OfType<AnimationCurveEvaluatorDirectGroup>().FirstOrDefault(x => x.ElementType == clipChannel.ElementType);

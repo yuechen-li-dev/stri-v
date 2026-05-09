@@ -15,33 +15,33 @@ namespace Stride.Engine.Network
     {
         private const uint MagicAck = 0x35AABBCC;
 
-        private TcpSocketClient socket;
+        private TcpSocketClient? socket;
         private bool isConnected;
 
         public Stream ReadStream
         {
-            get { return socket.ReadStream; }
+            get { return Socket.ReadStream; }
         }
 
         public Stream WriteStream
         {
-            get { return socket.WriteStream; }
+            get { return Socket.WriteStream; }
         }
 
         public string RemoteAddress
         {
-            get { return socket.RemoteAddress; }
+            get { return Socket.RemoteAddress; }
         }
 
         public int RemotePort
         {
-            get { return socket.RemotePort; }
+            get { return Socket.RemotePort; }
         }
 
         /// <summary>
         /// Gets the underlying <see cref="TcpSocketClient"/> object.
         /// </summary>
-        internal TcpSocketClient Socket => socket;
+        internal TcpSocketClient Socket => socket ?? throw new ObjectDisposedException(nameof(SimpleSocket));
 
         // Called on a succesfull connection
         public Action<SimpleSocket> Connected;
