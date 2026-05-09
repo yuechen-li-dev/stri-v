@@ -136,6 +136,49 @@ public sealed class StriVEngineLifecycleRunnerTests
     }
 
     [Fact]
+    public async Task StriVEngineLifecycleRunner_DetachTransformParent_RunsThroughDominatusRuntime()
+    {
+        var parent = new Entity("Parent");
+        var child = new Entity("Child");
+        child.Transform.Parent = parent.Transform;
+        var runner = new StriVEngineLifecycleRunner();
+
+        Assert.Same(parent.Transform, child.Transform.Parent);
+        Assert.Contains(child.Transform, parent.Transform.Children);
+
+        await runner.DetachTransformParentAsync(child);
+
+        Assert.Null(child.Transform.Parent);
+        Assert.DoesNotContain(child.Transform, parent.Transform.Children);
+    }
+
+    [Fact]
+    public async Task StriVEngineLifecycleRunner_DetachEntityFromScene_RunsThroughDominatusRuntime()
+    {
+        var scene = new Scene();
+        var entity = new Entity("Entity");
+        entity.Scene = scene;
+        var runner = new StriVEngineLifecycleRunner();
+
+        Assert.Same(scene, entity.Scene);
+        Assert.Contains(entity, scene.Entities);
+
+        await runner.DetachEntityFromSceneAsync(entity);
+
+        Assert.Null(entity.Scene);
+        Assert.DoesNotContain(entity, scene.Entities);
+    }
+
+    [Fact]
+    public async Task StriVEngineLifecycleRunner_DetachCleanupMethods_RejectNullArguments()
+    {
+        var runner = new StriVEngineLifecycleRunner();
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => runner.DetachTransformParentAsync(null!).AsTask());
+        await Assert.ThrowsAsync<ArgumentNullException>(() => runner.DetachEntityFromSceneAsync(null!).AsTask());
+    }
+
+    [Fact]
     public void StriVEngineLifecycleRunner_InvalidMaxTicks_Throws()
     {
         var exception = Assert.Throws<ArgumentOutOfRangeException>(() => new StriVEngineLifecycleRunner(new StriVEngineLifecycleRunnerOptions { MaxTicks = 0 }));

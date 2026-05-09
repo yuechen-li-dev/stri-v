@@ -11,7 +11,7 @@ public readonly record struct SceneUnloaded(Scene Scene);
 public readonly record struct EntitySceneAttachRequested(Entity Entity, Scene Scene) : IActuationCommand;
 public readonly record struct EntitySceneAttached(Entity Entity, Scene Scene);
 
-public readonly record struct EntitySceneDetachRequested(Entity Entity);
+public readonly record struct EntitySceneDetachRequested(Entity Entity) : IActuationCommand;
 public readonly record struct EntitySceneDetached(Entity Entity);
 
 public readonly record struct RootSceneSetRequested(SceneInstance SceneInstance, Scene RootScene);

@@ -25,3 +25,24 @@ public sealed class EntitySceneAttachActuationHandler(ISceneLifecycleActuator ac
         return ActuatorHost.HandlerResult.CompletedWithPayload(new EntitySceneAttached(command.Entity, command.Scene));
     }
 }
+
+public sealed class EntitySceneDetachActuationHandler(ISceneLifecycleActuator actuator)
+    : IActuationHandler<EntitySceneDetachRequested>
+{
+    private readonly ISceneLifecycleActuator _actuator = actuator ?? throw new ArgumentNullException(nameof(actuator));
+
+    public ActuatorHost.HandlerResult Handle(
+        ActuatorHost host,
+        AiCtx ctx,
+        ActuationId id,
+        EntitySceneDetachRequested command)
+    {
+        var completed = SceneLifecycleTransition
+            .DetachEntityAsync(command, _actuator, ctx.Cancel)
+            .AsTask()
+            .GetAwaiter()
+            .GetResult();
+
+        return ActuatorHost.HandlerResult.CompletedWithPayload(completed);
+    }
+}
