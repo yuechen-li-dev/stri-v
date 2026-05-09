@@ -11,7 +11,7 @@ namespace Stride.Engine
     /// </summary>
     public abstract class SyncScript : StartupScript
     {
-        [CanBeNull] internal ScriptSystem ScriptSystem;
+        [CanBeNull] internal ScriptSystem? ScriptSystem;
         internal long ScheduledPriorityForUpdate;
 
         /// <summary>

@@ -42,10 +42,10 @@ namespace Stride.Engine
 
         private static readonly Dictionary<Type, ProfilingKey> ScriptToProfilingKey = new Dictionary<Type, ProfilingKey>();
 
-        private ProfilingKey profilingKey;
+        private ProfilingKey? profilingKey;
 
-        private IGraphicsDeviceService graphicsDeviceService;
-        private Logger logger;
+        private IGraphicsDeviceService? graphicsDeviceService;
+        private Logger? logger;
 
         protected ScriptComponent()
         {
@@ -74,7 +74,8 @@ namespace Stride.Engine
                 var scriptType = GetType();
                 if (!ScriptToProfilingKey.TryGetValue(scriptType, out profilingKey))
                 {
-                    profilingKey = new ProfilingKey(ScriptGlobalProfilingKey, scriptType.FullName);
+                    var profileName = scriptType.FullName ?? scriptType.Name;
+                    profilingKey = new ProfilingKey(ScriptGlobalProfilingKey, profileName);
                     ScriptToProfilingKey[scriptType] = profilingKey;
                 }
 
@@ -83,20 +84,20 @@ namespace Stride.Engine
         }
 
         [DataMemberIgnore]
-        public IServiceRegistry Services { get; private set; }
+        public IServiceRegistry? Services { get; private set; }
 
         [DataMemberIgnore]
-        public IGame Game { get; private set; }
+        public IGame? Game { get; private set; }
 
         [DataMemberIgnore]
-        public GraphicsDevice GraphicsDevice => graphicsDeviceService?.GraphicsDevice;
+        public GraphicsDevice? GraphicsDevice => graphicsDeviceService?.GraphicsDevice;
 
         [DataMemberIgnore]
-        public ContentManager Content 
+        public ContentManager? Content 
         { 
             get
             {
-                contentManager ??= Services.GetSafeServiceAs<IContentManager>() as ContentManager;
+                contentManager ??= Services?.GetSafeServiceAs<IContentManager>() as ContentManager;
                 return contentManager;
             }
             private set
@@ -104,14 +105,14 @@ namespace Stride.Engine
                 contentManager = value;
             }
         }
-        private ContentManager contentManager;
+        private ContentManager? contentManager;
 
         [DataMemberIgnore]
-        public GameProfilingSystem GameProfiler 
+        public GameProfilingSystem? GameProfiler 
         { 
             get
             {
-                gameProfilerSystem ??= Services.GetSafeServiceAs<GameProfilingSystem>();
+                gameProfilerSystem ??= Services?.GetSafeServiceAs<GameProfilingSystem>();
                 return gameProfilerSystem;
             }
             private set
@@ -119,14 +120,14 @@ namespace Stride.Engine
                 gameProfilerSystem = value;
             }
         }
-        private GameProfilingSystem gameProfilerSystem;
+        private GameProfilingSystem? gameProfilerSystem;
 
         [DataMemberIgnore]
-        public InputManager Input 
+        public InputManager? Input 
         { 
             get
             {
-                inputManager ??= Services.GetSafeServiceAs<InputManager>();
+                inputManager ??= Services?.GetSafeServiceAs<InputManager>();
                 return inputManager;
             }
             private set
@@ -134,14 +135,14 @@ namespace Stride.Engine
                 inputManager = value;
             }
         }
-        private InputManager inputManager;
+        private InputManager? inputManager;
 
         [DataMemberIgnore]
-        public ScriptSystem Script 
+        public ScriptSystem? Script 
         { 
             get
             {
-                scriptSystem ??= Services.GetSafeServiceAs<ScriptSystem>();
+                scriptSystem ??= Services?.GetSafeServiceAs<ScriptSystem>();
                 return scriptSystem;
             }
             private set
@@ -149,14 +150,14 @@ namespace Stride.Engine
                 scriptSystem = value;
             }
         }
-        private ScriptSystem scriptSystem;
+        private ScriptSystem? scriptSystem;
 
         [DataMemberIgnore]
-        public SceneSystem SceneSystem 
+        public SceneSystem? SceneSystem 
         { 
             get
             {
-                sceneSystem ??= Services.GetSafeServiceAs<SceneSystem>();
+                sceneSystem ??= Services?.GetSafeServiceAs<SceneSystem>();
                 return sceneSystem;
             }
             private set
@@ -164,14 +165,14 @@ namespace Stride.Engine
                 sceneSystem = value;
             }
         }
-        private SceneSystem sceneSystem;
+        private SceneSystem? sceneSystem;
 
         [DataMemberIgnore]
-        public EffectSystem EffectSystem 
+        public EffectSystem? EffectSystem 
         { 
             get
             {
-                effectSystem ??= Services.GetSafeServiceAs<EffectSystem>();
+                effectSystem ??= Services?.GetSafeServiceAs<EffectSystem>();
                 return effectSystem;
             }
             private set
@@ -179,14 +180,14 @@ namespace Stride.Engine
                 effectSystem = value;
             }
         }
-        private EffectSystem effectSystem;
+        private EffectSystem? effectSystem;
 
         [DataMemberIgnore]
-        public DebugTextSystem DebugText 
+        public DebugTextSystem? DebugText 
         { 
             get
             {
-                debugTextSystem ??= Services.GetSafeServiceAs<DebugTextSystem>();
+                debugTextSystem ??= Services?.GetSafeServiceAs<DebugTextSystem>();
                 return debugTextSystem;
             }
             private set
@@ -194,7 +195,7 @@ namespace Stride.Engine
                 debugTextSystem = value;
             }
         }
-        private DebugTextSystem debugTextSystem;
+        private DebugTextSystem? debugTextSystem;
 
 #if !STRIDE_ENGINE_WITHOUT_AUDIO
         [DataMemberIgnore]
@@ -214,11 +215,11 @@ namespace Stride.Engine
 #endif
 
         [DataMemberIgnore]
-        public SpriteAnimationSystem SpriteAnimation
+        public SpriteAnimationSystem? SpriteAnimation
         {
             get
             {
-                spriteAnimationSystem ??= Services.GetSafeServiceAs<SpriteAnimationSystem>();
+                spriteAnimationSystem ??= Services?.GetSafeServiceAs<SpriteAnimationSystem>();
                 return spriteAnimationSystem;
             }
             private set
@@ -226,18 +227,18 @@ namespace Stride.Engine
                 spriteAnimationSystem = value;
             }
         }
-        private SpriteAnimationSystem spriteAnimationSystem;
+        private SpriteAnimationSystem? spriteAnimationSystem;
 
         /// <summary>
         /// Gets the streaming system.
         /// </summary>
         /// <value>The streaming system.</value>
         [DataMemberIgnore]
-        public StreamingManager Streaming 
+        public StreamingManager? Streaming 
         { 
             get
             {
-                streamingManager ??= Services.GetSafeServiceAs<StreamingManager>();
+                streamingManager ??= Services?.GetSafeServiceAs<StreamingManager>();
                 return streamingManager;
             }
             private set
@@ -245,7 +246,7 @@ namespace Stride.Engine
                 streamingManager = value;
             }
         }
-        private StreamingManager streamingManager;
+        private StreamingManager? streamingManager;
 
         [DataMemberIgnore]
         protected Logger Log
@@ -257,7 +258,7 @@ namespace Stride.Engine
                     return logger;
                 }
 
-                var className = GetType().FullName;
+                var className = GetType().FullName ?? GetType().Name;
                 logger = GlobalLogger.GetLogger(className);
                 return logger;
             }
