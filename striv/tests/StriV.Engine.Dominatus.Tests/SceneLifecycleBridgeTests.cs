@@ -5,6 +5,8 @@ using StriV.Engine.Dominatus.Nodes;
 using StriV.Engine.Dominatus.Transitions;
 using Xunit;
 
+using StriV.Engine.Dominatus.Tests.Adapters;
+
 namespace StriV.Engine.Dominatus.Tests;
 
 public sealed class SceneLifecycleBridgeTests
@@ -14,7 +16,7 @@ public sealed class SceneLifecycleBridgeTests
     {
         var entity = new Entity("Entity");
         var scene = new Scene();
-        var actuator = new FakeSceneLifecycleActuator();
+        var actuator = new StrideSceneLifecycleTestAdapter();
         var request = new EntitySceneAttachRequested(entity, scene);
 
         var completed = await SceneLifecycleTransition.AttachEntityAsync(request, actuator);
@@ -31,7 +33,7 @@ public sealed class SceneLifecycleBridgeTests
     {
         var entity = new Entity("Entity");
         var scene = new Scene();
-        var actuator = new FakeSceneLifecycleActuator();
+        var actuator = new StrideSceneLifecycleTestAdapter();
 
         await actuator.AttachEntityToSceneAsync(entity, scene);
         var request = new EntitySceneDetachRequested(entity);
@@ -95,7 +97,7 @@ public sealed class SceneLifecycleBridgeTests
     {
         var entity = new Entity("Entity");
         var scene = new Scene();
-        var actuator = new FakeSceneLifecycleActuator();
+        var actuator = new StrideSceneLifecycleTestAdapter();
 
         var attachRequest = SceneLifecycleNode.RequestEntityAttach(entity, scene);
         var detachRequest = SceneLifecycleNode.RequestEntityDetach(entity);
@@ -112,38 +114,6 @@ public sealed class SceneLifecycleBridgeTests
         Assert.Same(entity, detached.Entity);
         Assert.Equal(1, actuator.AttachCalls);
         Assert.Equal(1, actuator.DetachCalls);
-    }
-
-    private sealed class FakeSceneLifecycleActuator : ISceneLifecycleActuator
-    {
-        public int AttachCalls { get; private set; }
-        public int DetachCalls { get; private set; }
-
-        public ValueTask AttachSceneAsync(Scene scene, CancellationToken cancellationToken = default)
-            => ValueTask.CompletedTask;
-
-        public ValueTask DetachSceneAsync(Scene scene, CancellationToken cancellationToken = default)
-            => ValueTask.CompletedTask;
-
-        public ValueTask AttachEntityToSceneAsync(Entity entity, Scene scene, CancellationToken cancellationToken = default)
-        {
-            AttachCalls++;
-            entity.Scene = scene;
-            return ValueTask.CompletedTask;
-        }
-
-        public ValueTask DetachEntityFromSceneAsync(Entity entity, CancellationToken cancellationToken = default)
-        {
-            DetachCalls++;
-            DetachFromScene(entity);
-            return ValueTask.CompletedTask;
-        }
-
-        private static void DetachFromScene(Entity entity)
-        {
-            // Legacy Stride detach API: null scene means detach. Kept inside fake actuator boundary.
-            entity.Scene = null!;
-        }
     }
 
     private sealed class ThrowingSceneLifecycleActuator : ISceneLifecycleActuator
