@@ -10,7 +10,7 @@ namespace StriV.Engine.Dominatus.Tests.Integration;
 public sealed class EngineLifecycleCompositionTests
 {
     [Fact]
-    public async Task RootSceneComposition_SetRootScene_ThenProcessorTransitions_ComposeThroughProductionAdapters()
+    public async Task RootSceneComposition_RemoveProcessorAndClearRootScene_ComposeThroughProductionAdapters()
     {
         var sceneInstance = new SceneInstance(new ServiceRegistry());
         var rootScene = new Scene();
@@ -41,6 +41,21 @@ public sealed class EngineLifecycleCompositionTests
         Assert.Same(entity, processorEntityAdded.Entity);
         Assert.Equal(1, processor.AddedCount);
         Assert.Same(entity, Assert.Single(processor.AddedEntities));
+
+        // Explicit cleanup policy: remove processor entity membership first, then processor system membership, then clear root scene.
+        var processorEntityRemoved = await ProcessorLifecycleTransition.RemoveEntityFromProcessorAsync(new ProcessorEntityRemoveRequested(processor, entity), processorActuator);
+
+        Assert.Same(processor, processorEntityRemoved.Processor);
+        Assert.Same(entity, processorEntityRemoved.Entity);
+        Assert.Equal(1, processor.RemovedCount);
+        Assert.Same(entity, Assert.Single(processor.RemovedEntities));
+
+        var processorSystemRemoved = await ProcessorLifecycleTransition.RemoveProcessorFromSystemAsync(new ProcessorSystemRemoveRequested(processor, sceneInstance), processorActuator);
+
+        Assert.Same(processor, processorSystemRemoved.Processor);
+        Assert.Same(sceneInstance, processorSystemRemoved.EntityManager);
+        Assert.Null(processor.EntityManager);
+        Assert.DoesNotContain(processor, sceneInstance.Processors);
 
         var rootCleared = await SceneLifecycleTransition.ClearRootSceneAsync(new RootSceneClearRequested(sceneInstance), sceneActuator);
 
@@ -102,12 +117,20 @@ public sealed class EngineLifecycleCompositionTests
     private sealed class RecordingProcessor : EntityProcessor<TestComponent>
     {
         public int AddedCount { get; private set; }
+        public int RemovedCount { get; private set; }
         public List<Entity> AddedEntities { get; } = [];
+        public List<Entity> RemovedEntities { get; } = [];
 
         protected override void OnEntityComponentAdding(Entity entity, TestComponent component, TestComponent data)
         {
             AddedCount++;
             AddedEntities.Add(entity);
+        }
+
+        protected override void OnEntityComponentRemoved(Entity entity, TestComponent component, TestComponent data)
+        {
+            RemovedCount++;
+            RemovedEntities.Add(entity);
         }
     }
 }
