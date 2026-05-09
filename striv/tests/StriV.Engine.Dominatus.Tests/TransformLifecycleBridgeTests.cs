@@ -5,6 +5,8 @@ using StriV.Engine.Dominatus.Nodes;
 using StriV.Engine.Dominatus.Transitions;
 using Xunit;
 
+using StriV.Engine.Dominatus.Tests.Adapters;
+
 namespace StriV.Engine.Dominatus.Tests;
 
 public sealed class TransformLifecycleBridgeTests
@@ -14,7 +16,7 @@ public sealed class TransformLifecycleBridgeTests
     {
         var parent = new Entity("Parent");
         var child = new Entity("Child");
-        var actuator = new FakeTransformLifecycleActuator();
+        var actuator = new StrideTransformLifecycleTestAdapter();
 
         await actuator.AttachParentAsync(child, parent);
 
@@ -27,7 +29,7 @@ public sealed class TransformLifecycleBridgeTests
     {
         var parent = new Entity("Parent");
         var child = new Entity("Child");
-        var actuator = new FakeTransformLifecycleActuator();
+        var actuator = new StrideTransformLifecycleTestAdapter();
 
         await actuator.AttachParentAsync(child, parent);
         await actuator.DetachParentAsync(child);
@@ -74,7 +76,7 @@ public sealed class TransformLifecycleBridgeTests
     {
         var parent = new Entity("Parent");
         var child = new Entity("Child");
-        var actuator = new FakeTransformLifecycleActuator();
+        var actuator = new StrideTransformLifecycleTestAdapter();
         var request = new TransformParentAttachRequested(child, parent);
 
         var completed = await TransformLifecycleTransition.AttachParentAsync(request, actuator);
@@ -83,7 +85,7 @@ public sealed class TransformLifecycleBridgeTests
         Assert.Same(parent, completed.Parent);
         Assert.Same(parent.Transform, child.Transform.Parent);
         Assert.Contains(child.Transform, parent.Transform.Children);
-        Assert.Equal(1, actuator.AttachCallCount);
+        Assert.Equal(1, actuator.AttachCalls);
     }
 
     [Fact]
@@ -91,7 +93,7 @@ public sealed class TransformLifecycleBridgeTests
     {
         var parent = new Entity("Parent");
         var child = new Entity("Child");
-        var actuator = new FakeTransformLifecycleActuator();
+        var actuator = new StrideTransformLifecycleTestAdapter();
 
         await actuator.AttachParentAsync(child, parent);
         var request = new TransformParentDetachRequested(child);
@@ -101,7 +103,7 @@ public sealed class TransformLifecycleBridgeTests
         Assert.Same(child, completed.Child);
         Assert.Null(child.Transform.Parent);
         Assert.DoesNotContain(child.Transform, parent.Transform.Children);
-        Assert.Equal(1, actuator.DetachCallCount);
+        Assert.Equal(1, actuator.DetachCalls);
     }
 
     [Fact]
@@ -129,32 +131,6 @@ public sealed class TransformLifecycleBridgeTests
             async () => await TransformLifecycleTransition.AttachParentAsync(attachRequest, actuator: null!));
         await Assert.ThrowsAsync<ArgumentNullException>(
             async () => await TransformLifecycleTransition.DetachParentAsync(detachRequest, actuator: null!));
-    }
-
-    private sealed class FakeTransformLifecycleActuator : ITransformLifecycleActuator
-    {
-        public int AttachCallCount { get; private set; }
-        public int DetachCallCount { get; private set; }
-
-        public ValueTask AttachParentAsync(Entity child, Entity parent, CancellationToken cancellationToken = default)
-        {
-            AttachCallCount++;
-            child.Transform.Parent = parent.Transform;
-            return ValueTask.CompletedTask;
-        }
-
-        public ValueTask DetachParentAsync(Entity child, CancellationToken cancellationToken = default)
-        {
-            DetachCallCount++;
-            DetachFromParent(child);
-            return ValueTask.CompletedTask;
-        }
-
-        private static void DetachFromParent(Entity child)
-        {
-            // Legacy Stride detach API: null parent means detach. Kept inside fake actuator boundary.
-            child.Transform.Parent = null!;
-        }
     }
 
     private sealed class ThrowingTransformLifecycleActuator : ITransformLifecycleActuator
