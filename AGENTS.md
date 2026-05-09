@@ -4,7 +4,7 @@ Stri-V is a hard fork of the Stride Engine. The original Stride code contained w
 
 ## Dominatus
 
-Read ARCHITECTURE.md and AUTHORING_GUIDE.md under /striv/external/Dominatus/ before writing Dominatus related code for guidance.
+Read ARCHITECTURE.md and AUTHORING_GUIDE.md under /striv/external/Dominatus/ as well as samples under /striv/external/Dominatus/samples for Dominatus usage and style guidance, in addition to vendored source code.
 
 ## Convergence rule
 
