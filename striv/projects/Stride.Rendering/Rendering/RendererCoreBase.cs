@@ -65,35 +65,35 @@ namespace Stride.Rendering
         public ProfilingKey CPUProfilingKey => cpuProfilingKey ??= new ProfilingKey($"{Name}.Draw");
 
         [DataMemberIgnore]
-        protected RenderContext Context { get; private set; }
+        protected RenderContext? Context { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IServiceRegistry"/>.
         /// </summary>
         /// <value>The service registry.</value>
         [DataMemberIgnore]
-        protected IServiceRegistry Services { get; private set; }
+        protected IServiceRegistry? Services { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ContentManager"/>.
         /// </summary>
         /// <value>The asset manager.</value>
         [DataMemberIgnore]
-        protected ContentManager Content { get; private set; }
+        protected ContentManager? Content { get; private set; }
 
         /// <summary>
         /// Gets the graphics device.
         /// </summary>
         /// <value>The graphics device.</value>
         [DataMemberIgnore]
-        protected GraphicsDevice GraphicsDevice { get; private set; }
+        protected GraphicsDevice? GraphicsDevice { get; private set; }
 
         /// <summary>
         /// Gets the effect system.
         /// </summary>
         /// <value>The effect system.</value>
         [DataMemberIgnore]
-        protected EffectSystem EffectSystem { get; private set; }
+        protected EffectSystem? EffectSystem { get; private set; }
 
         public bool Initialized { get; private set; }
 
@@ -206,7 +206,7 @@ namespace Stride.Rendering
         protected T ToLoadAndUnload<T>(T effect) where T : class, IGraphicsRendererCore
         {
             if (effect == null) throw new ArgumentNullException("effect");
-            effect.Initialize(Context);
+            effect.Initialize(Context!);
             subRenderersToUnload.Add(effect);
             return effect;
         }
@@ -215,7 +215,7 @@ namespace Stride.Rendering
         {
             foreach (var scopedResource in scopedResources)
             {
-                Context.Allocator.ReleaseReference(scopedResource);
+                Context!.Allocator.ReleaseReference(scopedResource);
             }
             scopedResources.Clear();
         }

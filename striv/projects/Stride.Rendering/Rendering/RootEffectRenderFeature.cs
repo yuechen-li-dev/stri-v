@@ -25,7 +25,7 @@ namespace Stride.Rendering
     public abstract class RootEffectRenderFeature : RootRenderFeature
     {
         [ThreadStatic]
-        private static CompilerParameters staticCompilerParameters;
+        private static CompilerParameters? staticCompilerParameters;
 
         // Helper class to build pipeline state
         private ThreadLocal<PrepareThreadContext> prepareThreadContext;
@@ -66,18 +66,18 @@ namespace Stride.Rendering
         private EffectDescriptorSetReference perViewDescriptorSetSlot;
         private EffectDescriptorSetReference perDrawDescriptorSetSlot;
 
-        private EffectPermutationSlot[] effectSlots = null;
+        private EffectPermutationSlot[]? effectSlots = null;
 
         public ConcurrentCollector<EffectObjectNode> EffectObjectNodes { get; } = new ConcurrentCollector<EffectObjectNode>();
 
         public delegate Effect ComputeFallbackEffectDelegate(RenderObject renderObject, RenderEffect renderEffect, RenderEffectState renderEffectState);
 
-        public ComputeFallbackEffectDelegate ComputeFallbackEffect { get; set; }
+        public ComputeFallbackEffectDelegate? ComputeFallbackEffect { get; set; }
 
         public ResourceGroup[] ResourceGroupPool = new ResourceGroup[256];
 
         public ConcurrentCollector<FrameResourceGroupLayout> FrameLayouts { get; } = new ConcurrentCollector<FrameResourceGroupLayout>();
-        public Action<RenderSystem, Effect, RenderEffectReflection> EffectCompiled;
+        public Action<RenderSystem, Effect, RenderEffectReflection>? EffectCompiled;
 
         [DataMember]
         [Category]
@@ -352,7 +352,7 @@ namespace Stride.Rendering
         /// <returns></returns>
         public EffectPermutationSlot GetEffectPermutationSlot(RenderStage renderStage)
         {
-            return effectSlots[renderStage.Index];
+            return effectSlots![renderStage.Index];
         }
 
         /// <summary>
@@ -400,7 +400,7 @@ namespace Stride.Rendering
 
                 // Get RenderEffect
                 var staticObjectNode = renderObject.StaticObjectNode;
-                var staticEffectObjectNode = staticObjectNode * EffectPermutationSlotCount + effectSlots[renderNode.RenderStage.Index].Index;
+                var staticEffectObjectNode = staticObjectNode * EffectPermutationSlotCount + effectSlots![renderNode.RenderStage.Index].Index;
                 var renderEffect = renderEffects[staticEffectObjectNode];
 
                 if (renderEffect != null)
@@ -441,7 +441,7 @@ namespace Stride.Rendering
 
                     // Get RenderEffect
                     var staticObjectNode = renderObject.StaticObjectNode;
-                    var staticEffectObjectNode = staticObjectNode * effectSlotCount + effectSlots[renderNode.RenderStage.Index].Index;
+                    var staticEffectObjectNode = staticObjectNode * effectSlotCount + effectSlots![renderNode.RenderStage.Index].Index;
                     var renderEffect = renderEffects[staticEffectObjectNode];
 
                     var effectSelector = renderObject.ActiveRenderStages[renderNode.RenderStage.Index].EffectSelector;
@@ -719,7 +719,7 @@ namespace Stride.Rendering
 
                     // Get RenderEffect
                     var staticObjectNode = renderObject.StaticObjectNode;
-                    var staticEffectObjectNode = staticObjectNode * effectSlotCount + effectSlots[renderNode.RenderStage.Index].Index;
+                    var staticEffectObjectNode = staticObjectNode * effectSlotCount + effectSlots![renderNode.RenderStage.Index].Index;
                     var renderEffect = renderEffects[staticEffectObjectNode];
 
                     // Not compiled yet?
@@ -1040,7 +1040,7 @@ namespace Stride.Rendering
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     Array.Resize(ref effectSlots, RenderSystem.RenderStages.Count);
-                    effectSlots[e.Index] = CreateEffectPermutationSlot(renderStage.EffectSlotName);
+                    effectSlots![e.Index] = CreateEffectPermutationSlot(renderStage.EffectSlotName);
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     // TODO GRAPHICS REFACTOR support removal of render stages

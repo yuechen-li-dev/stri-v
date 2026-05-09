@@ -51,7 +51,7 @@ namespace Stride.Rendering.Materials
             // PerMaterial
             public ResourceGroup Resources = new ResourceGroup();
             public int ResourceCount;
-            public EffectConstantBufferDescription ConstantBufferReflection;
+            public EffectConstantBufferDescription? ConstantBufferReflection;
         }
 
         /// <summary>
@@ -63,20 +63,20 @@ namespace Stride.Rendering.Materials
 
             // Permutation parameters
             public int PermutationCounter; // Dirty counter against material.Parameters.PermutationCounter
-            public ParameterCollection MaterialParameters; // Protect against changes of Material.Parameters instance (happens with editor fast reload)
+            public ParameterCollection? MaterialParameters; // Protect against changes of Material.Parameters instance (happens with editor fast reload)
             public CullMode? CullMode;
             public CompareFunction? DepthFunction;
 
-            public ShaderSource VertexStageSurfaceShaders;
-            public ShaderSource VertexStageStreamInitializer;
+            public ShaderSource? VertexStageSurfaceShaders;
+            public ShaderSource? VertexStageStreamInitializer;
 
-            public ShaderSource DomainStageSurfaceShaders;
-            public ShaderSource DomainStageStreamInitializer;
+            public ShaderSource? DomainStageSurfaceShaders;
+            public ShaderSource? DomainStageStreamInitializer;
 
-            public ShaderSource TessellationShader;
+            public ShaderSource? TessellationShader;
 
-            public ShaderSource PixelStageSurfaceShaders;
-            public ShaderSource PixelStageStreamInitializer;
+            public ShaderSource? PixelStageSurfaceShaders;
+            public ShaderSource? PixelStageStreamInitializer;
 
             public bool HasNormalMap;
 

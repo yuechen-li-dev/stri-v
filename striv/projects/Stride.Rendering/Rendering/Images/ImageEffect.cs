@@ -18,10 +18,10 @@ namespace Stride.Rendering.Images
         private readonly Texture[] inputTextures;
         private int maxInputTextureIndex;
 
-        private Texture outputDepthStencilView;
-        private Texture outputRenderTargetView;
-        private Texture[] outputRenderTargetViews;
-        private Texture[] createdOutputRenderTargetViews;
+        private Texture? outputDepthStencilView;
+        private Texture? outputRenderTargetView;
+        private Texture[]? outputRenderTargetViews;
+        private Texture[]? createdOutputRenderTargetViews;
 
         private int boundViewportCount;
         private readonly Viewport[] viewports = new Viewport[CommandList.MaxViewportAndScissorRectangleCount];
@@ -361,7 +361,7 @@ namespace Stride.Rendering.Images
         /// <value>
         /// The depth stencil output.
         /// </value>
-        protected Texture DepthStencil => outputDepthStencilView;
+        protected Texture? DepthStencil => outputDepthStencilView;
 
         /// <summary>
         /// Gets a value indicating whether this effect has depth stencil output texture binded.
