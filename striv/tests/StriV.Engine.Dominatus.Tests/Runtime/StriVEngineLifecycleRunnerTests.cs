@@ -192,6 +192,50 @@ public sealed class StriVEngineLifecycleRunnerTests
         Assert.Equal("options", exception.ParamName);
     }
 
+    [Fact]
+    public async Task StriVEngineLifecycleRunner_RunSceneTransformProcessorFullCycle_RunsThroughDominatusRuntime()
+    {
+        var scene = new Scene();
+        var entityManager = new SceneInstance(new ServiceRegistry());
+        var parent = new Entity("Parent");
+        var child = new Entity("Child");
+        child.Components.Add(new TestComponent());
+        var processor = new RecordingProcessor();
+        var runner = new StriVEngineLifecycleRunner();
+
+        await runner.RunSceneTransformProcessorFullCycleAsync(scene, parent, child, entityManager, processor);
+
+        Assert.Null(parent.Scene);
+        Assert.Null(child.Scene);
+        Assert.DoesNotContain(parent, scene.Entities);
+        Assert.DoesNotContain(child, scene.Entities);
+        Assert.Null(child.Transform.Parent);
+        Assert.DoesNotContain(child.Transform, parent.Transform.Children);
+        Assert.Null(processor.EntityManager);
+        Assert.DoesNotContain(processor, entityManager.Processors);
+        Assert.Equal(1, processor.AddedCount);
+        Assert.Equal(1, processor.RemovedCount);
+        Assert.Same(child, Assert.Single(processor.AddedEntities));
+        Assert.Same(child, Assert.Single(processor.RemovedEntities));
+    }
+
+    [Fact]
+    public async Task StriVEngineLifecycleRunner_RunSceneTransformProcessorFullCycle_RejectsNullArguments()
+    {
+        var scene = new Scene();
+        var entityManager = new SceneInstance(new ServiceRegistry());
+        var parent = new Entity("Parent");
+        var child = new Entity("Child");
+        var processor = new RecordingProcessor();
+        var runner = new StriVEngineLifecycleRunner();
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => runner.RunSceneTransformProcessorFullCycleAsync(null!, parent, child, entityManager, processor).AsTask());
+        await Assert.ThrowsAsync<ArgumentNullException>(() => runner.RunSceneTransformProcessorFullCycleAsync(scene, null!, child, entityManager, processor).AsTask());
+        await Assert.ThrowsAsync<ArgumentNullException>(() => runner.RunSceneTransformProcessorFullCycleAsync(scene, parent, null!, entityManager, processor).AsTask());
+        await Assert.ThrowsAsync<ArgumentNullException>(() => runner.RunSceneTransformProcessorFullCycleAsync(scene, parent, child, null!, processor).AsTask());
+        await Assert.ThrowsAsync<ArgumentNullException>(() => runner.RunSceneTransformProcessorFullCycleAsync(scene, parent, child, entityManager, null!).AsTask());
+    }
+
     private sealed class TestComponent : EntityComponent;
 
     private sealed class RecordingProcessor : EntityProcessor<TestComponent>
