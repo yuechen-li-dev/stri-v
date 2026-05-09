@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <!-- Stri-V private hardfork: keep local builds unsigned to avoid legacy strong-name/public-key friend-assembly coupling. -->
+    <SignAssembly>false</SignAssembly>
+    <PublicSign>false</PublicSign>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+</Project>
