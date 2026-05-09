@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using Stride.Core;
 using Stride.Core.Collections;
 using Stride.Core.Diagnostics;
@@ -200,6 +202,35 @@ namespace Stride.Engine
             }
         }
 
+
+        /// <summary>
+        /// Opt-in lifecycle orchestration seam that delegates a full entity lifecycle operation to a caller-provided orchestrator.
+        /// </summary>
+        /// <remarks>
+        /// This method does not alter default engine runtime behavior and is only executed when explicitly invoked by callers.
+        /// </remarks>
+        public ValueTask RunEntityLifecycleFullCycleAsync(
+            Lifecycle.IEntityLifecycleOrchestrator orchestrator,
+            Scene scene,
+            Entity parent,
+            Entity child,
+            EntityProcessor processor,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(orchestrator);
+            ArgumentNullException.ThrowIfNull(scene);
+            ArgumentNullException.ThrowIfNull(parent);
+            ArgumentNullException.ThrowIfNull(child);
+            ArgumentNullException.ThrowIfNull(processor);
+
+            return orchestrator.RunSceneTransformProcessorFullCycleAsync(
+                scene,
+                parent,
+                child,
+                this,
+                processor,
+                cancellationToken);
+        }
         /// <summary>
         /// Removes the entity from the <see cref="EntityManager" />.
         /// It works either entity has a parent or not.
