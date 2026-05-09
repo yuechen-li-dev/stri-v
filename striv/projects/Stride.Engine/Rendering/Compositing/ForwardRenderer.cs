@@ -33,8 +33,8 @@ namespace Stride.Rendering.Compositing
         // TODO: should we use GraphicsDeviceManager.PreferredBackBufferFormat?
         public const PixelFormat DepthBufferFormat = PixelFormat.D24_UNorm_S8_UInt;
 
-        private IShadowMapRenderer shadowMapRenderer;
-        private Texture depthStencilROCached;
+        private IShadowMapRenderer? shadowMapRenderer;
+        private Texture? depthStencilROCached;
         private MultisampleCount actualMultisampleCount = MultisampleCount.None;
 #if !STRIDE_ENGINE_WITHOUT_VIRTUAL_REALITY
         private VRDeviceSystem vrSystem;
@@ -44,11 +44,11 @@ namespace Stride.Rendering.Compositing
 
         private readonly List<Texture> currentRenderTargets = [];
         private readonly List<Texture> currentRenderTargetsNonMSAA = [];
-        private Texture currentDepthStencil;
-        private Texture currentDepthStencilNonMSAA;
+        private Texture? currentDepthStencil;
+        private Texture? currentDepthStencilNonMSAA;
 
-        protected Texture viewOutputTarget;
-        protected Texture viewDepthStencil;
+        protected Texture? viewOutputTarget;
+        protected Texture? viewDepthStencil;
 
         protected int ViewCount { get; private set; }
 
@@ -64,12 +64,12 @@ namespace Stride.Rendering.Compositing
         /// <summary>
         /// The main render stage for opaque geometry.
         /// </summary>
-        public RenderStage OpaqueRenderStage { get; set; }
+        public RenderStage? OpaqueRenderStage { get; set; }
 
         /// <summary>
         /// The transparent render stage for transparent geometry.
         /// </summary>
-        public RenderStage TransparentRenderStage { get; set; }
+        public RenderStage? TransparentRenderStage { get; set; }
 
         /// <summary>
         /// The shadow map render stages for shadow casters. No shadow rendering will happen if null.
@@ -80,17 +80,17 @@ namespace Stride.Rendering.Compositing
         /// <summary>
         /// The G-Buffer render stage to render depth buffer and possibly some other extra info to buffers (i.e. normals)
         /// </summary>
-        public RenderStage GBufferRenderStage { get; set; }
+        public RenderStage? GBufferRenderStage { get; set; }
 
         /// <summary>
         /// The post effects renderer.
         /// </summary>
-        public IPostProcessingEffects PostEffects { get; set; }
+        public IPostProcessingEffects? PostEffects { get; set; }
 
         /// <summary>
         /// Light shafts effect
         /// </summary>
-        public LightShafts LightShafts { get; set; }
+        public LightShafts? LightShafts { get; set; }
 
         /// <summary>
         /// Virtual Reality related settings
@@ -102,7 +102,7 @@ namespace Stride.Rendering.Compositing
         /// <summary>
         /// Separable subsurface scattering effect
         /// </summary>
-        public SubsurfaceScatteringBlur SubsurfaceScatteringBlurEffect { get; set; }
+        public SubsurfaceScatteringBlur? SubsurfaceScatteringBlurEffect { get; set; }
 
         /// <summary>
         /// The level of multi-sampling
@@ -790,7 +790,7 @@ namespace Stride.Rendering.Compositing
             }
         }
 
-        private Texture ResolveDepthAsSRV(RenderDrawContext context)
+        private Texture? ResolveDepthAsSRV(RenderDrawContext context)
         {
             if (!BindDepthAsResourceDuringTransparentRendering)
                 return null;
@@ -824,7 +824,7 @@ namespace Stride.Rendering.Compositing
             return depthStencilSRV;
         }
 
-        private Texture ResolveRenderTargetAsSRV(RenderDrawContext drawContext)
+        private Texture? ResolveRenderTargetAsSRV(RenderDrawContext drawContext)
         {
             if (!BindOpaqueAsResourceDuringTransparentRendering)
                 return null;
