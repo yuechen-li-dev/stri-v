@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation and Contributors (https://dotnetfoundation.org/ & https://stride3d.net) and Silicon Studio Corp. (https://www.siliconstudio.co.jp)
 // Distributed under the MIT license. See the LICENSE.md file in the project root for more information.
 
+using System;
 using Stride.Core.Serialization;
 
 namespace Stride.Engine.Design
@@ -13,7 +14,7 @@ namespace Stride.Engine.Design
     {
         public override void PreSerialize(ref T obj, ArchiveMode mode, SerializationStream stream)
         {
-            var cloneContext = stream.Context.Get(EntityCloner.CloneContextProperty);
+            var cloneContext = GetCloneContext(stream);
 
             if (mode == ArchiveMode.Serialize)
             {
@@ -33,11 +34,11 @@ namespace Stride.Engine.Design
                 if (isSharedObject)
                 {
                     stream.Write(cloneContext.SharedObjects.Count);
-                    cloneContext.SharedObjects.Add(mappedObject);
+                    cloneContext.SharedObjects.Add(mappedObject ?? obj);
                 }
                 else
                 {
-                    var dataSerializer = cloneContext.EntitySerializerSelector.GetSerializer<T>();
+                    var dataSerializer = GetEntitySerializerSelector(cloneContext).GetSerializer<T>();
                     if (dataSerializer != this)
                         dataSerializer.PreSerialize(ref obj, mode, stream);
                     cloneContext.SerializedObjects.Add(obj);
@@ -61,7 +62,7 @@ namespace Stride.Engine.Design
                 }
                 else
                 {
-                    var dataSerializer = cloneContext.EntitySerializerSelector.GetSerializer<T>();
+                    var dataSerializer = GetEntitySerializerSelector(cloneContext).GetSerializer<T>();
                     if (dataSerializer != this)
                         dataSerializer.PreSerialize(ref obj, mode, stream);
                     cloneContext.SerializedObjects.Add(obj);
@@ -71,12 +72,12 @@ namespace Stride.Engine.Design
 
         public override void Serialize(ref T obj, ArchiveMode mode, SerializationStream stream)
         {
-            var cloneContext = stream.Context.Get(EntityCloner.CloneContextProperty);
+            var cloneContext = GetCloneContext(stream);
 
             if (cloneContext.SerializedObjects.Contains(obj))
             {
                 // Get actual serializer
-                var dataSerializer = cloneContext.EntitySerializerSelector.GetSerializer<T>();
+                var dataSerializer = GetEntitySerializerSelector(cloneContext).GetSerializer<T>();
 
                 // Serialize object
                 //stream.Context.Set(EntitySerializer.InsideEntityComponentProperty, false);
@@ -93,6 +94,18 @@ namespace Stride.Engine.Design
                     ((EntityComponent)(object)obj).Entity = entity;
                 }
             }
+        }
+
+        private static EntityCloner.CloneContext GetCloneContext(SerializationStream stream)
+        {
+            return stream.Context.Get(EntityCloner.CloneContextProperty)
+                ?? throw new InvalidOperationException("Clone context was not initialized before clone serialization.");
+        }
+
+        private static SerializerSelector GetEntitySerializerSelector(EntityCloner.CloneContext cloneContext)
+        {
+            return cloneContext.EntitySerializerSelector
+                ?? throw new InvalidOperationException("Clone serializer selector was not initialized before clone serialization.");
         }
     }
 }

@@ -83,6 +83,8 @@ namespace Stride.Engine.Design
         /// <returns>A cloned entity</returns>
         public static Entity Clone(Entity entity)
         {
+            if (entity is null) throw new ArgumentNullException(nameof(entity));
+
             var clonedObjects = ClonedObjects();
             try
             {
