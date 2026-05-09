@@ -9,15 +9,15 @@
 - Uses lifecycle vocabulary from `StriV.Engine.Dominatus`.
 - Uses production side-effect wrappers from `StriV.Engine.Dominatus.Adapters`.
 
-## Current capability (M19a)
+## Current capability (M20b)
 
-The first runner method executes the composed lifecycle add-flow for:
+- `StriVEngineLifecycleRunner` remains the low-level Dominatus runtime executor.
+- `IEntityLifecycleOrchestrator` defines a callsite-facing lifecycle seam for future opt-in consumers.
+- `DominatusEntityLifecycleOrchestrator` is the current Dominatus-backed implementation and delegates to `StriVEngineLifecycleRunner`.
+- The interface surface uses Stride lifecycle types and does not expose Dominatus runtime internals.
 
-- scene attach,
-- transform parent attach,
-- processor system add,
-- processor entity add.
+## Integration direction
 
-## Future expansion
-
-Future methods may cover cleanup/remove flows and root-scene lifecycle paths while remaining opt-in.
+- This seam is intentionally outside `Stride.Engine` in M20b.
+- Future callsites should depend on `IEntityLifecycleOrchestrator` (or a later engine-owned neutral seam), not Dominatus internals.
+- No default runtime behavior changes are introduced by this package.
