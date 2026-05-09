@@ -118,6 +118,40 @@ public sealed class StriVEngineLifecycleRunner
             cancellationToken);
     }
 
+    public ValueTask RunSceneTransformProcessorFullCycleAsync(
+        Scene scene,
+        Entity parent,
+        Entity child,
+        EntityManager entityManager,
+        EntityProcessor processor,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(scene);
+        ArgumentNullException.ThrowIfNull(parent);
+        ArgumentNullException.ThrowIfNull(child);
+        ArgumentNullException.ThrowIfNull(entityManager);
+        ArgumentNullException.ThrowIfNull(processor);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var actuatorHost = new ActuatorHost();
+        var sceneActuator = new StrideSceneLifecycleActuator();
+        var transformActuator = new StrideTransformLifecycleActuator();
+        var processorActuator = new StrideProcessorLifecycleActuator();
+        actuatorHost.Register(new EntitySceneAttachActuationHandler(sceneActuator));
+        actuatorHost.Register(new EntitySceneDetachActuationHandler(sceneActuator));
+        actuatorHost.Register(new TransformParentAttachActuationHandler(transformActuator));
+        actuatorHost.Register(new TransformParentDetachActuationHandler(transformActuator));
+        actuatorHost.Register(new ProcessorSystemAddActuationHandler(processorActuator));
+        actuatorHost.Register(new ProcessorEntityAddActuationHandler(processorActuator));
+        actuatorHost.Register(new ProcessorEntityRemoveActuationHandler(processorActuator));
+        actuatorHost.Register(new ProcessorSystemRemoveActuationHandler(processorActuator));
+
+        return RunSingleNodeAsync(
+            actuatorHost,
+            _ => EngineLifecycleDominatusNodes.RunSceneTransformProcessorFullCycle(scene, parent, child, entityManager, processor),
+            cancellationToken);
+    }
+
     private ValueTask RunSingleNodeAsync(
         ActuatorHost actuatorHost,
         AiNode node,
