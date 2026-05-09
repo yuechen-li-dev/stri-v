@@ -34,10 +34,34 @@ public sealed class StrideSceneLifecycleActuator : ISceneLifecycleActuator
         return ValueTask.CompletedTask;
     }
 
+    public ValueTask SetRootSceneAsync(SceneInstance sceneInstance, Scene rootScene, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(sceneInstance);
+        ArgumentNullException.ThrowIfNull(rootScene);
+
+        sceneInstance.RootScene = rootScene;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask ClearRootSceneAsync(SceneInstance sceneInstance, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(sceneInstance);
+
+        ClearRootScene(sceneInstance);
+        return ValueTask.CompletedTask;
+    }
+
     private static void DetachFromScene(Entity entity)
     {
         // Legacy Stride detach API: null scene means detach.
         // Contained here as a compatibility boundary until Stri-V introduces explicit detach APIs.
         entity.Scene = null!;
+    }
+
+    private static void ClearRootScene(SceneInstance sceneInstance)
+    {
+        // Legacy Stride root-scene clear API: null root scene means clear.
+        // Contained here as a compatibility boundary until Stri-V introduces explicit root-scene lifecycle APIs.
+        sceneInstance.RootScene = null!;
     }
 }

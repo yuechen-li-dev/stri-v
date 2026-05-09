@@ -5,6 +5,31 @@ namespace StriV.Engine.Dominatus.Transitions;
 
 public static class SceneLifecycleTransition
 {
+    public static async ValueTask<RootSceneSet> SetRootSceneAsync(
+        RootSceneSetRequested request,
+        ISceneLifecycleActuator actuator,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request.SceneInstance);
+        ArgumentNullException.ThrowIfNull(request.RootScene);
+        ArgumentNullException.ThrowIfNull(actuator);
+
+        await actuator.SetRootSceneAsync(request.SceneInstance, request.RootScene, cancellationToken);
+        return new RootSceneSet(request.SceneInstance, request.RootScene);
+    }
+
+    public static async ValueTask<RootSceneCleared> ClearRootSceneAsync(
+        RootSceneClearRequested request,
+        ISceneLifecycleActuator actuator,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request.SceneInstance);
+        ArgumentNullException.ThrowIfNull(actuator);
+
+        await actuator.ClearRootSceneAsync(request.SceneInstance, cancellationToken);
+        return new RootSceneCleared(request.SceneInstance);
+    }
+
     public static async ValueTask<EntitySceneAttached> AttachEntityAsync(
         EntitySceneAttachRequested request,
         ISceneLifecycleActuator actuator,
