@@ -41,16 +41,16 @@ namespace Stride.Engine
         /// <summary>
         /// Static event that will be fired when a game is initialized
         /// </summary>
-        public static event EventHandler GameStarted;
+        public static event EventHandler? GameStarted;
 
         /// <summary>
         /// Static event that will be fired when a game is destroyed
         /// </summary>
-        public static event EventHandler GameDestroyed;
+        public static event EventHandler? GameDestroyed;
 
         private readonly GameFontSystem gameFontSystem;
 
-        private readonly LogListener logListener;
+        private readonly LogListener? logListener;
 
         private DatabaseFileProvider? databaseFileProvider;
 
@@ -59,7 +59,8 @@ namespace Stride.Engine
         /// Please note that it will be populated during initialization
         /// It will be ok to read them after the GameStarted event or after initialization
         /// </summary>
-        public GameSettings Settings { get; private set; } // for easy transfer from PrepareContext to Initialize
+        private GameSettings settings;
+        public GameSettings Settings => settings;
 
         /// <summary>
         /// Gets the graphics device manager.
@@ -77,7 +78,7 @@ namespace Stride.Engine
         /// Gets the input manager.
         /// </summary>
         /// <value>The input.</value>
-        public InputManager Input { get; internal set; }
+        public InputManager? Input { get; internal set; }
 
         /// <summary>
         /// Gets the scene system.
@@ -89,7 +90,7 @@ namespace Stride.Engine
         /// Gets the effect system.
         /// </summary>
         /// <value>The effect system.</value>
-        public EffectSystem EffectSystem { get; private set; }
+        public EffectSystem? EffectSystem { get; private set; }
 
         /// <summary>
         /// Gets the streaming system.
@@ -251,6 +252,7 @@ namespace Stride.Engine
 #endif
 
             AutoLoadDefaultSettings = true;
+            settings = new GameSettings();
         }
 
         /// <inheritdoc/>
@@ -275,20 +277,21 @@ namespace Stride.Engine
             if (Context.InitializeDatabase)
             {
                 databaseFileProvider = InitializeAssetDatabase();
-                ((DatabaseFileProviderService)Services.GetService<IDatabaseFileProviderService>()).FileProvider = databaseFileProvider;
+                if (Services.GetService<IDatabaseFileProviderService>() is DatabaseFileProviderService databaseFileProviderService)
+                    databaseFileProviderService.FileProvider = databaseFileProvider;
 
                 var renderingSettings = new RenderingSettings();
                 if (Content.Exists(GameSettings.AssetUrl))
                 {
-                    Settings = Content.Load<GameSettings>(GameSettings.AssetUrl);
+                    settings = Content.Load<GameSettings>(GameSettings.AssetUrl);
 
-                    renderingSettings = Settings.Configurations.Get<RenderingSettings>();
+                    renderingSettings = settings.Configurations.Get<RenderingSettings>();
 
                     // Set ShaderProfile even if AutoLoadDefaultSettings is false (because that is what shaders in effect logs are compiled against, even if actual instantiated profile is different)
                     if (renderingSettings.DefaultGraphicsProfile > 0)
                     {
-                        var deviceManager = (GraphicsDeviceManager) graphicsDeviceManager;
-                        deviceManager.ShaderProfile ??= renderingSettings.DefaultGraphicsProfile;
+                        if (graphicsDeviceManager is GraphicsDeviceManager deviceManager)
+                            deviceManager.ShaderProfile ??= renderingSettings.DefaultGraphicsProfile;
                     }
 
                     Services.AddService<IGameSettingsService>(this);
@@ -297,7 +300,9 @@ namespace Stride.Engine
                 // Load several default settings
                 if (AutoLoadDefaultSettings)
                 {
-                    var deviceManager = (GraphicsDeviceManager)graphicsDeviceManager;
+                    if (graphicsDeviceManager is not GraphicsDeviceManager deviceManager)
+                        return;
+
                     if (renderingSettings.DefaultGraphicsProfile > 0)
                     {
                         deviceManager.PreferredGraphicsProfile = new[] { renderingSettings.DefaultGraphicsProfile };
@@ -307,11 +312,11 @@ namespace Stride.Engine
                     if (renderingSettings.DefaultBackBufferHeight > 0) deviceManager.PreferredBackBufferHeight = renderingSettings.DefaultBackBufferHeight;
 
                     deviceManager.PreferredColorSpace = renderingSettings.ColorSpace;
-                    SceneSystem.InitialSceneUrl = Settings?.DefaultSceneUrl;
-                    SceneSystem.InitialGraphicsCompositorUrl = Settings?.DefaultGraphicsCompositorUrl;
-                    SceneSystem.SplashScreenUrl = Settings?.SplashScreenUrl;
-                    SceneSystem.SplashScreenColor = Settings?.SplashScreenColor ?? Color4.Black;
-                    SceneSystem.DoubleViewSplashScreen = Settings?.DoubleViewSplashScreen ?? false;
+                    SceneSystem.InitialSceneUrl = settings?.DefaultSceneUrl;
+                    SceneSystem.InitialGraphicsCompositorUrl = settings?.DefaultGraphicsCompositorUrl;
+                    SceneSystem.SplashScreenUrl = settings?.SplashScreenUrl;
+                    SceneSystem.SplashScreenColor = settings?.SplashScreenColor ?? Color4.Black;
+                    SceneSystem.DoubleViewSplashScreen = settings?.DoubleViewSplashScreen ?? false;
                 }
             }
         }
@@ -320,9 +325,10 @@ namespace Stride.Engine
         {
             if (!AutoLoadDefaultSettings) return;
 
-            var renderingSettings = Settings?.Configurations.Get<RenderingSettings>();
+            var renderingSettings = settings?.Configurations.Get<RenderingSettings>();
 
-            var deviceManager = (GraphicsDeviceManager)graphicsDeviceManager;
+            if (graphicsDeviceManager is not GraphicsDeviceManager deviceManager)
+                return;
 
             if (gameCreation)
             {
@@ -387,18 +393,18 @@ namespace Stride.Engine
 
             // If requested in game settings, compile effects remotely and/or notify new shader requests
 #if !STRIDE_ENGINE_WITHOUT_SHADER_COMPILER
-            EffectSystem.Compiler = EffectCompilerFactory.CreateEffectCompiler(Content.FileProvider, EffectSystem, Settings?.PackageName, Settings?.EffectCompilation ?? EffectCompilationMode.Local, Settings?.RecordUsedEffects ?? false);
+            EffectSystem.Compiler = EffectCompilerFactory.CreateEffectCompiler(Content.FileProvider, EffectSystem, settings?.PackageName, settings?.EffectCompilation ?? EffectCompilationMode.Local, settings?.RecordUsedEffects ?? false);
 #endif
 
             // Setup shader compiler settings from a compilation mode.
             // TODO: We might want to provide overrides on the GameSettings to specify debug and/or optim level specifically.
-            if (Settings != null)
-                EffectSystem.SetCompilationMode(Settings.CompilationMode);
+            if (settings != null)
+                EffectSystem.SetCompilationMode(settings.CompilationMode);
 
             GameSystems.Add(EffectSystem);
 
-            if (Settings != null)
-                Streaming.SetStreamingSettings(Settings.Configurations.Get<StreamingSettings>());
+            if (settings != null)
+                Streaming.SetStreamingSettings(settings.Configurations.Get<StreamingSettings>());
             GameSystems.Add(Streaming);
             GameSystems.Add(SceneSystem);
 
@@ -437,8 +443,6 @@ namespace Stride.Engine
         {
             if (databaseFileProvider != null)
             {
-                if (Services.GetService<IDatabaseFileProviderService>() is DatabaseFileProviderService dbfp)
-                    dbfp.FileProvider = null;
                 databaseFileProvider.Dispose();
                 databaseFileProvider = null;
             }
@@ -447,7 +451,7 @@ namespace Stride.Engine
         protected override void EndDraw(bool present)
         {
             // Allow to make a screenshot using CTRL+c+F12 (on release of F12)
-            if (Input.HasKeyboard)
+            if (Input?.HasKeyboard == true)
             {
                 if (Input.IsKeyDown(Keys.LeftCtrl)
                     && Input.IsKeyDown(Keys.C)
@@ -456,7 +460,7 @@ namespace Stride.Engine
                     var currentFilePath = PlatformFolders.ApplicationExecutablePath;
                     var timeNow = DateTime.Now.ToString("s", CultureInfo.InvariantCulture).Replace(':', '_');
                     var newFileName = Path.Combine(
-                        Path.GetDirectoryName(currentFilePath),
+                        Path.GetDirectoryName(currentFilePath) ?? string.Empty,
                         Path.GetFileNameWithoutExtension(currentFilePath) + "_" + timeNow + ".png");
 
                     Console.WriteLine("Saving screenshot: {0}", newFileName);
