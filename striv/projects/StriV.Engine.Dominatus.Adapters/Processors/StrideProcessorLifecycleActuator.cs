@@ -24,8 +24,26 @@ public sealed class StrideProcessorLifecycleActuator : IProcessorLifecycleActuat
     }
 
     public ValueTask AddEntityToProcessorAsync(EntityProcessor processor, Entity entity, CancellationToken cancellationToken = default)
-        => throw new NotSupportedException("Current Stride API does not expose a safe public processor-entity attach surface without runtime rewiring.");
+    {
+        ArgumentNullException.ThrowIfNull(processor);
+        ArgumentNullException.ThrowIfNull(entity);
+
+        var entityManager = processor.EntityManager
+            ?? throw new InvalidOperationException("Processor must be registered with an EntityManager.");
+
+        entityManager.AddEntityToProcessor(processor, entity);
+        return ValueTask.CompletedTask;
+    }
 
     public ValueTask RemoveEntityFromProcessorAsync(EntityProcessor processor, Entity entity, CancellationToken cancellationToken = default)
-        => throw new NotSupportedException("Current Stride API does not expose a safe public processor-entity detach surface without runtime rewiring.");
+    {
+        ArgumentNullException.ThrowIfNull(processor);
+        ArgumentNullException.ThrowIfNull(entity);
+
+        var entityManager = processor.EntityManager
+            ?? throw new InvalidOperationException("Processor must be registered with an EntityManager.");
+
+        entityManager.RemoveEntityFromProcessor(processor, entity);
+        return ValueTask.CompletedTask;
+    }
 }
