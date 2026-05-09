@@ -45,3 +45,43 @@ public sealed class ProcessorEntityAddActuationHandler(IProcessorLifecycleActuat
         return ActuatorHost.HandlerResult.CompletedWithPayload(completed);
     }
 }
+
+public sealed class ProcessorSystemRemoveActuationHandler(IProcessorLifecycleActuator actuator)
+    : IActuationHandler<ProcessorSystemRemoveRequested>
+{
+    private readonly IProcessorLifecycleActuator _actuator = actuator ?? throw new ArgumentNullException(nameof(actuator));
+
+    public ActuatorHost.HandlerResult Handle(
+        ActuatorHost host,
+        AiCtx ctx,
+        ActuationId id,
+        ProcessorSystemRemoveRequested command)
+    {
+        var completed = ProcessorLifecycleTransition.RemoveProcessorFromSystemAsync(command, _actuator, ctx.Cancel)
+            .AsTask()
+            .GetAwaiter()
+            .GetResult();
+
+        return ActuatorHost.HandlerResult.CompletedWithPayload(completed);
+    }
+}
+
+public sealed class ProcessorEntityRemoveActuationHandler(IProcessorLifecycleActuator actuator)
+    : IActuationHandler<ProcessorEntityRemoveRequested>
+{
+    private readonly IProcessorLifecycleActuator _actuator = actuator ?? throw new ArgumentNullException(nameof(actuator));
+
+    public ActuatorHost.HandlerResult Handle(
+        ActuatorHost host,
+        AiCtx ctx,
+        ActuationId id,
+        ProcessorEntityRemoveRequested command)
+    {
+        var completed = ProcessorLifecycleTransition.RemoveEntityFromProcessorAsync(command, _actuator, ctx.Cancel)
+            .AsTask()
+            .GetAwaiter()
+            .GetResult();
+
+        return ActuatorHost.HandlerResult.CompletedWithPayload(completed);
+    }
+}
