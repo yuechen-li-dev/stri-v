@@ -25,3 +25,24 @@ public sealed class TransformParentAttachActuationHandler(ITransformLifecycleAct
         return ActuatorHost.HandlerResult.CompletedWithPayload(new TransformParentAttached(command.Child, command.Parent));
     }
 }
+
+public sealed class TransformParentDetachActuationHandler(ITransformLifecycleActuator actuator)
+    : IActuationHandler<TransformParentDetachRequested>
+{
+    private readonly ITransformLifecycleActuator _actuator = actuator ?? throw new ArgumentNullException(nameof(actuator));
+
+    public ActuatorHost.HandlerResult Handle(
+        ActuatorHost host,
+        AiCtx ctx,
+        ActuationId id,
+        TransformParentDetachRequested command)
+    {
+        var completed = TransformLifecycleTransition
+            .DetachParentAsync(command, _actuator, ctx.Cancel)
+            .AsTask()
+            .GetAwaiter()
+            .GetResult();
+
+        return ActuatorHost.HandlerResult.CompletedWithPayload(completed);
+    }
+}

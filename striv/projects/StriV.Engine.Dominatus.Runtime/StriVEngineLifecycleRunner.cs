@@ -86,6 +86,38 @@ public sealed class StriVEngineLifecycleRunner
             cancellationToken);
     }
 
+    public ValueTask DetachTransformParentAsync(
+        Entity child,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(child);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var actuatorHost = new ActuatorHost();
+        actuatorHost.Register(new TransformParentDetachActuationHandler(new StrideTransformLifecycleActuator()));
+
+        return RunSingleNodeAsync(
+            actuatorHost,
+            ctx => TransformLifecycleDominatusNodes.DetachTransformParent(ctx, child),
+            cancellationToken);
+    }
+
+    public ValueTask DetachEntityFromSceneAsync(
+        Entity entity,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var actuatorHost = new ActuatorHost();
+        actuatorHost.Register(new EntitySceneDetachActuationHandler(new StrideSceneLifecycleActuator()));
+
+        return RunSingleNodeAsync(
+            actuatorHost,
+            ctx => SceneLifecycleDominatusNodes.DetachEntityFromScene(ctx, entity),
+            cancellationToken);
+    }
+
     private ValueTask RunSingleNodeAsync(
         ActuatorHost actuatorHost,
         AiNode node,
