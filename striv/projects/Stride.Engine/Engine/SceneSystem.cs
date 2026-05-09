@@ -229,11 +229,17 @@ namespace Stride.Engine
             // Update the entities at draw time.
             currentRenderContext.Time = gameTime;
 
-            // The camera processor needs the graphics compositor
-            // STRIV-TODO: Nullability/lifecycle cleanup.
-            // Reason: PropertyKey<T> in rendering tags is non-nullable in legacy API while runtime compositor can be absent.
-            // Future direction: audit PropertyKey<T> nullable contracts across render tag APIs to remove CS8620 boundary mismatches safely.
-            using (currentRenderContext.PushTagAndRestore(GraphicsCompositor.Current, GraphicsCompositor))
+            // The camera processor needs the graphics compositor when one is active.
+            if (GraphicsCompositor is { } graphicsCompositor)
+            {
+                using (currentRenderContext.PushTagAndRestore(GraphicsCompositor.Current, graphicsCompositor))
+                {
+                    // Execute Draw step of SceneInstance
+                    // This will run entity processors
+                    SceneInstance?.Draw(currentRenderContext);
+                }
+            }
+            else
             {
                 // Execute Draw step of SceneInstance
                 // This will run entity processors
@@ -248,8 +254,15 @@ namespace Stride.Engine
             currentRenderDrawContext.ResourceGroupAllocator.Flush();
             currentRenderDrawContext.QueryManager.Flush();
 
-            // Push context (pop after using)
-            using (currentRenderDrawContext.RenderContext.PushTagAndRestore(SceneInstance.Current, SceneInstance))
+            // Push context (pop after using) when a scene instance is active.
+            if (SceneInstance is { } sceneInstance)
+            {
+                using (currentRenderDrawContext.RenderContext.PushTagAndRestore(SceneInstance.Current, sceneInstance))
+                {
+                    GraphicsCompositor?.Draw(currentRenderDrawContext);
+                }
+            }
+            else
             {
                 GraphicsCompositor?.Draw(currentRenderDrawContext);
             }
@@ -272,7 +285,11 @@ namespace Stride.Engine
                         }
                     case SplashScreenState.Intro:
                         {
-                            Game.GraphicsContext.CommandList.Clear(Game.GraphicsContext.CommandList.RenderTarget, SplashScreenColor);
+                            var introRenderTarget = Game.GraphicsContext.CommandList.RenderTarget;
+                            if (introRenderTarget == null)
+                                break;
+
+                            Game.GraphicsContext.CommandList.Clear(introRenderTarget, SplashScreenColor);
 
                             if (gameTime.Total.TotalSeconds > SplashScreenFadeTime)
                             {
