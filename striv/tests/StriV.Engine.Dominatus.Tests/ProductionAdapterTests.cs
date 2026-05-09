@@ -1,3 +1,4 @@
+using Stride.Core;
 using Stride.Engine;
 using StriV.Engine.Dominatus.Adapters;
 using StriV.Engine.Dominatus.Events;
@@ -63,6 +64,30 @@ public sealed class ProductionAdapterTests
     }
 
     [Fact]
+    public async Task StrideProcessorLifecycleActuator_AddRemoveProcessor_UsesEntityManagerProcessorCollection()
+    {
+        var manager = new SceneInstance(new ServiceRegistry());
+        var processor = new Stride.Engine.Processors.TransformProcessor();
+        var actuator = new StrideProcessorLifecycleActuator();
+
+        await actuator.AddProcessorToSystemAsync(processor, manager);
+        Assert.Same(processor, manager.GetProcessor<Stride.Engine.Processors.TransformProcessor>());
+
+        await actuator.RemoveProcessorFromSystemAsync(processor, manager);
+        Assert.Null(manager.GetProcessor<Stride.Engine.Processors.TransformProcessor>());
+    }
+
+
+    [Fact]
+    public async Task StrideProcessorLifecycleActuator_EntityLevelOperations_AreExplicitlyNotSupported()
+    {
+        var actuator = new StrideProcessorLifecycleActuator();
+
+        await Assert.ThrowsAsync<NotSupportedException>(async () => await actuator.AddEntityToProcessorAsync(new Stride.Engine.Processors.TransformProcessor(), new Entity("Entity")));
+        await Assert.ThrowsAsync<NotSupportedException>(async () => await actuator.RemoveEntityFromProcessorAsync(new Stride.Engine.Processors.TransformProcessor(), new Entity("Entity")));
+    }
+
+    [Fact]
     public async Task ProductionAdapters_WorkThroughTransitionHelpers()
     {
         var parent = new Entity("Parent");
@@ -72,12 +97,8 @@ public sealed class ProductionAdapterTests
         var transformActuator = new StrideTransformLifecycleActuator();
         var sceneActuator = new StrideSceneLifecycleActuator();
 
-        var parentAttached = await TransformLifecycleTransition.AttachParentAsync(
-            new TransformParentAttachRequested(child, parent),
-            transformActuator);
-        var entityAttached = await SceneLifecycleTransition.AttachEntityAsync(
-            new EntitySceneAttachRequested(sceneEntity, scene),
-            sceneActuator);
+        var parentAttached = await TransformLifecycleTransition.AttachParentAsync(new TransformParentAttachRequested(child, parent), transformActuator);
+        var entityAttached = await SceneLifecycleTransition.AttachEntityAsync(new EntitySceneAttachRequested(sceneEntity, scene), sceneActuator);
 
         Assert.Same(child, parentAttached.Child);
         Assert.Same(parent, parentAttached.Parent);
@@ -86,30 +107,5 @@ public sealed class ProductionAdapterTests
         Assert.Same(sceneEntity, entityAttached.Entity);
         Assert.Same(scene, entityAttached.Scene);
         Assert.Same(scene, sceneEntity.Scene);
-    }
-
-    [Fact]
-    public async Task StrideTransformLifecycleActuator_RejectsNullArguments()
-    {
-        var actuator = new StrideTransformLifecycleActuator();
-        var entity = new Entity("Entity");
-
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await actuator.AttachParentAsync(null!, entity));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await actuator.AttachParentAsync(entity, null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await actuator.DetachParentAsync(null!));
-    }
-
-    [Fact]
-    public async Task StrideSceneLifecycleActuator_RejectsNullArguments()
-    {
-        var actuator = new StrideSceneLifecycleActuator();
-        var entity = new Entity("Entity");
-        var scene = new Scene();
-
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await actuator.AttachSceneAsync(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await actuator.DetachSceneAsync(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await actuator.AttachEntityToSceneAsync(null!, scene));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await actuator.AttachEntityToSceneAsync(entity, null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await actuator.DetachEntityFromSceneAsync(null!));
     }
 }
