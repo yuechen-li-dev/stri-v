@@ -476,6 +476,9 @@ namespace Stride.Rendering.Compositing
         /// <param name="drawContext">The draw context.</param>
         private void ResolveMSAA(RenderDrawContext drawContext)
         {
+            var depthStencil = currentDepthStencil ?? throw new InvalidOperationException("ForwardRenderer depth stencil is unavailable before MSAA resolve.");
+            var depthStencilOutput = viewDepthStencil ?? throw new InvalidOperationException("ForwardRenderer output depth stencil is unavailable before MSAA resolve.");
+
             // Resolve render targets
             CollectionsMarshal.SetCount(currentRenderTargetsNonMSAA, currentRenderTargets.Count);
 
@@ -491,8 +494,8 @@ namespace Stride.Rendering.Compositing
             }
 
             // Resolve depth buffer
-            currentDepthStencilNonMSAA = viewDepthStencil;
-            MSAAResolver.Resolve(drawContext, currentDepthStencil, currentDepthStencilNonMSAA);
+            currentDepthStencilNonMSAA = depthStencilOutput;
+            MSAAResolver.Resolve(drawContext, depthStencil, depthStencilOutput);
         }
 
         protected virtual void DrawView(RenderContext context, RenderDrawContext drawContext, int eyeIndex, int eyeCount)
@@ -516,7 +519,7 @@ namespace Stride.Rendering.Compositing
                     drawContext.CommandList.SetRenderTarget(drawContext.CommandList.DepthStencilBuffer, null);
 
                     // Draw [main view | z-prepass stage]
-                    renderSystem.Draw(drawContext, context.RenderView, GBufferRenderStage);
+                        renderSystem.Draw(drawContext, context.RenderView, GBufferRenderStage);
                 }
 
                 // Bake lightprobes against Z-buffer
@@ -593,6 +596,9 @@ namespace Stride.Rendering.Compositing
                 // Shafts if we have them
                 if (LightShafts != null)
                 {
+                    if (depthStencil == null)
+                        throw new InvalidOperationException("ForwardRenderer depth stencil is unavailable before light shafts.");
+
                     using (drawContext.QueryManager.BeginProfile(Color.Green, CompositingProfilingKeys.LightShafts))
                     {
                         LightShafts.Draw(drawContext, depthStencil, renderTargets[colorTargetIndex]);
@@ -603,6 +609,11 @@ namespace Stride.Rendering.Compositing
                 {
                     // Run post effects
                     // Note: OpaqueRenderStage can't be null otherwise colorTargetIndex would be -1
+                    if (depthStencil == null)
+                        throw new InvalidOperationException("ForwardRenderer depth stencil is unavailable before post effects.");
+                    if (viewOutputTarget == null)
+                        throw new InvalidOperationException("ForwardRenderer output render target is unavailable before post effects.");
+
                     PostEffects.Draw(drawContext, OpaqueRenderStage.OutputValidator, CollectionsMarshal.AsSpan(renderTargets), depthStencil, viewOutputTarget);
                 }
                 else
@@ -611,6 +622,9 @@ namespace Stride.Rendering.Compositing
                     {
                         using (drawContext.QueryManager.BeginProfile(Color.Green, CompositingProfilingKeys.MsaaResolve))
                         {
+                            if (viewOutputTarget == null)
+                                throw new InvalidOperationException("ForwardRenderer output render target is unavailable before copy.");
+
                             drawContext.CommandList.Copy(renderTargets[colorTargetIndex], viewOutputTarget);
                         }
                     }
@@ -755,7 +769,8 @@ namespace Stride.Rendering.Compositing
 
                     using (drawContext.PushRenderTargetsAndRestore())
                     {
-                        drawContext.CommandList.SetRenderTargets(currentDepthStencil, CollectionsMarshal.AsSpan(currentRenderTargets));
+                        var depthStencil = currentDepthStencil ?? throw new InvalidOperationException("ForwardRenderer depth stencil must be initialized before drawing.");
+                        drawContext.CommandList.SetRenderTargets(depthStencil, CollectionsMarshal.AsSpan(currentRenderTargets));
 
                         // Clear render target and depth stencil
                         Clear?.Draw(drawContext);
@@ -884,7 +899,8 @@ namespace Stride.Rendering.Compositing
                 var textureDescription = TextureDescription.New2D(description.Width, description.Height, 1, description.Format, TextureFlags.DepthStencil | TextureFlags.ShaderResource, 1, GraphicsResourceUsage.Default, actualMultisampleCount);
                 currentDepthStencil = PushScopedResource(drawContext.GraphicsContext.Allocator.GetTemporaryTexture2D(textureDescription));
             }
-            drawContext.CommandList.ResourceBarrierTransition(currentDepthStencil, BarrierLayout.DepthStencilWrite);
+            var depthStencil = currentDepthStencil ?? throw new InvalidOperationException("ForwardRenderer depth stencil must be initialized during render target preparation.");
+            drawContext.CommandList.ResourceBarrierTransition(depthStencil, BarrierLayout.DepthStencilWrite);
         }
 
         /// <summary>
