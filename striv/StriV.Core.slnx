@@ -39,6 +39,7 @@
     <Project Path="tests/Stride.Core.Serialization.Generator.Tests/Stride.Core.Serialization.Generator.Tests.csproj" />
     <Project Path="tests/Stride.Core.Reflection.Tests/Stride.Core.Reflection.Tests.csproj" />
     <Project Path="tests/Stride.Games.Tests/Stride.Games.Tests.csproj" />
+    <Project Path="tests/Stride.Engine.Tests/Stride.Engine.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/StriV.Engine.Dominatus.Tests/StriV.Engine.Dominatus.Tests.csproj" />

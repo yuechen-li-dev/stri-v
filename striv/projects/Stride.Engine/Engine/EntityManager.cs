@@ -160,6 +160,47 @@ namespace Stride.Engine
         }
 
         /// <summary>
+        /// Invokes the existing processor component-match add path for a single entity.
+        /// </summary>
+        /// <remarks>
+        /// This seam is entity-addressed for external orchestration, but matching remains component-driven
+        /// and uses the existing <see cref="EntityManager"/> processor logic.
+        /// </remarks>
+        public void AddEntityToProcessor(EntityProcessor processor, Entity entity)
+        {
+            ArgumentNullException.ThrowIfNull(processor);
+            ArgumentNullException.ThrowIfNull(entity);
+
+            ValidateProcessorBinding(processor);
+            CheckEntityWithNewProcessor(entity, processor);
+        }
+
+        /// <summary>
+        /// Invokes the existing processor component-match remove path for a single entity.
+        /// </summary>
+        /// <remarks>
+        /// This seam is entity-addressed for external orchestration, but matching remains component-driven
+        /// and uses the existing <see cref="EntityManager"/> processor logic.
+        /// </remarks>
+        public void RemoveEntityFromProcessor(EntityProcessor processor, Entity entity)
+        {
+            ArgumentNullException.ThrowIfNull(processor);
+            ArgumentNullException.ThrowIfNull(entity);
+
+            ValidateProcessorBinding(processor);
+
+            var components = entity.Components;
+            for (int i = 0; i < components.Count; i++)
+            {
+                var component = components[i];
+                if (processor.Accept(component.GetType().GetTypeInfo()))
+                {
+                    processor.ProcessEntityComponent(entity, component, true);
+                }
+            }
+        }
+
+        /// <summary>
         /// Removes the entity from the <see cref="EntityManager" />.
         /// It works either entity has a parent or not.
         /// In conjonction with <see cref="EntityProcessor" />, it will remove child entities as well.
@@ -260,6 +301,14 @@ namespace Stride.Engine
             RegisterPendingProcessors();
 
             OnEntityAdded(entity);
+        }
+
+        private void ValidateProcessorBinding(EntityProcessor processor)
+        {
+            if (!ReferenceEquals(processor.EntityManager, this))
+            {
+                throw new InvalidOperationException("Processor must be registered with this EntityManager.");
+            }
         }
 
         private void RegisterPendingProcessors()

@@ -77,14 +77,62 @@ public sealed class ProductionAdapterTests
         Assert.Null(manager.GetProcessor<Stride.Engine.Processors.TransformProcessor>());
     }
 
+    [Fact]
+    public async Task StrideProcessorLifecycleActuator_AddEntity_UsesEngineSeam()
+    {
+        var manager = CreateManagerWithEntity(out var entity);
+        var processor = new RecordingProcessor();
+        var actuator = new StrideProcessorLifecycleActuator();
+        manager.Processors.Add(processor);
+
+        await actuator.AddEntityToProcessorAsync(processor, entity);
+
+        Assert.Equal(1, processor.AddedCount);
+    }
 
     [Fact]
-    public async Task StrideProcessorLifecycleActuator_EntityLevelOperations_AreExplicitlyNotSupported()
+    public async Task StrideProcessorLifecycleActuator_RemoveEntity_UsesEngineSeam()
     {
+        var manager = CreateManagerWithEntity(out var entity);
+        var processor = new RecordingProcessor();
+        var actuator = new StrideProcessorLifecycleActuator();
+        manager.Processors.Add(processor);
+        await actuator.AddEntityToProcessorAsync(processor, entity);
+
+        await actuator.RemoveEntityFromProcessorAsync(processor, entity);
+
+        Assert.Equal(1, processor.RemovedCount);
+    }
+
+    [Fact]
+    public async Task ProcessorLifecycleTransition_AddEntity_ThroughProductionAdapter_ReturnsCompletedEvent()
+    {
+        var manager = CreateManagerWithEntity(out var entity);
+        var processor = new RecordingProcessor();
+        manager.Processors.Add(processor);
         var actuator = new StrideProcessorLifecycleActuator();
 
-        await Assert.ThrowsAsync<NotSupportedException>(async () => await actuator.AddEntityToProcessorAsync(new Stride.Engine.Processors.TransformProcessor(), new Entity("Entity")));
-        await Assert.ThrowsAsync<NotSupportedException>(async () => await actuator.RemoveEntityFromProcessorAsync(new Stride.Engine.Processors.TransformProcessor(), new Entity("Entity")));
+        var completed = await ProcessorLifecycleTransition.AddEntityToProcessorAsync(new ProcessorEntityAddRequested(processor, entity), actuator);
+
+        Assert.Same(processor, completed.Processor);
+        Assert.Same(entity, completed.Entity);
+        Assert.Equal(1, processor.AddedCount);
+    }
+
+    [Fact]
+    public async Task ProcessorLifecycleTransition_RemoveEntity_ThroughProductionAdapter_ReturnsCompletedEvent()
+    {
+        var manager = CreateManagerWithEntity(out var entity);
+        var processor = new RecordingProcessor();
+        manager.Processors.Add(processor);
+        var actuator = new StrideProcessorLifecycleActuator();
+        await ProcessorLifecycleTransition.AddEntityToProcessorAsync(new ProcessorEntityAddRequested(processor, entity), actuator);
+
+        var completed = await ProcessorLifecycleTransition.RemoveEntityFromProcessorAsync(new ProcessorEntityRemoveRequested(processor, entity), actuator);
+
+        Assert.Same(processor, completed.Processor);
+        Assert.Same(entity, completed.Entity);
+        Assert.Equal(1, processor.RemovedCount);
     }
 
     [Fact]
@@ -107,5 +155,25 @@ public sealed class ProductionAdapterTests
         Assert.Same(sceneEntity, entityAttached.Entity);
         Assert.Same(scene, entityAttached.Scene);
         Assert.Same(scene, sceneEntity.Scene);
+    }
+
+    private static SceneInstance CreateManagerWithEntity(out Entity entity)
+    {
+        var manager = new SceneInstance(new ServiceRegistry()) { RootScene = new Scene() };
+        entity = new Entity("Entity");
+        entity.Components.Add(new TestComponent());
+        manager.RootScene.Entities.Add(entity);
+        return manager;
+    }
+
+    private sealed class TestComponent : EntityComponent;
+
+    private sealed class RecordingProcessor : EntityProcessor<TestComponent>
+    {
+        public int AddedCount { get; private set; }
+        public int RemovedCount { get; private set; }
+
+        protected override void OnEntityComponentAdding(Entity entity, TestComponent component, TestComponent data) => AddedCount++;
+        protected override void OnEntityComponentRemoved(Entity entity, TestComponent component, TestComponent data) => RemovedCount++;
     }
 }
