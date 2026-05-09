@@ -1,5 +1,6 @@
 using Dominatus.Core;
 using Dominatus.Core.Hfsm;
+using Dominatus.Core.Nodes;
 using Dominatus.Core.Runtime;
 
 using Stride.Engine;
@@ -37,11 +38,45 @@ public sealed class StriVEngineLifecycleRunner
         actuatorHost.Register(new ProcessorSystemAddActuationHandler(new StrideProcessorLifecycleActuator()));
         actuatorHost.Register(new ProcessorEntityAddActuationHandler(new StrideProcessorLifecycleActuator()));
 
+        return RunSingleNodeAsync(
+            actuatorHost,
+            _ => EngineLifecycleDominatusNodes.AttachSceneTransformAndProcessor(scene, parent, child, entityManager, processor),
+            cancellationToken);
+    }
+
+    public ValueTask CleanupProcessorLifecycleAsync(
+        EntityManager entityManager,
+        Entity child,
+        EntityProcessor processor,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(entityManager);
+        ArgumentNullException.ThrowIfNull(child);
+        ArgumentNullException.ThrowIfNull(processor);
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var actuatorHost = new ActuatorHost();
+        var processorActuator = new StrideProcessorLifecycleActuator();
+        actuatorHost.Register(new ProcessorEntityRemoveActuationHandler(processorActuator));
+        actuatorHost.Register(new ProcessorSystemRemoveActuationHandler(processorActuator));
+
+        return RunSingleNodeAsync(
+            actuatorHost,
+            _ => ProcessorLifecycleDominatusNodes.RemoveProcessorAndEntity(processor, entityManager, child),
+            cancellationToken);
+    }
+
+    private static ValueTask RunSingleNodeAsync(
+        ActuatorHost actuatorHost,
+        AiNode node,
+        CancellationToken cancellationToken)
+    {
         var graph = new HfsmGraph { Root = new StateId("Root") };
         graph.Add(new HfsmStateDef
         {
             Id = "Root",
-            Node = _ => EngineLifecycleDominatusNodes.AttachSceneTransformAndProcessor(scene, parent, child, entityManager, processor),
+            Node = node,
         });
 
         var agent = new AiAgent(new HfsmInstance(graph));
