@@ -39,14 +39,14 @@ namespace Stride.Engine
 
         private readonly Dictionary<TypeInfo, RegisteredRenderProcessors> registeredRenderProcessorTypes = new Dictionary<TypeInfo, RegisteredRenderProcessors>();
 
-        private Scene rootScene;
+        private Scene? rootScene;
 
         public TrackingCollection<VisibilityGroup> VisibilityGroups { get; }
 
         /// <summary>
         /// Occurs when the scene changed from a scene child component.
         /// </summary>
-        public event EventHandler<EventArgs> RootSceneChanged;
+        public event EventHandler<EventArgs>? RootSceneChanged;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityManager" /> class.
@@ -65,7 +65,7 @@ namespace Stride.Engine
         /// <exception cref="System.ArgumentNullException">services
         /// or
         /// rootScene</exception>
-        public SceneInstance(IServiceRegistry services, Scene rootScene, ExecutionMode executionMode = ExecutionMode.Runtime) : base(services)
+        public SceneInstance(IServiceRegistry services, Scene? rootScene, ExecutionMode executionMode = ExecutionMode.Runtime) : base(services)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
@@ -80,7 +80,7 @@ namespace Stride.Engine
         /// Gets the scene.
         /// </summary>
         /// <value>The scene.</value>
-        public Scene RootScene
+        public Scene? RootScene
         {
             get { return rootScene; }
             set
@@ -154,9 +154,9 @@ namespace Stride.Engine
                 }
                 scene.Entities.CollectionChanged -= DealWithTempChanges;
 
-                void DealWithTempChanges(object sender, TrackingCollectionChangedEventArgs e)
+                void DealWithTempChanges(object? sender, TrackingCollectionChangedEventArgs e)
                 {
-                    Entity entity = (Entity)e.Item;
+                    if (e.Item is not Entity entity) return;
                     if (e.Action == NotifyCollectionChangedAction.Remove)
                     {
                         if (entitiesToAdd.Remove(entity) == false)
@@ -185,9 +185,9 @@ namespace Stride.Engine
                 }
                 scene.Children.CollectionChanged -= DealWithTempChanges;
 
-                void DealWithTempChanges(object sender, TrackingCollectionChangedEventArgs e)
+                void DealWithTempChanges(object? sender, TrackingCollectionChangedEventArgs e)
                 {
-                    Scene subScene = (Scene)e.Item;
+                    if (e.Item is not Scene subScene) return;
                     if (e.Action == NotifyCollectionChangedAction.Remove)
                     {
                         if (scenesToAdd.Remove(subScene) == false)
@@ -225,28 +225,28 @@ namespace Stride.Engine
             }
         }
 
-        private void Entities_CollectionChanged(object sender, TrackingCollectionChangedEventArgs e)
+        private void Entities_CollectionChanged(object? sender, TrackingCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    Add((Entity)e.Item);
+                    if (e.Item is Entity addedEntity) Add(addedEntity);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    Remove((Entity)e.Item);
+                    if (e.Item is Entity removedEntity) Remove(removedEntity);
                     break;
             }
         }
 
-        private void Children_CollectionChanged(object sender, TrackingCollectionChangedEventArgs e)
+        private void Children_CollectionChanged(object? sender, TrackingCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    Add((Scene)e.Item);
+                    if (e.Item is Scene addedScene) Add(addedScene);
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    Remove((Scene)e.Item);
+                    if (e.Item is Scene removedScene) Remove(removedScene);
                     break;
             }
         }
@@ -274,9 +274,9 @@ namespace Stride.Engine
             registeredRenderProcessorTypes.Clear();
         }
 
-        private void VisibilityGroups_CollectionChanged(object sender, TrackingCollectionChangedEventArgs e)
+        private void VisibilityGroups_CollectionChanged(object? sender, TrackingCollectionChangedEventArgs e)
         {
-            var visibilityGroup = (VisibilityGroup)e.Item;
+            if (e.Item is not VisibilityGroup visibilityGroup) return;
 
             switch (e.Action)
             {
@@ -312,7 +312,7 @@ namespace Stride.Engine
             }
         }
 
-        private void EntitySystemOnComponentTypeAdded(object sender, TypeInfo type)
+        private void EntitySystemOnComponentTypeAdded(object? sender, TypeInfo type)
         {
             var rendererTypeAttributes = type.GetCustomAttributes<DefaultEntityComponentRendererAttribute>();
             foreach (var rendererTypeAttribute in rendererTypeAttributes)

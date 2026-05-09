@@ -45,22 +45,22 @@ namespace Stride.Engine
         /// </summary>
         /// <value>The scene</value>
         /// <exception cref="System.ArgumentNullException">Scene cannot be null</exception>
-        public SceneInstance SceneInstance { get; set; }
+        public SceneInstance? SceneInstance { get; set; }
 
         /// <summary>
         /// URL of the scene loaded at initialization.
         /// </summary>
-        public string InitialSceneUrl { get; set; }
+        public string? InitialSceneUrl { get; set; }
 
         /// <summary>
         /// URL of the graphics compositor loaded at initialization.
         /// </summary>
-        public string InitialGraphicsCompositorUrl { get; set; }
+        public string? InitialGraphicsCompositorUrl { get; set; }
 
         /// <summary>
         /// URL of the splash screen texture loaded at initialization.
         /// </summary>
-        public string SplashScreenUrl { get; set; }
+        public string? SplashScreenUrl { get; set; }
 
         /// <summary>
         /// Splash screen background color.
@@ -77,16 +77,16 @@ namespace Stride.Engine
         /// </summary>
         public bool SplashScreenEnabled { get; set; }
 
-        public GraphicsCompositor GraphicsCompositor { get; set; }
+        public GraphicsCompositor? GraphicsCompositor { get; set; }
 
-        private Task<Scene> sceneTask;
-        private Task<GraphicsCompositor> compositorTask;
+        private Task<Scene>? sceneTask;
+        private Task<GraphicsCompositor>? compositorTask;
 
         private const double MinSplashScreenTime = 4.0f;
         private const float SplashScreenFadeTime = 1.0f;
 
         private double fadeTime;
-        private Texture splashScreenTexture;
+        private Texture? splashScreenTexture;
 
         public enum SplashScreenState
         {
@@ -163,6 +163,8 @@ namespace Stride.Engine
 
         private void RenderSplashScreen(Color4 color, BlendStateDescription blendState)
         {
+            if (splashScreenTexture == null)
+                return;
             var renderTarget = Game.GraphicsContext.CommandList.RenderTarget;
             Game.GraphicsContext.CommandList.Clear(renderTarget, SplashScreenColor);
             
