@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../StriV.Engine.Dominatus/StriV.Engine.Dominatus.csproj" />
+    <ProjectReference Include="../Stride.Engine/Stride.Engine.csproj" />
+  </ItemGroup>
+</Project>
