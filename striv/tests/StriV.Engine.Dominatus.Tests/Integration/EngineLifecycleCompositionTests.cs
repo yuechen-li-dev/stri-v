@@ -10,6 +10,46 @@ namespace StriV.Engine.Dominatus.Tests.Integration;
 public sealed class EngineLifecycleCompositionTests
 {
     [Fact]
+    public async Task RootSceneComposition_SetRootScene_ThenProcessorTransitions_ComposeThroughProductionAdapters()
+    {
+        var sceneInstance = new SceneInstance(new ServiceRegistry());
+        var rootScene = new Scene();
+        var entity = new Entity("RootEntity");
+        entity.Components.Add(new TestComponent());
+        rootScene.Entities.Add(entity);
+        var processor = new RecordingProcessor();
+
+        var sceneActuator = new StrideSceneLifecycleActuator();
+        var processorActuator = new StrideProcessorLifecycleActuator();
+
+        var rootSet = await SceneLifecycleTransition.SetRootSceneAsync(new RootSceneSetRequested(sceneInstance, rootScene), sceneActuator);
+
+        Assert.Same(sceneInstance, rootSet.SceneInstance);
+        Assert.Same(rootScene, rootSet.RootScene);
+        Assert.Same(rootScene, sceneInstance.RootScene);
+        Assert.Same(sceneInstance, entity.EntityManager);
+
+        var processorSystemAdded = await ProcessorLifecycleTransition.AddProcessorToSystemAsync(new ProcessorSystemAddRequested(processor, sceneInstance), processorActuator);
+
+        Assert.Same(processor, processorSystemAdded.Processor);
+        Assert.Same(sceneInstance, processorSystemAdded.EntityManager);
+        Assert.Same(sceneInstance, processor.EntityManager);
+
+        var processorEntityAdded = await ProcessorLifecycleTransition.AddEntityToProcessorAsync(new ProcessorEntityAddRequested(processor, entity), processorActuator);
+
+        Assert.Same(processor, processorEntityAdded.Processor);
+        Assert.Same(entity, processorEntityAdded.Entity);
+        Assert.Equal(1, processor.AddedCount);
+        Assert.Same(entity, Assert.Single(processor.AddedEntities));
+
+        var rootCleared = await SceneLifecycleTransition.ClearRootSceneAsync(new RootSceneClearRequested(sceneInstance), sceneActuator);
+
+        Assert.Same(sceneInstance, rootCleared.SceneInstance);
+        Assert.Null(sceneInstance.RootScene);
+        Assert.Null(entity.EntityManager);
+    }
+
+    [Fact]
     public async Task EngineLifecycleComposition_TransformSceneProcessorTransitions_ComposeThroughProductionAdapters()
     {
         var scene = new Scene();
