@@ -21,8 +21,11 @@ namespace Stride.Engine
     {
         private static readonly Logger Log = GlobalLogger.GetLogger("SceneSystem");
 
-        private RenderContext renderContext;
-        private RenderDrawContext renderDrawContext;
+        private RenderContext? renderContext;
+        private RenderDrawContext? renderDrawContext;
+
+        private RenderContext RenderContext => renderContext ?? throw new InvalidOperationException("SceneSystem render context is not initialized.");
+        private RenderDrawContext RenderDrawContext => renderDrawContext ?? throw new InvalidOperationException("SceneSystem render draw context is not initialized.");
 
         private int previousWidth;
         private int previousHeight;
@@ -151,6 +154,9 @@ namespace Stride.Engine
                 GraphicsCompositor = null;
             }
 
+            renderDrawContext = null;
+            renderContext = null;
+
             base.Destroy();
         }
 
@@ -166,6 +172,9 @@ namespace Stride.Engine
             if (splashScreenTexture == null)
                 return;
             var renderTarget = Game.GraphicsContext.CommandList.RenderTarget;
+            if (renderTarget == null)
+                return;
+
             Game.GraphicsContext.CommandList.Clear(renderTarget, SplashScreenColor);
             
             var viewWidth = renderTarget.Width / (DoubleViewSplashScreen ? 2 : 1);
@@ -196,30 +205,39 @@ namespace Stride.Engine
         public override void Draw(GameTime gameTime)
         {
             // Reset the context
-            renderContext.Reset();
+            var currentRenderContext = RenderContext;
+            var currentRenderDrawContext = RenderDrawContext;
 
-            var renderTarget = renderDrawContext.CommandList.RenderTarget;
+            // Reset the context
+            currentRenderContext.Reset();
+
+            var renderTarget = currentRenderDrawContext.CommandList.RenderTarget;
+            if (renderTarget == null)
+                return;
 
             // If the width or height changed, we have to recycle all temporary allocated resources.
             // NOTE: We assume that they are mostly resolution dependent.
             if (previousWidth != renderTarget.ViewWidth || previousHeight != renderTarget.ViewHeight)
             {
                 // Force a recycle of all allocated temporary textures
-                renderContext.Allocator.Recycle(link => link.Resource is Texture);
+                currentRenderContext.Allocator.Recycle(link => link.Resource is Texture);
             }
 
             previousWidth = renderTarget.ViewWidth;
             previousHeight = renderTarget.ViewHeight;
 
             // Update the entities at draw time.
-            renderContext.Time = gameTime;
+            currentRenderContext.Time = gameTime;
 
             // The camera processor needs the graphics compositor
-            using (renderContext.PushTagAndRestore(GraphicsCompositor.Current, GraphicsCompositor))
+            // STRIV-TODO: Nullability/lifecycle cleanup.
+            // Reason: PropertyKey<T> in rendering tags is non-nullable in legacy API while runtime compositor can be absent.
+            // Future direction: audit PropertyKey<T> nullable contracts across render tag APIs to remove CS8620 boundary mismatches safely.
+            using (currentRenderContext.PushTagAndRestore(GraphicsCompositor.Current, GraphicsCompositor))
             {
                 // Execute Draw step of SceneInstance
                 // This will run entity processors
-                SceneInstance?.Draw(renderContext);
+                SceneInstance?.Draw(currentRenderContext);
             }
 
             // Render phase
@@ -227,13 +245,13 @@ namespace Stride.Engine
             //context.GraphicsDevice.Parameters.Set(GlobalKeys.Time, (float)gameTime.Total.TotalSeconds);
             //context.GraphicsDevice.Parameters.Set(GlobalKeys.TimeStep, (float)gameTime.Elapsed.TotalSeconds);
 
-            renderDrawContext.ResourceGroupAllocator.Flush();
-            renderDrawContext.QueryManager.Flush();
+            currentRenderDrawContext.ResourceGroupAllocator.Flush();
+            currentRenderDrawContext.QueryManager.Flush();
 
             // Push context (pop after using)
-            using (renderDrawContext.RenderContext.PushTagAndRestore(SceneInstance.Current, SceneInstance))
+            using (currentRenderDrawContext.RenderContext.PushTagAndRestore(SceneInstance.Current, SceneInstance))
             {
-                GraphicsCompositor?.Draw(renderDrawContext);
+                GraphicsCompositor?.Draw(currentRenderDrawContext);
             }
 
             //do this here, make sure GCompositor and Scene are updated/rendered the next frame!
