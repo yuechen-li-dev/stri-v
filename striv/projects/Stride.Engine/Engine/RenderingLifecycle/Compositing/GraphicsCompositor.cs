@@ -50,7 +50,7 @@ namespace Stride.Rendering.Compositing
         /// <summary>
         /// A property key to get the current <see cref="GraphicsCompositor"/> from the <see cref="ComponentBase.Tags"/>.
         /// </summary>
-        public static readonly PropertyKey<GraphicsCompositor> Current = new PropertyKey<GraphicsCompositor>("GraphicsCompositor.Current", typeof(GraphicsCompositor));
+        public static readonly PropertyKey<GraphicsCompositor?> Current = new PropertyKey<GraphicsCompositor?>("GraphicsCompositor.Current", typeof(GraphicsCompositor));
 
         private readonly List<SceneInstance> initializedSceneInstances = new List<SceneInstance>();
         private static readonly ProfilingKey RenderSystemCollectKey = new ProfilingKey("RenderSystem.Collect");
@@ -154,7 +154,7 @@ namespace Stride.Rendering.Compositing
 
                 // Get or create VisibilityGroup for this RenderSystem + SceneInstance
                 var sceneInstance = SceneInstance.GetCurrent(context.RenderContext);
-                VisibilityGroup visibilityGroup = null;
+                VisibilityGroup? visibilityGroup = null;
                 if (sceneInstance != null)
                 {
                     // Find if VisibilityGroup
