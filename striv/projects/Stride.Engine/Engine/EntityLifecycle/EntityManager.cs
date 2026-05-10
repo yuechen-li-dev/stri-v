@@ -470,10 +470,6 @@ namespace Stride.Engine
                 // Add dependent component
                 if (processor.IsDependentOnComponentType(componentType))
                 {
-                    if (processorList.Dependencies == null)
-                    {
-                        processorList.Dependencies = new List<EntityProcessor>();
-                    }
                     processorList.Dependencies.Add(processor);
                 }
             }
@@ -494,10 +490,7 @@ namespace Stride.Engine
                 var processorList = componentTypeAndProcessors.Value;
 
                 processorList.Remove(processor);
-                if (processorList.Dependencies != null)
-                {
-                    processorList.Dependencies.Remove(processor);
-                }
+                processorList.Dependencies.Remove(processor);
             }
 
             processor.RemoveAllEntities();
@@ -510,33 +503,45 @@ namespace Stride.Engine
         internal void NotifyComponentChanged(int index, in EntityComponentChange change)
         {
             var entity = change.Entity;
-            var oldComponent = change.OldComponent;
-            var newComponent = change.NewComponent;
-
-            // No real update   
-            if (oldComponent == newComponent)
-                return;
-
-            // If we have a new component we can try to collect processors for it
-            if (newComponent != null)
-            {
-                CollectNewProcessorsByComponentType(newComponent.GetType().GetTypeInfo());
-                RegisterPendingProcessors();
-            }
-
-            // Remove previous component from processors
             currentDependentProcessors.Clear(); 
-            if (oldComponent != null)
+            switch (change.Kind)
             {
-                CheckEntityComponentWithProcessors(entity, oldComponent, true, currentDependentProcessors);
-                flexibleProcessors.RemoveComponent(oldComponent, ExecutionMode);
-            }
+                case EntityComponentChangeKind.Added:
+                {
+                    var addedComponent = change.AddedComponent;
+                    CollectNewProcessorsByComponentType(addedComponent.GetType().GetTypeInfo());
+                    RegisterPendingProcessors();
+                    CheckEntityComponentWithProcessors(entity, addedComponent, false, currentDependentProcessors);
+                    flexibleProcessors.IntroduceComponent(addedComponent, ExecutionMode);
+                    break;
+                }
 
-            // Add new component to processors
-            if (newComponent != null)
-            {
-                CheckEntityComponentWithProcessors(entity, newComponent, false, currentDependentProcessors);
-                flexibleProcessors.IntroduceComponent(newComponent, ExecutionMode);
+                case EntityComponentChangeKind.Removed:
+                {
+                    var removedComponent = change.RemovedComponent;
+                    CheckEntityComponentWithProcessors(entity, removedComponent, true, currentDependentProcessors);
+                    flexibleProcessors.RemoveComponent(removedComponent, ExecutionMode);
+                    break;
+                }
+
+                case EntityComponentChangeKind.Replaced:
+                {
+                    var oldComponent = change.RemovedComponent;
+                    var newComponent = change.AddedComponent;
+
+                    CollectNewProcessorsByComponentType(newComponent.GetType().GetTypeInfo());
+                    RegisterPendingProcessors();
+
+                    CheckEntityComponentWithProcessors(entity, oldComponent, true, currentDependentProcessors);
+                    flexibleProcessors.RemoveComponent(oldComponent, ExecutionMode);
+
+                    CheckEntityComponentWithProcessors(entity, newComponent, false, currentDependentProcessors);
+                    flexibleProcessors.IntroduceComponent(newComponent, ExecutionMode);
+                    break;
+                }
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(change));
             }
 
             // Update all dependencies
@@ -547,7 +552,7 @@ namespace Stride.Engine
             }
 
             // Notify component changes
-            OnComponentChanged(entity, index, oldComponent, newComponent);
+            OnComponentChanged(entity, index, change.OldComponent, change.NewComponent);
         }
 
         private void UpdateDependentProcessors(Entity entity, in EntityComponentChange change)
@@ -584,7 +589,7 @@ namespace Stride.Engine
             for (int i = 0; i < components.Count; i++)
             {
                 var component = components[i];
-                CheckEntityComponentWithProcessors(entity, component, forceRemove, null);
+                CheckEntityComponentWithProcessors(entity, component, forceRemove, currentDependentProcessors: null);
                 if (collecComponentTypesAndProcessors)
                 {
                     CollectNewProcessorsByComponentType(component.GetType().GetTypeInfo());
@@ -610,7 +615,7 @@ namespace Stride.Engine
             }
         }
 
-        private void CheckEntityComponentWithProcessors(Entity entity, EntityComponent component, bool forceRemove, List<EntityProcessor> dependentProcessors)
+        private void CheckEntityComponentWithProcessors(Entity entity, EntityComponent component, bool forceRemove, List<EntityProcessor>? currentDependentProcessors)
         {
             var componentType = component.GetType().GetTypeInfo();
             EntityProcessorCollectionPerComponentType processorsForComponent;
@@ -636,10 +641,6 @@ namespace Stride.Engine
 
                     if (processor.IsDependentOnComponentType(componentType))
                     {
-                        if (processorsForComponent.Dependencies == null)
-                        {
-                            processorsForComponent.Dependencies = new List<EntityProcessor>();
-                        }
                         processorsForComponent.Dependencies.Add(processor);
                     }
                 }
@@ -648,14 +649,14 @@ namespace Stride.Engine
 
             // Collect dependent processors
             var processorsForComponentDependencies = processorsForComponent.Dependencies;
-            if (dependentProcessors != null && processorsForComponentDependencies != null)
+            if (currentDependentProcessors != null && processorsForComponentDependencies.Count > 0)
             {
                 for (int i = 0; i < processorsForComponentDependencies.Count; i++)
                 {
                     var processor = processorsForComponentDependencies[i];
-                    if (!dependentProcessors.Contains(processor))
+                    if (!currentDependentProcessors.Contains(processor))
                     {
-                        dependentProcessors.Add(processor);
+                        currentDependentProcessors.Add(processor);
                     }
                 }
             }
@@ -704,7 +705,7 @@ namespace Stride.Engine
             /// <summary>
             /// The processors that are depending on the component type
             /// </summary>
-            public List<EntityProcessor> Dependencies;
+            public List<EntityProcessor> Dependencies = [];
         }
 
         private class TrackingEntityProcessorCollection : EntityProcessorCollection

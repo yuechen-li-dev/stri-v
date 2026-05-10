@@ -7,6 +7,76 @@ namespace Stride.Engine.Tests;
 public sealed class EntityManagerProcessorPolicyTests
 {
     [Fact]
+    public void EntityManager_RequiredTypeProcessor_DoesNotMatchUntilAllRequiredComponentsPresent()
+    {
+        var manager = CreateManagerWithEntity(out var entity, withComponent: false);
+        var processor = new RequiredTypeRecordingProcessor();
+        manager.Processors.Add(processor);
+
+        entity.Components.Add(new MainTestComponent());
+
+        Assert.Equal(0, processor.AddedCount);
+    }
+
+    [Fact]
+    public void EntityManager_RequiredTypeProcessor_AddsMembershipWhenRequiredComponentAppears()
+    {
+        var manager = CreateManagerWithEntity(out var entity, withComponent: false);
+        var processor = new RequiredTypeRecordingProcessor();
+        manager.Processors.Add(processor);
+
+        var mainComponent = new MainTestComponent();
+        entity.Components.Add(mainComponent);
+        entity.Components.Add(new RequiredTestComponent());
+
+        Assert.Equal(1, processor.AddedCount);
+        Assert.Same(mainComponent, Assert.Single(processor.AddedComponents));
+    }
+
+    [Fact]
+    public void EntityManager_RequiredTypeProcessor_RemovesMembershipWhenRequiredComponentDisappears()
+    {
+        var manager = CreateManagerWithEntity(out var entity, withComponent: false);
+        var processor = new RequiredTypeRecordingProcessor();
+        manager.Processors.Add(processor);
+
+        var mainComponent = new MainTestComponent();
+        var requiredComponent = new RequiredTestComponent();
+        entity.Components.Add(mainComponent);
+        entity.Components.Add(requiredComponent);
+
+        Assert.Equal(1, processor.AddedCount);
+
+        entity.Components.Remove(requiredComponent);
+
+        Assert.Equal(1, processor.RemovedCount);
+        Assert.Same(mainComponent, Assert.Single(processor.RemovedComponents));
+    }
+
+    [Fact]
+    public void EntityManager_RequiredTypeProcessor_RevalidatesOnRequiredComponentRemoveAdd()
+    {
+        var manager = CreateManagerWithEntity(out var entity, withComponent: false);
+        var processor = new RequiredTypeRecordingProcessor();
+        manager.Processors.Add(processor);
+
+        var originalMainComponent = new MainTestComponent();
+        var requiredComponent = new RequiredTestComponent();
+        entity.Components.Add(originalMainComponent);
+        entity.Components.Add(requiredComponent);
+
+        Assert.Equal(1, processor.AddedCount);
+
+        entity.Components.Remove(requiredComponent);
+        entity.Components.Add(new RequiredTestComponent());
+
+        Assert.Equal(2, processor.AddedCount);
+        Assert.Equal(1, processor.RemovedCount);
+        Assert.Same(originalMainComponent, processor.RemovedComponents[0]);
+        Assert.Same(originalMainComponent, processor.AddedComponents[1]);
+    }
+
+    [Fact]
     public void EntityProcessor_AssociatedData_AddRemoveLifecycle_PassesNonNullDataWhenMatched()
     {
         var manager = CreateManagerWithEntity(out var entity, withComponent: true);
@@ -50,6 +120,8 @@ public sealed class EntityManagerProcessorPolicyTests
     }
 
     private sealed class TestComponent : EntityComponent;
+    private sealed class MainTestComponent : EntityComponent;
+    private sealed class RequiredTestComponent : EntityComponent;
 
     private sealed class AssociatedDataRecordingProcessor : EntityProcessor<TestComponent, string>
     {
@@ -70,6 +142,33 @@ public sealed class EntityManagerProcessorPolicyTests
         {
             RemovedCount++;
             LastRemovedData = data;
+        }
+    }
+
+    private sealed class RequiredTypeRecordingProcessor : EntityProcessor<MainTestComponent, string>
+    {
+        public int AddedCount { get; private set; }
+        public int RemovedCount { get; private set; }
+        public List<MainTestComponent> AddedComponents { get; } = [];
+        public List<MainTestComponent> RemovedComponents { get; } = [];
+
+        public RequiredTypeRecordingProcessor()
+            : base(typeof(RequiredTestComponent))
+        {
+        }
+
+        protected override string GenerateComponentData(Entity entity, MainTestComponent component) => entity.Name;
+
+        protected override void OnEntityComponentAdding(Entity entity, MainTestComponent component, string data)
+        {
+            AddedCount++;
+            AddedComponents.Add(component);
+        }
+
+        protected override void OnEntityComponentRemoved(Entity entity, MainTestComponent component, string data)
+        {
+            RemovedCount++;
+            RemovedComponents.Add(component);
         }
     }
 }
