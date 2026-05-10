@@ -358,8 +358,8 @@ namespace Stride.Engine
 
                 item.parent = transform;
 
-                Entity?.EntityManager?.OnHierarchyChanged(item.Entity);
-                Entity?.EntityManager?.GetProcessor<TransformProcessor>().NotifyChildrenCollectionChanged(item, true);
+                Entity?.EntityManagerOrNull?.OnHierarchyChanged(item.Entity);
+                Entity?.EntityManagerOrNull?.GetProcessor<TransformProcessor>().NotifyChildrenCollectionChanged(item, true);
             }
             private void OnTransformRemoved(TransformComponent item)
             {
@@ -368,8 +368,8 @@ namespace Stride.Engine
 
                 item.parent = null;
 
-                Entity?.EntityManager?.OnHierarchyChanged(item.Entity);
-                Entity?.EntityManager?.GetProcessor<TransformProcessor>().NotifyChildrenCollectionChanged(item, false);
+                Entity?.EntityManagerOrNull?.OnHierarchyChanged(item.Entity);
+                Entity?.EntityManagerOrNull?.GetProcessor<TransformProcessor>().NotifyChildrenCollectionChanged(item, false);
             }
 
             /// <inheritdoc/>
