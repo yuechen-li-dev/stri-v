@@ -46,6 +46,35 @@ public class AnimationLifecycleTests
     }
 
     [Fact]
+    public void AnimationChannel_DefaultConstruction_HasValidInertState()
+    {
+        var channel = new AnimationChannel();
+
+        Assert.NotNull(channel.KeyFrames);
+        Assert.Empty(channel.KeyFrames);
+        Assert.Null(channel.TargetObject);
+        Assert.Null(channel.TargetProperty);
+    }
+
+    [Fact]
+    public void AnimationChannel_MissingTarget_IsAllowedAsUnboundAuthoringState()
+    {
+        var channel = new AnimationChannel
+        {
+            TargetObject = null,
+            TargetProperty = null,
+        };
+
+        var exception = Record.Exception(() =>
+        {
+            _ = channel.TargetObject;
+            _ = channel.TargetProperty;
+        });
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void AnimationClipResult_DefaultConstruction_HasValidEmptyState()
     {
         var result = new AnimationClipResult();

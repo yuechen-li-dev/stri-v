@@ -84,8 +84,15 @@ namespace Stride.Animations
 
         private class ErrorComparer : IComparer<LinkedListNode<ErrorNode>>
         {
-            public int Compare(LinkedListNode<ErrorNode> x, LinkedListNode<ErrorNode> y)
+            public int Compare(LinkedListNode<ErrorNode>? x, LinkedListNode<ErrorNode>? y)
             {
+                if (ReferenceEquals(x, y))
+                    return 0;
+                if (x is null)
+                    return -1;
+                if (y is null)
+                    return 1;
+
                 if (x.Value.Error != y.Value.Error)
                     return MathF.Sign(x.Value.Error - y.Value.Error);
 
@@ -201,7 +208,7 @@ namespace Stride.Animations
         /// <value>
         /// The target object name.
         /// </value>
-        public string TargetObject { get; set; }
+        public string? TargetObject { get; set; }
 
         /// <summary>
         /// Gets or sets the target property name.
@@ -209,7 +216,7 @@ namespace Stride.Animations
         /// <value>
         /// The target property name.
         /// </value>
-        public string TargetProperty { get; set; }
+        public string? TargetProperty { get; set; }
 
         internal static void InitializeAnimation(ref EvaluatorData animationChannel, ref AnimationInitialValues<float> animationValue)
         {
@@ -233,7 +240,7 @@ namespace Stride.Animations
             private CompressedTimeSpan currentTime;
             private bool reachedEnd;
             private IEnumerable<KeyFrameData<float>> keyFrames;
-            private IEnumerator<KeyFrameData<float>> currentKeyFrame;
+            private IEnumerator<KeyFrameData<float>>? currentKeyFrame;
             //private KeyFrameData<float> ValueStart;
             //private KeyFrameData<float> ValueEnd;
             
@@ -302,6 +309,9 @@ namespace Stride.Animations
                 // Advance until requested time is reached
                 while (!(currentTime >= data.ValueStart.Time && currentTime < data.ValueEnd.Time) && !reachedEnd)
                 {
+                    if (currentKeyFrame is null)
+                        throw new InvalidOperationException("Animation channel evaluator keyframes are not initialized.");
+
                     var moveNextFrame = currentKeyFrame.MoveNext();
                     if (!moveNextFrame)
                     {
