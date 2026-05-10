@@ -16,6 +16,6 @@ namespace Stride.Updater
         /// <summary>
         /// Stores the list of pre-allocated objects for non-blittable struct unboxing.
         /// </summary>
-        internal object[] TemporaryObjects;
+        internal object?[] TemporaryObjects;
     }
 }
