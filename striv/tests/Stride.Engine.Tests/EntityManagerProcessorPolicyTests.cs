@@ -7,6 +7,51 @@ namespace Stride.Engine.Tests;
 public sealed class EntityManagerProcessorPolicyTests
 {
     [Fact]
+    public void EntityProcessorMembershipChange_Added_HasExpectedPayload()
+    {
+        CreateManagerWithEntity(out var entity, withComponent: false);
+        var processor = new RequiredTypeRecordingProcessor();
+        var component = new MainTestComponent();
+
+        var change = EntityProcessorMembershipChange.Added(processor, entity, component);
+
+        Assert.Same(processor, change.Processor);
+        Assert.Same(entity, change.Entity);
+        Assert.Same(component, change.Component);
+        Assert.Equal(EntityProcessorMembershipChangeKind.Added, change.Kind);
+    }
+
+    [Fact]
+    public void EntityProcessorMembershipChange_Removed_HasExpectedPayload()
+    {
+        CreateManagerWithEntity(out var entity, withComponent: false);
+        var processor = new RequiredTypeRecordingProcessor();
+        var component = new MainTestComponent();
+
+        var change = EntityProcessorMembershipChange.Removed(processor, entity, component);
+
+        Assert.Same(processor, change.Processor);
+        Assert.Same(entity, change.Entity);
+        Assert.Same(component, change.Component);
+        Assert.Equal(EntityProcessorMembershipChangeKind.Removed, change.Kind);
+    }
+
+    [Fact]
+    public void EntityProcessorMembershipChange_Revalidated_HasExpectedPayload()
+    {
+        CreateManagerWithEntity(out var entity, withComponent: false);
+        var processor = new RequiredTypeRecordingProcessor();
+        var component = new MainTestComponent();
+
+        var change = EntityProcessorMembershipChange.Revalidated(processor, entity, component);
+
+        Assert.Same(processor, change.Processor);
+        Assert.Same(entity, change.Entity);
+        Assert.Same(component, change.Component);
+        Assert.Equal(EntityProcessorMembershipChangeKind.Revalidated, change.Kind);
+    }
+
+    [Fact]
     public void EntityManager_RequiredTypeProcessor_DoesNotMatchUntilAllRequiredComponentsPresent()
     {
         var manager = CreateManagerWithEntity(out var entity, withComponent: false);
@@ -74,6 +119,54 @@ public sealed class EntityManagerProcessorPolicyTests
         Assert.Equal(1, processor.RemovedCount);
         Assert.Same(originalMainComponent, processor.RemovedComponents[0]);
         Assert.Same(originalMainComponent, processor.AddedComponents[1]);
+    }
+
+    [Fact]
+    public void EntityManager_ComponentAdded_RoutesProcessorMembershipAddedOnce()
+    {
+        var manager = CreateManagerWithEntity(out var entity, withComponent: false);
+        var processor = new RequiredTypeRecordingProcessor();
+        manager.Processors.Add(processor);
+
+        entity.Components.Add(new RequiredTestComponent());
+        entity.Components.Add(new MainTestComponent());
+
+        Assert.Equal(1, processor.AddedCount);
+        Assert.Equal(["add"], processor.MembershipTransitions);
+    }
+
+    [Fact]
+    public void EntityManager_ComponentRemoved_RoutesProcessorMembershipRemovedOnce()
+    {
+        var manager = CreateManagerWithEntity(out var entity, withComponent: false);
+        var processor = new RequiredTypeRecordingProcessor();
+        manager.Processors.Add(processor);
+
+        var main = new MainTestComponent();
+        var required = new RequiredTestComponent();
+        entity.Components.Add(main);
+        entity.Components.Add(required);
+        entity.Components.Remove(required);
+
+        Assert.Equal(1, processor.RemovedCount);
+        Assert.Equal(["add", "remove"], processor.MembershipTransitions);
+    }
+
+    [Fact]
+    public void EntityManager_RequiredTypeProcessor_RevalidationPreservesExpectedOrder()
+    {
+        var manager = CreateManagerWithEntity(out var entity, withComponent: false);
+        var processor = new RequiredTypeRecordingProcessor();
+        manager.Processors.Add(processor);
+
+        var main = new MainTestComponent();
+        var required = new RequiredTestComponent();
+        entity.Components.Add(main);
+        entity.Components.Add(required);
+        entity.Components.Remove(required);
+        entity.Components.Add(new RequiredTestComponent());
+
+        Assert.Equal(["add", "remove", "add"], processor.MembershipTransitions);
     }
 
     [Fact]
@@ -151,6 +244,7 @@ public sealed class EntityManagerProcessorPolicyTests
         public int RemovedCount { get; private set; }
         public List<MainTestComponent> AddedComponents { get; } = [];
         public List<MainTestComponent> RemovedComponents { get; } = [];
+        public List<string> MembershipTransitions { get; } = [];
 
         public RequiredTypeRecordingProcessor()
             : base(typeof(RequiredTestComponent))
@@ -163,12 +257,14 @@ public sealed class EntityManagerProcessorPolicyTests
         {
             AddedCount++;
             AddedComponents.Add(component);
+            MembershipTransitions.Add("add");
         }
 
         protected override void OnEntityComponentRemoved(Entity entity, MainTestComponent component, string data)
         {
             RemovedCount++;
             RemovedComponents.Add(component);
+            MembershipTransitions.Add("remove");
         }
     }
 }
