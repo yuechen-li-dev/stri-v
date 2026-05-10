@@ -16,7 +16,7 @@ namespace Stride.Rendering.LightProbes
         }
 
         /// <inheritdoc/>
-        public VisibilityGroup VisibilityGroup { get; set; }
+        public VisibilityGroup VisibilityGroup { get; set; } = null!;
 
         /// <summary>
         /// Light probe runtime data is auto-computed when lightprobes are added/removed.  If you move them at runtime, please call this method.
@@ -26,7 +26,11 @@ namespace Stride.Rendering.LightProbes
         /// </remarks>
         public void UpdateLightProbePositions()
         {
-            VisibilityGroup.Tags.Set(LightProbeRenderer.CurrentLightProbes, null);
+            var visibilityGroup = VisibilityGroup;
+            if (visibilityGroup is null)
+                return;
+
+            visibilityGroup.Tags.Remove(LightProbeRenderer.CurrentLightProbes);
             needPositionUpdate = false;
 
             // Initial load
@@ -44,7 +48,7 @@ namespace Stride.Rendering.LightProbes
                 if (lightProbes.Count < 4)
                     return;
 
-                VisibilityGroup.Tags.Set(LightProbeRenderer.CurrentLightProbes, LightProbeGenerator.GenerateRuntimeData(lightProbes));
+                visibilityGroup.Tags.Set(LightProbeRenderer.CurrentLightProbes, LightProbeGenerator.GenerateRuntimeData(lightProbes));
             }
             catch
             {
@@ -58,7 +62,7 @@ namespace Stride.Rendering.LightProbes
         /// </summary>
         public void UpdateLightProbeCoefficients()
         {
-            var runtimeData = VisibilityGroup.Tags.Get(LightProbeRenderer.CurrentLightProbes);
+            var runtimeData = VisibilityGroup?.Tags.Get(LightProbeRenderer.CurrentLightProbes);
             if (runtimeData == null)
                 return;
 

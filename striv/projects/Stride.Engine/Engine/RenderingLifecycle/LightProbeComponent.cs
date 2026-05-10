@@ -17,6 +17,11 @@ namespace Stride.Engine
     [ComponentCategory("Lights")]
     public class LightProbeComponent : EntityComponent
     {
+        public LightProbeComponent()
+        {
+            Coefficients = [];
+        }
+
         [Display(Browsable = false)]
         [NonIdentifiableCollectionItems]
         public List<Color3> Coefficients { get; set; }

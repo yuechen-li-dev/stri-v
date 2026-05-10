@@ -85,14 +85,16 @@ namespace Stride.Rendering.Compositing
                 bakeLightProbesPipeline.State.PrimitiveType = PrimitiveType.TriangleList;
             }
 
+            var depthStencilBuffer = drawContext.CommandList.DepthStencilBuffer ?? throw new InvalidOperationException("ForwardRenderer light probes require a depth stencil buffer.");
+
             // Render IBL tetrahedra ID so that we can assign them per pixel
             //ibl = PushScopedResource(Context.Allocator.GetTemporaryTexture2D(drawContext.CommandList.DepthStencilBuffer.Width, drawContext.CommandList.DepthStencilBuffer.Height, PixelFormat.R16_UInt));
-            ibl = PushScopedResource(Context.Allocator.GetTemporaryTexture2D(TextureDescription.New2D(drawContext.CommandList.DepthStencilBuffer.Width, drawContext.CommandList.DepthStencilBuffer.Height,
+            ibl = PushScopedResource(Context.Allocator.GetTemporaryTexture2D(TextureDescription.New2D(depthStencilBuffer.Width, depthStencilBuffer.Height,
                         1, PixelFormat.R16_UInt, TextureFlags.ShaderResource | TextureFlags.RenderTarget, 1, GraphicsResourceUsage.Default, actualMultisampleCount)));
             using (drawContext.PushRenderTargetsAndRestore())
             {
                 drawContext.CommandList.Clear(ibl, Color4.Black);
-                drawContext.CommandList.SetRenderTarget(drawContext.CommandList.DepthStencilBuffer, ibl);
+                drawContext.CommandList.SetRenderTarget(depthStencilBuffer, ibl);
 
                 if (GraphicsDevice is null || Services is null)
                     throw new InvalidOperationException("ForwardRenderer light probes require initialized graphics device and services.");
@@ -120,7 +122,8 @@ namespace Stride.Rendering.Compositing
                 bakeLightProbesPipeline.State.Output.CaptureState(drawContext.CommandList);
                 bakeLightProbesPipeline.Update();
 
-                drawContext.CommandList.SetPipelineState(bakeLightProbesPipeline.CurrentState);
+                var bakePipelineState = bakeLightProbesPipeline.CurrentState ?? throw new InvalidOperationException("ForwardRenderer light probe pipeline state was not built.");
+                drawContext.CommandList.SetPipelineState(bakePipelineState);
                 drawContext.CommandList.SetStencilReference(0);
 
                 // Apply the effect
