@@ -253,10 +253,21 @@ namespace Stride.Engine
             Components.RemoveAll<T>();
         }
 
-        internal void OnComponentChanged(int index, EntityComponent oldComponent, EntityComponent newComponent)
+        internal void OnComponentChanged(int index, EntityComponent? oldComponent, EntityComponent? newComponent)
         {
             // Don't use events but directly call the Owner
-            entityManager?.NotifyComponentChanged(this, index, oldComponent, newComponent);
+            if (entityManager == null)
+            {
+                return;
+            }
+
+            var componentChange = oldComponent == null
+                ? EntityComponentChange.Added(this, newComponent!)
+                : newComponent == null
+                    ? EntityComponentChange.Removed(this, oldComponent)
+                    : EntityComponentChange.Replaced(this, oldComponent, newComponent);
+
+            entityManager.NotifyComponentChanged(index, componentChange);
         }
 
         public override string ToString()
