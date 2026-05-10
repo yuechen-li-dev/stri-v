@@ -507,8 +507,12 @@ namespace Stride.Engine
             processor.SetEntityManager(null);
         }
 
-        internal void NotifyComponentChanged(Entity entity, int index, EntityComponent oldComponent, EntityComponent newComponent)
+        internal void NotifyComponentChanged(int index, in EntityComponentChange change)
         {
+            var entity = change.Entity;
+            var oldComponent = change.OldComponent;
+            var newComponent = change.NewComponent;
+
             // No real update   
             if (oldComponent == newComponent)
                 return;
@@ -538,7 +542,7 @@ namespace Stride.Engine
             // Update all dependencies
             if (currentDependentProcessors.Count > 0)
             {
-                UpdateDependentProcessors(entity, oldComponent, newComponent);
+                UpdateDependentProcessors(entity, change);
                 currentDependentProcessors.Clear();
             }
 
@@ -546,8 +550,10 @@ namespace Stride.Engine
             OnComponentChanged(entity, index, oldComponent, newComponent);
         }
 
-        private void UpdateDependentProcessors(Entity entity, EntityComponent skipComponent1, EntityComponent skipComponent2)
+        private void UpdateDependentProcessors(Entity entity, in EntityComponentChange change)
         {
+            var skipComponent1 = change.OldComponent;
+            var skipComponent2 = change.NewComponent;
             var components = entity.Components;
             for (int i = 0; i < components.Count; i++)
             {
@@ -680,9 +686,9 @@ namespace Stride.Engine
             EntityRemoved?.Invoke(this, e);
         }
 
-        protected virtual void OnComponentChanged(Entity entity, int index, EntityComponent previousComponent, EntityComponent newComponent)
+        protected virtual void OnComponentChanged(Entity entity, int index, EntityComponent? previousComponent, EntityComponent? newComponent)
         {
-            ComponentChanged?.Invoke(this, new EntityComponentEventArgs(entity, index, previousComponent, newComponent));
+            ComponentChanged?.Invoke(this, new EntityComponentEventArgs(entity, index, previousComponent!, newComponent!));
         }
 
         internal void OnHierarchyChanged(Entity entity)
