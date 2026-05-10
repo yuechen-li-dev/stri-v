@@ -34,7 +34,7 @@ namespace Stride.Rendering.Compositing
         public string Name { get; set; } = "CameraSlot";
 
         [DataMemberIgnore]
-        public CameraComponent Camera { get; internal set; }
+        public CameraComponent? Camera { get; internal set; }
 
         /// <summary>
         /// Generates a <see cref="SceneCameraSlotId"/> corresponding to this slot.
