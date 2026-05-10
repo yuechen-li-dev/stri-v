@@ -481,61 +481,63 @@ namespace Stride.Updater
             var temporaryObjects = compiledUpdate.TemporaryObjects;
 
             var stack = StackPool.Acquire();
-
-            // Current object being processed
-            object currentObj = target;
-            object nextObject;
-
-            // pinned test (this will need to be on a stack somehow)
-            var currentPtr = UpdateEngineHelper.ObjectToPointer(currentObj);
-
-            if (operations.Length == 0)
-                return;
-
-            ref var operation = ref MemoryMarshal.GetArrayDataReference(operations);
-            for (int index = 0; index < operations.Length; index++)
+            try
             {
-                // Adjust offset
-                currentPtr += operation.AdjustOffset;
+                // Current object being processed
+                object? currentObj = target;
 
-                switch (operation.Type)
+                // pinned test (this will need to be on a stack somehow)
+                var currentPtr = UpdateEngineHelper.ObjectToPointer(RequireObject(currentObj, null, "current"));
+
+                if (operations.Length == 0)
+                    return;
+
+                ref var operation = ref MemoryMarshal.GetArrayDataReference(operations);
+                for (int index = 0; index < operations.Length; index++)
                 {
-                    case UpdateOperationType.EnterObjectProperty:
+                    // Adjust offset
+                    currentPtr += operation.AdjustOffset;
+
+                    switch (operation.Type)
                     {
-                        nextObject = ((UpdatableProperty)operation.Member).GetObject(currentPtr);
-                        if ((nextObject == null || (!operation.EnterChecker?.CanEnter(nextObject) ?? false)) && operation.SkipCountIfNull != -1)
+                        case UpdateOperationType.EnterObjectProperty:
                         {
-                            index += operation.SkipCountIfNull;
-                            operation = ref Unsafe.Add(ref operation, operation.SkipCountIfNull);
+                            var nextObject = ((UpdatableProperty)operation.Member).GetObject(currentPtr);
+                            if ((nextObject == null || (!operation.EnterChecker?.CanEnter(nextObject) ?? false)) && operation.SkipCountIfNull != -1)
+                            {
+                                index += operation.SkipCountIfNull;
+                                operation = ref Unsafe.Add(ref operation, operation.SkipCountIfNull);
+                                break;
+                            }
+
+                            // Compute offset and push to stack
+                            var parentObject = RequireObject(currentObj, operation, "current");
+                            stack.Push(new UpdateStackEntry(
+                                parentObject,
+                                (int)((byte*)currentPtr - (byte*)UpdateEngineHelper.ObjectToPointer(parentObject))));
+
+                            // Get object
+                            currentObj = nextObject;
+                            currentPtr = UpdateEngineHelper.ObjectToPointer(RequireObject(currentObj, operation, "entered"));
+
                             break;
                         }
-
-                        // Compute offset and push to stack
-                        stack.Push(new UpdateStackEntry(
-                            currentObj,
-                            (int)((byte*)currentPtr - (byte*)UpdateEngineHelper.ObjectToPointer(currentObj))));
-
-                        // Get object
-                        currentObj = nextObject;
-                        currentPtr = UpdateEngineHelper.ObjectToPointer(currentObj);
-
-                        break;
-                    }
                     case UpdateOperationType.EnterStructPropertyBase:
                     {
                         // Compute offset and push to stack
+                        var parentObject = RequireObject(currentObj, operation, "current");
                         stack.Push(new UpdateStackEntry(
-                            currentObj,
-                            (int)((byte*)currentPtr - (byte*)UpdateEngineHelper.ObjectToPointer(currentObj))));
+                            parentObject,
+                            (int)((byte*)currentPtr - (byte*)UpdateEngineHelper.ObjectToPointer(parentObject))));
 
                         currentObj = temporaryObjects[operation.DataOffset];
-                        currentPtr = ((UpdatablePropertyBase)operation.Member).GetStructAndUnbox(currentPtr, currentObj);
+                        currentPtr = ((UpdatablePropertyBase)operation.Member).GetStructAndUnbox(currentPtr, RequireObject(currentObj, operation, "temporary struct"));
 
                         break;
                     }
                     case UpdateOperationType.EnterObjectField:
                     {
-                        nextObject = ((UpdatableField)operation.Member).GetObject(currentPtr);
+                        var nextObject = ((UpdatableField)operation.Member).GetObject(currentPtr);
                         if ((nextObject == null || (!operation.EnterChecker?.CanEnter(nextObject) ?? false)) && operation.SkipCountIfNull != -1)
                         {
                             index += operation.SkipCountIfNull;
@@ -544,18 +546,19 @@ namespace Stride.Updater
                         }
 
                         // Compute offset and push to stack
+                        var parentObject = RequireObject(currentObj, operation, "current");
                         stack.Push(new UpdateStackEntry(
-                            currentObj,
-                            (int)((byte*)currentPtr - (byte*)UpdateEngineHelper.ObjectToPointer(currentObj))));
+                            parentObject,
+                            (int)((byte*)currentPtr - (byte*)UpdateEngineHelper.ObjectToPointer(parentObject))));
 
                         // Get object
                         currentObj = nextObject;
-                        currentPtr = UpdateEngineHelper.ObjectToPointer(currentObj);
+                        currentPtr = UpdateEngineHelper.ObjectToPointer(RequireObject(currentObj, operation, "entered"));
                         break;
                     }
                     case UpdateOperationType.EnterObjectCustom:
                     {
-                        nextObject = ((UpdatableCustomAccessor)operation.Member).GetObject(currentPtr);
+                        var nextObject = ((UpdatableCustomAccessor)operation.Member).GetObject(currentPtr);
                         if ((nextObject == null || (!operation.EnterChecker?.CanEnter(nextObject) ?? false)) && operation.SkipCountIfNull != -1)
                         {
                             index += operation.SkipCountIfNull;
@@ -564,13 +567,14 @@ namespace Stride.Updater
                         }
 
                         // Compute offset and push to stack
+                        var parentObject = RequireObject(currentObj, operation, "current");
                         stack.Push(new UpdateStackEntry(
-                            currentObj,
-                            (int)((byte*)currentPtr - (byte*)UpdateEngineHelper.ObjectToPointer(currentObj))));
+                            parentObject,
+                            (int)((byte*)currentPtr - (byte*)UpdateEngineHelper.ObjectToPointer(parentObject))));
 
                         // Get object
                         currentObj = nextObject;
-                        currentPtr = UpdateEngineHelper.ObjectToPointer(currentObj);
+                        currentPtr = UpdateEngineHelper.ObjectToPointer(RequireObject(currentObj, operation, "entered"));
                         break;
                     }
 
@@ -582,7 +586,7 @@ namespace Stride.Updater
                         // Restore currentObj and currentPtr from stack
                         var stackEntry = stack.Pop();
                         currentObj = stackEntry.Object;
-                        currentPtr = UpdateEngineHelper.ObjectToPointer(currentObj) + stackEntry.Offset;
+                        currentPtr = UpdateEngineHelper.ObjectToPointer(RequireObject(currentObj, operation, "restored")) + stackEntry.Offset;
 
                         // Use setter to set back struct
                         ((UpdatablePropertyBase)operation.Member).SetBlittable(currentPtr, oldPtr);
@@ -594,7 +598,7 @@ namespace Stride.Updater
                         // Restore currentObj and currentPtr from stack
                         var stackEntry = stack.Pop();
                         currentObj = stackEntry.Object;
-                        currentPtr = UpdateEngineHelper.ObjectToPointer(currentObj) + stackEntry.Offset;
+                        currentPtr = UpdateEngineHelper.ObjectToPointer(RequireObject(currentObj, operation, "restored")) + stackEntry.Offset;
                         break;
                     }
                     case UpdateOperationType.ConditionalSetObjectProperty:
@@ -691,10 +695,22 @@ namespace Stride.Updater
                         throw new ArgumentOutOfRangeException();
                 }
 
-                operation = ref Unsafe.Add(ref operation, 1);
+                    operation = ref Unsafe.Add(ref operation, 1);
+                }
             }
+            finally
+            {
+                StackPool.Release(stack);
+            }
+        }
+        
+        private static object RequireObject(object? value, UpdateOperation? operation, string role)
+        {
+            if (value != null)
+                return value;
 
-            StackPool.Release(stack);
+            var operationType = operation?.Type.ToString() ?? "Unknown";
+            throw new InvalidOperationException($"Update runtime frame expected non-null '{role}' object while executing [{operationType}].");
         }
 
         // Helper struct to blit small struct
