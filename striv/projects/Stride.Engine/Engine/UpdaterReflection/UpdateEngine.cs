@@ -119,7 +119,7 @@ namespace Stride.Updater
             /// Contains the last node that was just left.
             /// Used to call <see cref="UpdatableMember.CreateEnterChecker"/>.
             /// </summary>
-            public UpdatableMember LastChildMember;
+            public UpdatableMember? LastChildMember;
         }
 
         /// <summary>
@@ -333,7 +333,7 @@ namespace Stride.Updater
                     state.UpdateOperations.Add(new UpdateOperation
                     {
                         Type = stackPathPart.LeaveOperation,
-                        Member = stackPathPart.Member,
+                        Member = RequireMember(stackPathPart.Member, stackPathPart.LeaveOperation),
                     });
 
                     // We execute a leave operation, previous stack will be restored
@@ -473,6 +473,14 @@ namespace Stride.Updater
                 return temporaryStorage;
 
             throw new InvalidOperationException($"Update compile frame expected non-null temporary storage for struct member type [{memberType}].");
+        }
+
+        private static UpdatableMember RequireMember(UpdatableMember? member, UpdateOperationType operationType)
+        {
+            if (member is not null)
+                return member;
+
+            throw new InvalidOperationException($"UpdateEngine compile operation [{operationType}] requires resolved member state.");
         }
 
         /// <summary>
