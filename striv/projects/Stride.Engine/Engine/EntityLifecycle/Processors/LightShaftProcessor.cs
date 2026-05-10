@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation and Contributors (https://dotnetfoundation.org/ & https://stride3d.net) and Silicon Studio Corp. (https://www.siliconstudio.co.jp)
 // Distributed under the MIT license. See the LICENSE.md file in the project root for more information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Stride.Core.Mathematics;
@@ -16,7 +17,13 @@ namespace Stride.Engine.Processors
         private readonly List<RenderLightShaft> activeLightShafts = new List<RenderLightShaft>();
 
         /// <inheritdoc/>
-        public VisibilityGroup VisibilityGroup { get; set; }
+        private VisibilityGroup? visibilityGroup;
+
+        public VisibilityGroup VisibilityGroup
+        {
+            get => visibilityGroup ?? throw new InvalidOperationException($"{nameof(VisibilityGroup)} is not set.");
+            set => visibilityGroup = value;
+        }
 
         protected internal override void OnSystemAdd()
         {
@@ -27,7 +34,7 @@ namespace Stride.Engine.Processors
 
         protected internal override void OnSystemRemove()
         {
-            VisibilityGroup.Tags.Set(LightShafts.CurrentLightShafts, null);
+            visibilityGroup?.Tags.Set(LightShafts.CurrentLightShafts, null);
 
             base.OnSystemRemove();
         }
@@ -80,6 +87,9 @@ namespace Stride.Engine.Processors
                 if (directLight == null)
                     continue;
 
+                if (lightShaft.Component is null)
+                    continue;
+
                 var boundingVolumes = lightShaftBoundingVolumeProcessor.GetBoundingVolumesForComponent(lightShaft.Component);
                 if (boundingVolumes == null)
                     continue;
@@ -98,8 +108,8 @@ namespace Stride.Engine.Processors
 
         public class AssociatedData
         {
-            public LightShaftComponent Component;
-            public LightComponent LightComponent;
+            public LightShaftComponent? Component;
+            public LightComponent? LightComponent;
         }
     }
 }
