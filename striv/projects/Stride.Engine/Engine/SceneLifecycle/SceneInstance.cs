@@ -25,17 +25,17 @@ namespace Stride.Engine
         /// <summary>
         /// A property key to get the current scene from the <see cref="ComponentBase.Tags"/>.
         /// </summary>
-        public static readonly PropertyKey<SceneInstance> Current = new PropertyKey<SceneInstance>("SceneInstance.Current", typeof(SceneInstance));
+        public static readonly PropertyKey<SceneInstance?> Current = new PropertyKey<SceneInstance?>("SceneInstance.Current", typeof(SceneInstance));
 
         /// <summary>
         /// A property key to get the current render system from the <see cref="ComponentBase.Tags"/>.
         /// </summary>
-        public static readonly PropertyKey<RenderSystem> CurrentRenderSystem = new PropertyKey<RenderSystem>("SceneInstance.CurrentRenderSystem", typeof(SceneInstance));
+        public static readonly PropertyKey<RenderSystem?> CurrentRenderSystem = new PropertyKey<RenderSystem?>("SceneInstance.CurrentRenderSystem", typeof(SceneInstance));
 
         /// <summary>
         /// A property key to get the current visibility group from the <see cref="ComponentBase.Tags"/>.
         /// </summary>
-        public static readonly PropertyKey<VisibilityGroup> CurrentVisibilityGroup = new PropertyKey<VisibilityGroup>("SceneInstance.CurrentVisibilityGroup", typeof(SceneInstance));
+        public static readonly PropertyKey<VisibilityGroup?> CurrentVisibilityGroup = new PropertyKey<VisibilityGroup?>("SceneInstance.CurrentVisibilityGroup", typeof(SceneInstance));
 
         private readonly Dictionary<TypeInfo, RegisteredRenderProcessors> registeredRenderProcessorTypes = new Dictionary<TypeInfo, RegisteredRenderProcessors>();
 
@@ -129,7 +129,7 @@ namespace Stride.Engine
         /// </summary>
         /// <param name="context">The context.</param>
         /// <returns>Stride.Engine.SceneInstance.</returns>
-        public static SceneInstance GetCurrent(RenderContext context)
+        public static SceneInstance? GetCurrent(RenderContext context)
         {
             return context.Tags.Get(Current);
         }
