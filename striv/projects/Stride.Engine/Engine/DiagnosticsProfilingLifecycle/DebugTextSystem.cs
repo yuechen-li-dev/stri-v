@@ -90,7 +90,7 @@ namespace Stride.Profiling
 
             if (fastTextRenderer == null)
             {
-                var debugFont = Content.Load<Texture>("StrideDebugSpriteFont");
+                var debugFont = Content?.Load<Texture>("StrideDebugSpriteFont");
                 if (debugFont == null)
                     return;
 

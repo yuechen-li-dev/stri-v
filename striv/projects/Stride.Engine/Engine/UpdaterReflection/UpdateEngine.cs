@@ -718,16 +718,10 @@ namespace Stride.Updater
         /// <summary>
         /// Internally used as key to register members.
         /// </summary>
-        private struct UpdateKey : IEquatable<UpdateKey>
+        private struct UpdateKey(Type owner, string name) : IEquatable<UpdateKey>
         {
-            public readonly Type Owner;
-            public readonly string Name;
-
-            public UpdateKey(Type owner, string name)
-            {
-                Owner = owner;
-                Name = name;
-            }
+            public readonly Type Owner = owner;
+            public readonly string Name = name;
 
             public override string ToString()
             {
@@ -758,16 +752,10 @@ namespace Stride.Updater
         /// <summary>
         /// Stack entry used in <see cref="Run"/>.
         /// </summary>
-        private struct UpdateStackEntry
+        private struct UpdateStackEntry(object o, int offset)
         {
-            public object Object;
-            public int Offset;
-
-            public UpdateStackEntry(object o, int offset)
-            {
-                Object = o;
-                Offset = offset;
-            }
+            public object Object = o;
+            public int Offset = offset;
         }
     }
 }

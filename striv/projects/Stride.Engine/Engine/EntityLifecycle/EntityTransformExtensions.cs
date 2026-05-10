@@ -114,7 +114,7 @@ namespace Stride.Engine
         [CanBeNull]
         public static Entity FindChild([NotNull] this Entity parentEntity, string childName)
         {
-            if (parentEntity == null) throw new ArgumentNullException(nameof(parentEntity));
+            ArgumentNullException.ThrowIfNull(parentEntity);
             return Utilities.IterateTree(parentEntity, entity => entity?.GetChildren()).FirstOrDefault(entity => entity != null && entity.Name == childName);
         }
 

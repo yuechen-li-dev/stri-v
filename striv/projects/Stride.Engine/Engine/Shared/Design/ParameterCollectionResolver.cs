@@ -1,5 +1,14 @@
 // Copyright (c) .NET Foundation and Contributors (https://dotnetfoundation.org/ & https://stride3d.net) and Silicon Studio Corp. (https://www.siliconstudio.co.jp)
 // Distributed under the MIT license. See the LICENSE.md file in the project root for more information.
+#pragma warning disable STRIDE2000
+// STRIV-NOTE:
+// This file is part of the UpdateEngine custom accessor bridge.
+// PointerToObject<T> is unsafe in general, but these calls occur only inside
+// UpdatableCustomAccessor.GetObject/SetObject-style traversal callbacks, where
+// UpdateEngine owns the object traversal lifetime contract.
+// Do not copy this pattern outside UpdateEngine resolver/accessor code.
+// Long-term direction: replace runtime pointer traversal with generated or typed
+// accessor code that does not round-trip managed objects through IntPtr.
 
 using System;
 using Unsafe = System.Runtime.CompilerServices.Unsafe;
@@ -22,8 +31,7 @@ namespace Stride.Engine.Design
         public override UpdatableMember ResolveIndexer(string indexerName)
         {
             var key = ParameterKeys.FindByName(indexerName);
-            if (key == null)
-                throw new InvalidOperationException($"Property Key path parse error: could not parse indexer value '{indexerName}'");
+            ArgumentNullException.ThrowIfNull(key, nameof(key));
 
             switch (key.Type)
             {
@@ -43,14 +51,8 @@ namespace Stride.Engine.Design
             new ValueParameterCollectionAccessor<T>(null);
         }
 
-        private class ValueParameterCollectionAccessor<T> : UpdatableCustomAccessor where T : struct
+        private class ValueParameterCollectionAccessor<T>(ValueParameterKey<T> parameterKey) : UpdatableCustomAccessor where T : struct
         {
-            private readonly ValueParameterKey<T> parameterKey;
-
-            public ValueParameterCollectionAccessor(ValueParameterKey<T> parameterKey)
-            {
-                this.parameterKey = parameterKey;
-            }
 
             /// <inheritdoc/>
             public override Type MemberType => parameterKey.PropertyType;

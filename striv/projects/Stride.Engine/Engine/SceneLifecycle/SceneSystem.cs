@@ -290,7 +290,6 @@ namespace Stride.Engine
                                 break;
 
                             Game.GraphicsContext.CommandList.Clear(introRenderTarget, SplashScreenColor);
-
                             if (gameTime.Total.TotalSeconds > SplashScreenFadeTime)
                             {
                                 splashScreenState = SplashScreenState.FadingIn;

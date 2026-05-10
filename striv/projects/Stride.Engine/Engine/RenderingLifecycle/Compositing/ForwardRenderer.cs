@@ -438,37 +438,15 @@ namespace Stride.Rendering.Compositing
 
         protected static PixelFormat ComputeNonMSAADepthFormat(PixelFormat format)
         {
-            PixelFormat result;
-
-            switch (format)
+            var result = format switch
             {
-                case PixelFormat.R16_Float:
-                case PixelFormat.R16_Typeless:
-                case PixelFormat.D16_UNorm:
-                    result = PixelFormat.R16_Float;
-                    break;
-                case PixelFormat.R32_Float:
-                case PixelFormat.R32_Typeless:
-                case PixelFormat.D32_Float:
-                    result = PixelFormat.R32_Float;
-                    break;
-
+                PixelFormat.R16_Float or PixelFormat.R16_Typeless or PixelFormat.D16_UNorm => PixelFormat.R16_Float,
+                PixelFormat.R32_Float or PixelFormat.R32_Typeless or PixelFormat.D32_Float => PixelFormat.R32_Float,
                 // Note: for those formats we lose stencil buffer information during MSAA -> non-MSAA conversion
-                case PixelFormat.R24G8_Typeless:
-                case PixelFormat.D24_UNorm_S8_UInt:
-                case PixelFormat.R24_UNorm_X8_Typeless:
-                    result = PixelFormat.R32_Float;
-                    break;
-                case PixelFormat.R32G8X24_Typeless:
-                case PixelFormat.D32_Float_S8X24_UInt:
-                case PixelFormat.R32_Float_X8X24_Typeless:
-                    result = PixelFormat.R32_Float;
-                    break;
-
-                default:
-                    throw new NotSupportedException($"Unsupported depth format [{format}]");
-            }
-
+                PixelFormat.R24G8_Typeless or PixelFormat.D24_UNorm_S8_UInt or PixelFormat.R24_UNorm_X8_Typeless => PixelFormat.R32_Float,
+                PixelFormat.R32G8X24_Typeless or PixelFormat.D32_Float_S8X24_UInt or PixelFormat.R32_Float_X8X24_Typeless => PixelFormat.R32_Float,
+                _ => throw new NotSupportedException($"Unsupported depth format [{format}]"),
+            };
             return result;
         }
 
@@ -568,8 +546,7 @@ namespace Stride.Rendering.Compositing
                     using (drawContext.QueryManager.BeginProfile(Color.Green, CompositingProfilingKeys.Transparent))
                     using (drawContext.PushRenderTargetsAndRestore())
                     {
-                        if (depthStencilSRV == null)
-                            depthStencilSRV = ResolveDepthAsSRV(drawContext);
+                        depthStencilSRV ??= ResolveDepthAsSRV(drawContext);
 
                         var renderTargetSRV = ResolveRenderTargetAsSRV(drawContext);
 
@@ -853,9 +830,7 @@ namespace Stride.Rendering.Compositing
                 return null;
 
             // Create temporary texture and blit active render target to it
-            var renderTarget = drawContext.CommandList.RenderTargets[0];
-            if (renderTarget is null)
-                throw new InvalidOperationException("ForwardRenderer opaque render target is unavailable for transparent pass resource binding.");
+            var renderTarget = drawContext.CommandList.RenderTargets[0] ?? throw new InvalidOperationException("ForwardRenderer opaque render target is unavailable for transparent pass resource binding.");
             var renderTargetTexture = Context.Allocator.GetTemporaryTexture2D(renderTarget.Description);
 
             drawContext.CommandList.Copy(renderTarget, renderTargetTexture);
@@ -961,7 +936,7 @@ namespace Stride.Rendering.Compositing
         {
             foreach (var renderFeature in context.RenderSystem.RenderFeatures)
             {
-                if (!(renderFeature is RootEffectRenderFeature))
+                if (renderFeature is not RootEffectRenderFeature)
                     continue;
 
                 var renderView = context.RenderView;

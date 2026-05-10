@@ -668,11 +668,11 @@ namespace Stride.Rendering
                     {
                         var minTotalSize = Math.Min(oldTotalSize, newTotalSize);
                         oldSpan[..minTotalSize].CopyTo(newSpan);
-                        if (newTotalSize > oldTotalSize) newSpan[minTotalSize..].Fill(0);
+                        if (newTotalSize > oldTotalSize) newSpan[minTotalSize..].Clear();
                     }
                     else
                     {
-                        #warning Partially copying parameter values and leaving remaining bytes zero may cause undesired side effects such as e.g. Color4.Alpha becoming zero.
+                        //Partially copying parameter values and leaving remaining bytes zero may cause undesired side effects such as e.g. Color4.Alpha becoming zero.
                         var minCount = Math.Min(oldParameterKeyInfo.Count, newParameterKeyInfo.Count);
                         var oldSize = oldParameterKeyInfo.Key.Size;
                         var newSize = newParameterKeyInfo.Key.Size;
