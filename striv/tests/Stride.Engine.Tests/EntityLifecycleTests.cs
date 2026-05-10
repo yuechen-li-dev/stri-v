@@ -1,3 +1,4 @@
+using System;
 using Stride.Core.Mathematics;
 using Stride.Core;
 using Stride.Engine;
@@ -17,7 +18,7 @@ public class EntityLifecycleTests
         Assert.Single(entity.Components);
         Assert.Same(entity.Transform, Assert.IsType<TransformComponent>(entity.Components[0]));
         Assert.Null(entity.Scene);
-        Assert.Null(entity.EntityManager);
+        Assert.False(entity.IsManaged);
     }
 
     [Fact]
@@ -25,7 +26,7 @@ public class EntityLifecycleTests
     {
         var component = new TestComponent();
 
-        Assert.Null(component.Entity);
+        Assert.False(component.IsAttached);
     }
 
     [Fact]
@@ -39,7 +40,7 @@ public class EntityLifecycleTests
 
         var removed = entity.Components.Remove(component);
         Assert.True(removed);
-        Assert.Null(component.Entity);
+        Assert.False(component.IsAttached);
 
         var removedAgain = entity.Components.Remove(component);
         Assert.False(removedAgain);
@@ -70,8 +71,84 @@ public class EntityLifecycleTests
         Assert.Same(instance, entity.EntityManager);
 
         instance.RootScene.Entities.Remove(entity);
-        Assert.Null(entity.EntityManager);
+        Assert.False(entity.IsManaged);
+    }
+
+    [Fact]
+    public void EntityComponent_UnattachedEntityAccess_ThrowsInvalidOperationException()
+    {
+        var component = new TestComponent();
+        var ex = Assert.Throws<InvalidOperationException>(() => _ = component.Entity);
+        Assert.Contains("not attached", ex.Message);
+    }
+
+    [Fact]
+    public void EntityComponent_AttachedEntityAccess_ReturnsOwner()
+    {
+        var entity = new Entity();
+        var component = new TestComponent();
+        entity.Components.Add(component);
+        Assert.Same(entity, component.Entity);
+    }
+
+    [Fact]
+    public void EntityComponent_RemovedEntityAccess_ThrowsInvalidOperationException()
+    {
+        var entity = new Entity();
+        var component = new TestComponent();
+        entity.Components.Add(component);
+        entity.Components.Remove(component);
+        var ex = Assert.Throws<InvalidOperationException>(() => _ = component.Entity);
+        Assert.Contains("not attached", ex.Message);
+    }
+
+    [Fact]
+    public void Entity_UnmanagedEntityManagerAccess_ThrowsInvalidOperationException()
+    {
+        var entity = new Entity("entity");
+        var ex = Assert.Throws<InvalidOperationException>(() => _ = entity.EntityManager);
+        Assert.Contains("not registered", ex.Message);
+    }
+
+    [Fact]
+    public void Entity_ManagedEntityManagerAccess_ReturnsManager()
+    {
+        var instance = new SceneInstance(new ServiceRegistry()) { RootScene = new Scene() };
+        var entity = new Entity("entity");
+        instance.RootScene.Entities.Add(entity);
+        Assert.Same(instance, entity.EntityManager);
+    }
+
+    [Fact]
+    public void Entity_RemovedEntityManagerAccess_ThrowsInvalidOperationException()
+    {
+        var instance = new SceneInstance(new ServiceRegistry()) { RootScene = new Scene() };
+        var entity = new Entity("entity");
+        instance.RootScene.Entities.Add(entity);
+        instance.RootScene.Entities.Remove(entity);
+        var ex = Assert.Throws<InvalidOperationException>(() => _ = entity.EntityManager);
+        Assert.Contains("not registered", ex.Message);
+    }
+
+    [Fact]
+    public void EntityProcessor_UnboundLifecycleAccess_ThrowsInvalidOperationException()
+    {
+        var processor = new TestProcessor();
+        var managerEx = Assert.Throws<InvalidOperationException>(() => _ = processor.EntityManager);
+        var servicesEx = Assert.Throws<InvalidOperationException>(() => _ = processor.ServicesAccessor);
+        Assert.Contains("not attached", managerEx.Message);
+        Assert.Contains("services are not available", servicesEx.Message);
     }
 
     private sealed class TestComponent : EntityComponent;
+
+    private sealed class TestProcessor : EntityProcessor
+    {
+        public TestProcessor() : base(typeof(TestComponent), Array.Empty<Type>()) { }
+        public IServiceRegistry ServicesAccessor => Services;
+        protected internal override void OnSystemAdd() { }
+        protected internal override void OnSystemRemove() { }
+        protected internal override void RemoveAllEntities() { }
+        protected internal override void ProcessEntityComponent(Entity entity, EntityComponent entityComponent, bool forceRemove) { }
+    }
 }

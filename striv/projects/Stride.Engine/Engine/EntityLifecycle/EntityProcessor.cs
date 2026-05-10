@@ -21,6 +21,8 @@ namespace Stride.Engine
         internal ProfilingKey DrawProfilingKey;
         private readonly TypeInfo mainTypeInfo;
         private readonly Dictionary<TypeInfo, bool> componentTypesSupportedAsRequired;
+        private EntityManager? entityManager;
+        private IServiceRegistry? services;
 
         /// <summary>
         /// Tags associated to this entity processor
@@ -107,12 +109,20 @@ namespace Stride.Engine
         /// <summary>
         /// Gets the current entity manager.
         /// </summary>
-        public EntityManager EntityManager { get; internal set; }
+        public EntityManager EntityManager => entityManager
+            ?? throw new InvalidOperationException($"Processor [{GetType().Name}] is not attached to an EntityManager.");
 
         /// <summary>
         /// Gets the services.
         /// </summary>
-        public IServiceRegistry Services { get; internal set; }
+        public IServiceRegistry Services => services
+            ?? throw new InvalidOperationException($"Processor [{GetType().Name}] services are not available before system add.");
+
+        public bool IsAttached => entityManager is not null;
+
+        internal void SetEntityManager(EntityManager? value) => entityManager = value;
+
+        internal void SetServices(IServiceRegistry? value) => services = value;
 
         /// <summary>
         /// Performs work related to this processor.
