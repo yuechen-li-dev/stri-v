@@ -6,7 +6,7 @@ using Stride.Rendering;
 
 namespace Stride.Engine.Processors
 {
-    public class ModelNodeLinkProcessor : EntityProcessor<ModelNodeLinkComponent>
+    public class ModelNodeLinkProcessor : EntityProcessor<ModelNodeLinkComponent>, IModelNodeLinkActuator
     {
         public Dictionary<ModelNodeLinkComponent, ModelNodeLinkComponent>.KeyCollection ModelNodeLinkComponents => ComponentDatas.Keys;
 
@@ -28,7 +28,7 @@ namespace Stride.Engine.Processors
         {
             // Reset TransformLink
             if (entity.Transform.TransformLink is ModelNodeTransformLink)
-                entity.Transform.TransformLink = null;
+                ClearModelNodeLink(entity.Transform);
 
             entity.EntityManager.HierarchyChanged -= component.OnHierarchyChanged;
         }
@@ -57,16 +57,42 @@ namespace Stride.Engine.Processors
                             modelComponent = modelEntity?.Get<ModelComponent>();
 
                         // If model component is not parent, we want to use forceRecursive because we might want to update this link before the modelComponent.Entity is updated (depending on order of transformation update)
-                        transformComponent.TransformLink = modelComponent != null
-                            ? new ModelNodeTransformLink(modelComponent, modelNodeLink.NodeName)
-                            : null;
+                        if (modelComponent != null)
+                        {
+                            AttachModelNodeLink(transformComponent, new ModelNodeTransformLink(modelComponent, modelNodeLink.NodeName));
+                        }
+                        else
+                        {
+                            ClearModelNodeLink(transformComponent);
+                        }
                     }
                 }
                 else
                 {
-                    transformComponent.TransformLink = null;
+                    ClearModelNodeLink(transformComponent);
                 }
             }
+        }
+
+
+        void IModelNodeLinkActuator.AttachModelNodeLink(TransformComponent transformComponent, ModelNodeTransformLink link)
+        {
+            transformComponent.TransformLink = link;
+        }
+
+        void IModelNodeLinkActuator.ClearModelNodeLink(TransformComponent transformComponent)
+        {
+            transformComponent.TransformLink = null;
+        }
+
+        private void AttachModelNodeLink(TransformComponent transformComponent, ModelNodeTransformLink link)
+        {
+            ((IModelNodeLinkActuator)this).AttachModelNodeLink(transformComponent, link);
+        }
+
+        private void ClearModelNodeLink(TransformComponent transformComponent)
+        {
+            ((IModelNodeLinkActuator)this).ClearModelNodeLink(transformComponent);
         }
     }
 }
