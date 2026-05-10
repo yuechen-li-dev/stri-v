@@ -44,16 +44,16 @@ namespace Stride.Profiling
         private readonly StringBuilder profilersStringBuilder = new StringBuilder();
         private string profilersString = string.Empty;
 
-        private FastTextRenderer fastTextRenderer;
+        private FastTextRenderer? fastTextRenderer;
 
         private readonly object stringLock = new object();
 
         private Color4 textColor = Color.LightGreen;
 
         private GameProfilingResults filteringMode;
-        private Task stringBuilderTask;
+        private Task? stringBuilderTask;
         private Size2 renderTargetSize;
-        private ChannelReader<ProfilingEvent> profilerChannel;
+        private ChannelReader<ProfilingEvent>? profilerChannel;
         private PresentInterval? userPresentInterval;
         private bool userMinimizedState = true;
 
@@ -69,7 +69,7 @@ namespace Stride.Profiling
         /// <summary>
         /// The render target where the profiling results should be rendered into. If null, the <see cref="Stride.Graphics.GraphicsPresenter.BackBuffer"/> is used.
         /// </summary>
-        public Texture RenderTarget { get; set; }
+        public Texture? RenderTarget { get; set; }
 
         private struct ProfilingResult : IComparer<ProfilingResult>
         {
@@ -116,7 +116,11 @@ namespace Stride.Profiling
             gcProfiler.Tick();
 
             // calculate elaspsed frames
-            var newDraw = Game.DrawTime.FrameCount;
+            var game = Game;
+            if (game == null)
+                return;
+
+            var newDraw = game.DrawTime.FrameCount;
             var elapsedFrames = newDraw - lastFrame;
             lastFrame = newDraw;
 
@@ -178,7 +182,7 @@ namespace Stride.Profiling
             gpuGeneralInfoStringBuilder.AppendFormat("Device: {0}, Platform: {1}, Profile: {2}, Resolution: {3}", GraphicsDevice.Adapter.Description, GraphicsDevice.Platform, GraphicsDevice.ShaderProfile, renderTargetSize);
 
             fpsStatStringBuilder.Clear();
-            fpsStatStringBuilder.AppendFormat("Displaying: {0}, Frame: {1}, Update: {2:0.00}ms, Draw: {3:0.00}ms, FPS: {4:0.00}", FilteringMode, Game.DrawTime.FrameCount, Game.UpdateTime.TimePerFrame.TotalMilliseconds, Game.DrawTime.TimePerFrame.TotalMilliseconds, Game.DrawTime.FramePerSecond);
+            fpsStatStringBuilder.AppendFormat("Displaying: {0}, Frame: {1}, Update: {2:0.00}ms, Draw: {3:0.00}ms, FPS: {4:0.00}", FilteringMode, game.DrawTime.FrameCount, game.UpdateTime.TimePerFrame.TotalMilliseconds, game.DrawTime.TimePerFrame.TotalMilliseconds, game.DrawTime.FramePerSecond);
 
             lock (stringLock)
             {
@@ -210,10 +214,10 @@ namespace Stride.Profiling
                     }
                 }
 
-                if (profilerChannel == null)
+                if (profilerChannel is not { } channel)
                     continue;
 
-                await foreach (var e in profilerChannel.ReadAllAsync())
+                await foreach (var e in channel.ReadAllAsync())
                 {
                     if (dumpTiming.ElapsedMilliseconds > RefreshTime)
                     {
@@ -284,6 +288,9 @@ namespace Stride.Profiling
         {
             elapsedFrames = Math.Max(elapsedFrames, 1);
 
+            if (!profilingResult.Event.HasValue)
+                return;
+
             var profilingEvent = profilingResult.Event.Value;
 
             Profiler.AppendTime(profilersStringBuilder, profilingResult.AccumulatedTime / elapsedFrames);
@@ -321,7 +328,8 @@ namespace Stride.Profiling
             Enabled = false;
             Visible = false;
 
-            Profiler.Unsubscribe(profilerChannel);
+            if (profilerChannel != null)
+                Profiler.Unsubscribe(profilerChannel);
 
             if (stringBuilderTask != null && !stringBuilderTask.IsCompleted)
             {
@@ -335,7 +343,8 @@ namespace Stride.Profiling
         public override void Draw(GameTime gameTime)
         {
             // Where to render the result?
-            var renderTarget = RenderTarget ?? Game.GraphicsDevice.Presenter.BackBuffer;
+            var game = Game ?? throw new InvalidOperationException("GameProfilingSystem must be attached to a Game before drawing.");
+            var renderTarget = RenderTarget ?? game.GraphicsDevice.Presenter.BackBuffer;
 
             // copy those values before fast text render not to influence the game stats
             drawCallsCount = GraphicsDevice.FrameDrawCalls;
@@ -454,7 +463,8 @@ namespace Stride.Profiling
             Visible = false;
 
             // Restore previous PresentInterval state
-            GraphicsDevice.Tags.Set(GraphicsPresenter.ForcedPresentInterval, userPresentInterval);
+            if (GraphicsDevice != null)
+                GraphicsDevice.Tags.Set(GraphicsPresenter.ForcedPresentInterval, userPresentInterval);
 
             userPresentInterval = default;
             if (Game != null)
@@ -499,7 +509,7 @@ namespace Stride.Profiling
                 {
                     if (filteringMode == GameProfilingResults.Fps)
                         profilerChannel = Profiler.Subscribe();
-                    else if (value == GameProfilingResults.Fps)
+                    else if (value == GameProfilingResults.Fps && profilerChannel != null)
                         Profiler.Unsubscribe(profilerChannel);
 
                     filteringMode = value;

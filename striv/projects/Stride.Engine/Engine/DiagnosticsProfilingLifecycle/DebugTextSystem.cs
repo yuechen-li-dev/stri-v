@@ -20,7 +20,7 @@ namespace Stride.Profiling
             public TimeSpan RemainingTime;
         }
         
-        private FastTextRenderer fastTextRenderer;
+        private FastTextRenderer? fastTextRenderer;
         private readonly List<DebugOverlayMessage> overlayMessages = new List<DebugOverlayMessage>();
 
         public DebugTextSystem(IServiceRegistry registry) : base(registry)
@@ -100,7 +100,7 @@ namespace Stride.Profiling
             fastTextRenderer.Begin(Game.GraphicsContext);
 
             // the loop is done backwards so when removing elements from the list you don't change the index of elements that weren't processed already
-            for (int index = overlayMessages.Count - 1; index > 0; index--)
+            for (int index = overlayMessages.Count - 1; index >= 0; index--)
             {
                 var msg = overlayMessages[index];
                 if (msg.TextColor != currentColor)
