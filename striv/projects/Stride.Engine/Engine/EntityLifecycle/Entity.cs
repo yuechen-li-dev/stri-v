@@ -135,6 +135,8 @@ namespace Stride.Engine
         [DataMemberIgnore]
         public bool IsManaged => entityManager is not null;
 
+        internal EntityManager? EntityManagerOrNull => entityManager;
+
         internal void SetEntityManager(EntityManager? value)
         {
             entityManager = value;

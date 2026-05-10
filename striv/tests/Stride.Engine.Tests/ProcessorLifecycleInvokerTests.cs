@@ -54,7 +54,7 @@ public sealed class ProcessorLifecycleInvokerTests
         var foreign = new RecordingProcessor();
 
         var ex = Assert.Throws<InvalidOperationException>(() => manager.AddEntityToProcessor(foreign, entity));
-        Assert.Contains("registered with this EntityManager", ex.Message);
+        Assert.Contains("not attached", ex.Message);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class ProcessorLifecycleInvokerTests
         var foreign = new RecordingProcessor();
 
         var ex = Assert.Throws<InvalidOperationException>(() => manager.RemoveEntityFromProcessor(foreign, entity));
-        Assert.Contains("registered with this EntityManager", ex.Message);
+        Assert.Contains("not attached", ex.Message);
     }
 
     private static SceneInstance CreateManagerWithEntity(out Entity entity)
