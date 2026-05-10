@@ -75,7 +75,8 @@ public sealed class EngineLifecycleRuntimeTests
         Assert.Equal(1, processor.AddedCount);
         Assert.Equal(1, processor.RemovedCount);
         Assert.Same(child, Assert.Single(processor.RemovedEntities));
-        Assert.Null(processor.EntityManager);
+        Assert.False(processor.IsAttached);
+        Assert.Throws<InvalidOperationException>(() => _ = processor.EntityManager);
         Assert.DoesNotContain(processor, entityManager.Processors);
     }
 

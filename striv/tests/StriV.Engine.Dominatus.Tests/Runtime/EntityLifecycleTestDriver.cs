@@ -51,7 +51,7 @@ internal static class EntityLifecycleTestDriver
             ChildSceneDetached: fixture.Child.Scene is null,
             ChildTransformDetached: fixture.Child.Transform.Parent is null,
             ParentChildrenDoesNotContainChild: !fixture.Parent.Transform.Children.Contains(fixture.Child.Transform),
-            ProcessorDetached: fixture.Processor.EntityManager is null,
+            ProcessorDetached: !fixture.Processor.IsAttached,
             ManagerDoesNotContainProcessor: !fixture.EntityManager.Processors.Contains(fixture.Processor),
             ProcessorAddedCount: fixture.Processor.AddedCount,
             ProcessorRemovedCount: fixture.Processor.RemovedCount,

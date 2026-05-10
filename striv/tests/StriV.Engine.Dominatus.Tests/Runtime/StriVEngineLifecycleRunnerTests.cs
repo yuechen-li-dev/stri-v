@@ -71,7 +71,8 @@ public sealed class StriVEngineLifecycleRunnerTests
         Assert.Null(child.Scene);
         Assert.Null(child.Transform.Parent);
         Assert.Empty(parent.Transform.Children);
-        Assert.Null(processor.EntityManager);
+        Assert.False(processor.IsAttached);
+        Assert.Throws<InvalidOperationException>(() => _ = processor.EntityManager);
         Assert.Empty(processor.AddedEntities);
     }
 
@@ -97,7 +98,8 @@ public sealed class StriVEngineLifecycleRunnerTests
 
         Assert.Equal(1, processor.RemovedCount);
         Assert.Same(child, Assert.Single(processor.RemovedEntities));
-        Assert.Null(processor.EntityManager);
+        Assert.False(processor.IsAttached);
+        Assert.Throws<InvalidOperationException>(() => _ = processor.EntityManager);
         Assert.DoesNotContain(processor, entityManager.Processors);
     }
 
@@ -211,7 +213,8 @@ public sealed class StriVEngineLifecycleRunnerTests
         Assert.DoesNotContain(child, scene.Entities);
         Assert.Null(child.Transform.Parent);
         Assert.DoesNotContain(child.Transform, parent.Transform.Children);
-        Assert.Null(processor.EntityManager);
+        Assert.False(processor.IsAttached);
+        Assert.Throws<InvalidOperationException>(() => _ = processor.EntityManager);
         Assert.DoesNotContain(processor, entityManager.Processors);
         Assert.Equal(1, processor.AddedCount);
         Assert.Equal(1, processor.RemovedCount);
