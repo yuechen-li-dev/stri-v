@@ -1,6 +1,8 @@
 using Stride.Engine;
 using Stride.Rendering.LightProbes;
 using Stride.Rendering.Lights;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Stride.Engine.Tests;
@@ -32,5 +34,20 @@ public class RenderingLightLifecycleTests
 
         Assert.NotNull(component.Coefficients);
         Assert.Empty(component.Coefficients);
+    }
+
+    [Fact]
+    public void LightProbeGenerator_UnboundProbeComponent_ThrowsInvalidOperationException()
+    {
+        var probes = new List<LightProbeComponent>
+        {
+            new(),
+            new(),
+            new(),
+            new(),
+        };
+
+        var exception = Assert.Throws<InvalidOperationException>(() => LightProbeGenerator.GenerateRuntimeData(probes));
+        Assert.Contains("attached to an entity", exception.Message, StringComparison.Ordinal);
     }
 }

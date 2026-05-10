@@ -44,17 +44,23 @@ namespace Stride.Rendering.LightProbes
 
                 using (cubemapRenderer.DrawContext.PushRenderTargetsAndRestore())
                 {
+                    var sceneInstance = context.SceneSystem?.SceneInstance
+                        ?? throw new InvalidOperationException("Light probe coefficient generation requires an active scene instance.");
+
                     // Render light probe
                     context.GraphicsContext.CommandList.BeginProfile(Color.Red, "LightProbes");
 
                     int lightProbeIndex = 0;
-                    foreach (var entity in context.SceneSystem.SceneInstance)
+                    foreach (var entity in sceneInstance)
                     {
                         var lightProbe = entity.Get<LightProbeComponent>();
                         if (lightProbe == null)
                             continue;
 
-                        var lightProbePosition = lightProbe.Entity.Transform.WorldMatrix.TranslationVector;
+                        if (lightProbe.Entity?.Transform is not { } transform)
+                            continue;
+
+                        var lightProbePosition = transform.WorldMatrix.TranslationVector;
                         context.GraphicsContext.ResourceGroupAllocator.Reset(context.GraphicsContext.CommandList);
 
                         context.GraphicsContext.CommandList.BeginProfile(Color.Red, $"LightProbes {lightProbeIndex}");
@@ -129,9 +135,11 @@ namespace Stride.Rendering.LightProbes
             for (var lightProbeIndex = 0; lightProbeIndex < lightProbes.Count; lightProbeIndex++)
             {
                 var lightProbe = lightProbes[lightProbeIndex];
+                var transform = lightProbe.Entity?.Transform
+                    ?? throw new InvalidOperationException("Light probe must be attached to an entity with a transform before runtime data generation.");
 
                 // Copy light position
-                lightProbePositions.Add(lightProbe.Entity.Transform.WorldMatrix.TranslationVector);
+                lightProbePositions.Add(transform.WorldMatrix.TranslationVector);
 
                 // Copy coefficients
                 if (lightProbe.Coefficients != null)
