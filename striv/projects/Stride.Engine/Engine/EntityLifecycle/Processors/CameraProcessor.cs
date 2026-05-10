@@ -12,7 +12,7 @@ namespace Stride.Engine.Processors
     /// <summary>
     /// The processor for <see cref="CameraComponent"/>.
     /// </summary>
-    public class CameraProcessor : EntityProcessor<CameraComponent>
+    public class CameraProcessor : EntityProcessor<CameraComponent>, ICameraSlotActuator
     {
         private GraphicsCompositor? currentCompositor;
         private bool cameraSlotsDirty = true;
@@ -57,7 +57,7 @@ namespace Stride.Engine.Processors
                         if (cameraSlot.Camera != null)
                         {
                             cameraSlot.Camera.Slot.AttachedCompositor = null;
-                            cameraSlot.Camera = null;
+                            ClearCamera(cameraSlot);
                         }
                     }
                 }
@@ -126,6 +126,27 @@ namespace Stride.Engine.Processors
             cameraSlotsDirty = true;
         }
 
+
+        void ICameraSlotActuator.AttachCamera(SceneCameraSlot slot, CameraComponent camera)
+        {
+            slot.Camera = camera;
+        }
+
+        void ICameraSlotActuator.ClearCamera(SceneCameraSlot slot)
+        {
+            slot.Camera = null;
+        }
+
+        private void AttachCamera(SceneCameraSlot slot, CameraComponent camera)
+        {
+            ((ICameraSlotActuator)this).AttachCamera(slot, camera);
+        }
+
+        private void ClearCamera(SceneCameraSlot slot)
+        {
+            ((ICameraSlotActuator)this).ClearCamera(slot);
+        }
+
         private void AttachCameraToSlot(GraphicsCompositor graphicsCompositor, CameraComponent camera)
         {
             if (!camera.Enabled) throw new InvalidOperationException($"The camera [{camera.Entity.Name}] is disabled and can't be attached");
@@ -139,14 +160,14 @@ namespace Stride.Engine.Processors
                     if (slot.Camera != null)
                         throw new InvalidOperationException($"Unable to attach camera [{camera.Entity.Name}] to the graphics compositor. Another camera, [{slot.Camera.Entity.Name}], is enabled and already attached to this slot.");
 
-                    slot.Camera = camera;
+                    AttachCamera(slot, camera);
                     camera.Slot.AttachedCompositor = graphicsCompositor;
                     break;
                 }
             }
         }
 
-        private static void DetachCameraFromSlot(CameraComponent camera)
+        private void DetachCameraFromSlot(CameraComponent camera)
         {
             if (camera.Slot.AttachedCompositor == null)
                 throw new InvalidOperationException($"The camera [{camera.Entity.Name}] isn't attached");
@@ -162,21 +183,21 @@ namespace Stride.Engine.Processors
                         throw new InvalidOperationException($"Can'to detach camera [{camera.Entity.Name}] from the graphics compositor. Another camera, {attachedCameraName}, is attached to this slot.");
                     }
 
-                    slot.Camera = null;
+                    ClearCamera(slot);
                     break;
                 }
             }
             camera.Slot.AttachedCompositor = null;
         }
 
-        private static void DetachCameraFromAllSlots(CameraComponent camera, GraphicsCompositor graphicsCompositor)
+        private void DetachCameraFromAllSlots(CameraComponent camera, GraphicsCompositor graphicsCompositor)
         {
             for (var i = 0; i < graphicsCompositor.Cameras.Count; ++i)
             {
                 var slot = graphicsCompositor.Cameras[i];
                 if (slot.Camera == camera)
                 {
-                    slot.Camera = null;
+                    ClearCamera(slot);
                 }
             }
             camera.Slot.AttachedCompositor = null;
