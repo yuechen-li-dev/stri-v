@@ -20,8 +20,8 @@ namespace Stride.Rendering.Compositing
 {
     partial class ForwardRenderer
     {
-        private DynamicEffectInstance bakeLightProbes;
-        private MutablePipelineState bakeLightProbesPipeline;
+        private DynamicEffectInstance? bakeLightProbes;
+        private MutablePipelineState? bakeLightProbesPipeline;
 
         private unsafe void PrepareLightprobeConstantBuffer(RenderContext context)
         {
@@ -58,10 +58,10 @@ namespace Stride.Rendering.Compositing
         /// <param name="drawContext">The drawing context</param>
         private unsafe void BakeLightProbes(RenderContext context, RenderDrawContext drawContext)
         {
-            Texture ibl = null;
-            Buffer tetrahedronProbeIndices = null;
-            Buffer tetrahedronMatrices = null;
-            Buffer lightprobesCoefficients = null;
+            Texture? ibl = null;
+            Buffer? tetrahedronProbeIndices = null;
+            Buffer? tetrahedronMatrices = null;
+            Buffer? lightprobesCoefficients = null;
             var renderView = context.RenderView;
 
             var lightProbesData = context.VisibilityGroup.Tags.Get(LightProbeRenderer.CurrentLightProbes);
@@ -91,7 +91,13 @@ namespace Stride.Rendering.Compositing
                 drawContext.CommandList.Clear(ibl, Color4.Black);
                 drawContext.CommandList.SetRenderTarget(drawContext.CommandList.DepthStencilBuffer, ibl);
 
+                if (GraphicsDevice is null || Services is null)
+                    throw new InvalidOperationException("ForwardRenderer light probes require initialized graphics device and services.");
+
                 bakeLightProbes.UpdateEffect(GraphicsDevice);
+
+                if (bakeLightProbesPipeline is null || bakeLightProbes is null)
+                    throw new InvalidOperationException("ForwardRenderer light probe pipeline is not initialized.");
 
                 bakeLightProbesPipeline.State.RootSignature = bakeLightProbes.RootSignature;
                 bakeLightProbesPipeline.State.EffectBytecode = bakeLightProbes.Effect.Bytecode;
