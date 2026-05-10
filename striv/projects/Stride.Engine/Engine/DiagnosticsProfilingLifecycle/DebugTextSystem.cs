@@ -90,9 +90,13 @@ namespace Stride.Profiling
 
             if (fastTextRenderer == null)
             {
+                var debugFont = Content.Load<Texture>("StrideDebugSpriteFont");
+                if (debugFont == null)
+                    return;
+
                 fastTextRenderer = new FastTextRenderer(game.GraphicsContext)
                 {
-                    DebugSpriteFont = Content.Load<Texture>("StrideDebugSpriteFont"),
+                    DebugSpriteFont = debugFont,
                     TextColor = TextColor,
                 };
             }
