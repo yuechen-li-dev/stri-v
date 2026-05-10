@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation and Contributors (https://dotnetfoundation.org/ & https://stride3d.net) and Silicon Studio Corp. (https://www.siliconstudio.co.jp)
 // Distributed under the MIT license. See the LICENSE.md file in the project root for more information.
 
+using System;
 using Stride.Core;
 using Stride.Core.Mathematics;
 using Stride.Engine;
@@ -27,7 +28,7 @@ namespace Stride.Rendering.Lights
         }
 
         /// <inheritdoc/>
-        public VisibilityGroup VisibilityGroup { get; set; }
+        public VisibilityGroup VisibilityGroup { get; set; } = null!;
 
         /// <summary>
         /// Gets the active lights.
@@ -35,7 +36,7 @@ namespace Stride.Rendering.Lights
         /// <value>The lights.</value>
         public RenderLightCollection Lights { get; } = new RenderLightCollection(DefaultLightCapacityCount);
 
-        public RenderLight GetRenderLight(LightComponent lightComponent)
+        public RenderLight? GetRenderLight(LightComponent lightComponent)
         {
             ComponentDatas.TryGetValue(lightComponent, out var renderLight);
             return renderLight;
@@ -48,12 +49,13 @@ namespace Stride.Rendering.Lights
         protected internal override void OnSystemAdd()
         {
             base.OnSystemAdd();
-            VisibilityGroup.Tags.Set(ForwardLightingRenderFeature.CurrentLights, Lights);
+            var visibilityGroup = VisibilityGroup ?? throw new InvalidOperationException("LightProcessor requires an initialized visibility group before system add.");
+            visibilityGroup.Tags.Set(ForwardLightingRenderFeature.CurrentLights, Lights);
         }
 
         protected internal override void OnSystemRemove()
         {
-            VisibilityGroup.Tags.Set(ForwardLightingRenderFeature.CurrentLights, null);
+            VisibilityGroup?.Tags.Remove(ForwardLightingRenderFeature.CurrentLights);
             base.OnSystemRemove();
         }
 
