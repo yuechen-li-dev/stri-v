@@ -13,12 +13,12 @@ namespace Stride.Animations
     [DataContract(Inherited = true)]
     public abstract class ComputeCurveSampler<T> where T : struct
     {
-        protected IComputeCurve<T> curve;
+        protected IComputeCurve<T>? curve;
 
         [NotNull]
         [DataMember(10)]
         [Display("Curve")]
-        public IComputeCurve<T> Curve
+        public IComputeCurve<T>? Curve
         {
             get
             {

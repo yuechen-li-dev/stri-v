@@ -10,8 +10,8 @@ namespace Stride.Animations
     {
         // Used internally by animation system
         // TODO: Stored in AnimationProcessor?
-        internal AnimationClipEvaluator Evaluator;
-        internal TaskCompletionSource<bool> EndedTCS;
+        internal AnimationClipEvaluator? Evaluator;
+        internal TaskCompletionSource<bool>? EndedTCS;
 
         internal PlayingAnimation(string name, AnimationClip clip) : this()
         {
@@ -37,12 +37,12 @@ namespace Stride.Animations
         /// <summary>
         /// Gets or sets the name of this playing animation (optional).
         /// </summary>
-        public string Name { get; }
+        public string? Name { get; }
 
         /// <summary>
         /// Gets or sets the animation clip to run
         /// </summary>
-        public AnimationClip Clip { get; }
+        public AnimationClip? Clip { get; }
 
         /// <summary>
         /// Gets or sets the repeat mode.

@@ -36,8 +36,8 @@ namespace Stride.Animations
     {
         private bool hasChanged = true;
         private BinaryCurveOperator operatorMethod = BinaryCurveOperator.Add;
-        private IComputeCurve<T> leftChild;
-        private IComputeCurve<T> rightChild;
+        private IComputeCurve<T>? leftChild;
+        private IComputeCurve<T>? rightChild;
 
         /// <inheritdoc/>
         public bool UpdateChanges()
@@ -96,7 +96,7 @@ namespace Stride.Animations
         /// </userdoc>
         [DataMember(20)]
         [Display("Left")]
-        public IComputeCurve<T> LeftChild
+        public IComputeCurve<T>? LeftChild
         {
             get { return leftChild; }
             set
@@ -114,7 +114,7 @@ namespace Stride.Animations
         /// </userdoc>
         [DataMember(30)]
         [Display("Right")]
-        public IComputeCurve<T> RightChild
+        public IComputeCurve<T>? RightChild
         {
             get { return rightChild; }
             set
