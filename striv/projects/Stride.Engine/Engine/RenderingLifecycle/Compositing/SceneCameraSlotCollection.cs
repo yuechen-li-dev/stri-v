@@ -18,6 +18,6 @@ namespace Stride.Rendering.Compositing
         /// <summary>
         /// Property key to access the current collection of <see cref="CameraComponent"/> from <see cref="ComponentBase.Tags"/>.
         /// </summary>
-        public static readonly PropertyKey<SceneCameraSlotCollection> Current = new PropertyKey<SceneCameraSlotCollection>("SceneCameraSlotCollection.Current", typeof(SceneCameraSlotCollection));
+        public static readonly PropertyKey<SceneCameraSlotCollection?> Current = new PropertyKey<SceneCameraSlotCollection?>("SceneCameraSlotCollection.Current", typeof(SceneCameraSlotCollection));
     }
 }
