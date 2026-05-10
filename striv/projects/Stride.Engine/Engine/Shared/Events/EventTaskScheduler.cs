@@ -25,7 +25,7 @@ namespace Stride.Engine.Events
 
         protected override IEnumerable<Task> GetScheduledTasks()
         {
-            return null;
+            return [];
         }
     }
 }

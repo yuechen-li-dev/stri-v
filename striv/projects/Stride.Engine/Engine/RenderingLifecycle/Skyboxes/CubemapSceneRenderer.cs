@@ -21,15 +21,16 @@ namespace Stride.Rendering.Skyboxes
             DrawContext = new RenderDrawContext(context.Services, renderContext, context.GraphicsContext);
 
             // Replace graphics compositor (don't want post fx, etc...)
-            gameCompositor = context.SceneSystem.GraphicsCompositor.Game;
-            context.SceneSystem.GraphicsCompositor.Game = new SceneExternalCameraRenderer { Child = context.SceneSystem.GraphicsCompositor.SingleView, ExternalCamera = Camera };
+            var graphicsCompositor = context.SceneSystem.GraphicsCompositor;
+            gameCompositor = graphicsCompositor.Game;
+            graphicsCompositor.Game = new SceneExternalCameraRenderer { Child = graphicsCompositor.SingleView, ExternalCamera = Camera };
         }
 
         public override void Dispose()
         {
             base.Dispose();
 
-            context.SceneSystem.GraphicsCompositor.Game = gameCompositor;
+            context.SceneSystem.GraphicsCompositor.Game = gameCompositor ?? context.SceneSystem.GraphicsCompositor.SingleView;
         }
 
         public static Texture GenerateCubemap(ISceneRendererContext context, Vector3 position, int textureSize)

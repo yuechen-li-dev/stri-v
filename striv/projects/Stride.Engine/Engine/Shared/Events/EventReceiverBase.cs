@@ -82,7 +82,7 @@ namespace Stride.Engine.Events
         {
             if (BufferBlock.Count == 0)
             {
-                data = default(T);
+                data = default!;
                 return false;
             }
 
@@ -144,7 +144,7 @@ namespace Stride.Engine.Events
                 return false;
             }
 
-            obj = res;
+            obj = res!;
             return true;
         }
     }

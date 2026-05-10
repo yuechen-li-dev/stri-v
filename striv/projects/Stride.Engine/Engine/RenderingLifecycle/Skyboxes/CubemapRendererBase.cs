@@ -48,7 +48,7 @@ namespace Stride.Rendering.Skyboxes
         /// <param name="cubeTexture"></param>
         public void Draw(Vector3 position, Texture cubeTexture)
         {
-            DrawContext.CommandList.SetRenderTargetAndViewport(depthStencil, renderTarget);
+            DrawContext.CommandList.SetRenderTargetAndViewport(depthStencil!, renderTarget);
 
             for (int face = 0; face < 6; ++face)
             {
