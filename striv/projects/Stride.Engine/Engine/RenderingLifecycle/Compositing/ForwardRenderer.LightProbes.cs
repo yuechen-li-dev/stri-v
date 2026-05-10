@@ -75,6 +75,9 @@ namespace Stride.Rendering.Compositing
             if (bakeLightProbes == null)
             {
                 bakeLightProbes = new DynamicEffectInstance("StrideBakeLightProbeEffect");
+                if (Services is null || GraphicsDevice is null)
+                    throw new InvalidOperationException("ForwardRenderer light probes require initialized services and graphics device.");
+
                 bakeLightProbes.Initialize(Services);
 
                 bakeLightProbesPipeline = new MutablePipelineState(GraphicsDevice);
@@ -374,6 +377,14 @@ namespace Stride.Rendering.Compositing
                     var logicalGroup = viewLayout.GetLogicalGroup(logicalKey);
                     if (logicalGroup.Hash == ObjectId.Empty)
                         continue;
+
+                    if (ibl is null || tetrahedronProbeIndices is null || tetrahedronMatrices is null || lightprobesCoefficients is null)
+                    {
+                        // STRIV-TODO: Rendering tag/resource nullability cleanup.
+                        // Reason: Light probe descriptor API currently requires non-null GraphicsResource instances for all slots.
+                        // Future direction: Add explicit optional slot semantics or guaranteed fallback resources at renderer initialization.
+                        continue;
+                    }
 
                     resourceGroup.DescriptorSet.SetShaderResourceView(logicalGroup.DescriptorSlotStart, ibl);
                     resourceGroup.DescriptorSet.SetShaderResourceView(logicalGroup.DescriptorSlotStart + 1, tetrahedronProbeIndices);
