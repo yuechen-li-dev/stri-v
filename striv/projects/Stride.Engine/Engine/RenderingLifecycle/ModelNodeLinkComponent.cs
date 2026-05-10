@@ -15,7 +15,7 @@ namespace Stride.Engine
     [ComponentCategory("Model")]
     public sealed class ModelNodeLinkComponent : EntityComponent
     {
-        private ModelComponent target;
+        private ModelComponent? target;
 
         [DataMemberIgnore]
         public bool IsValid { get; private set; }
@@ -30,7 +30,7 @@ namespace Stride.Engine
         /// Note: Stride does not support as target entities that themself linked to another bone.</userdoc>
         [DataMember(10)]
         [Display("Model (parent if not set)")]
-        public ModelComponent Target
+        public ModelComponent? Target
         {
             get
             {
@@ -52,14 +52,14 @@ namespace Stride.Engine
         /// <userdoc>The bone/joint to attach this entity to.</userdoc>
         [DataMember(20)]
         [Display("Bone")]
-        public string NodeName { get; set; }
+        public string NodeName { get; set; } = string.Empty;
 
         public void ValidityCheck()
         {
             ValidityCheck(target);
         }
 
-        public void ValidityCheck(ModelComponent targetToValidate)
+        public void ValidityCheck(ModelComponent? targetToValidate)
         {
             IsValid = targetToValidate == null ||
                         Entity == null ||
@@ -69,7 +69,7 @@ namespace Stride.Engine
                         && CheckParent(targetToValidate.Entity.Transform));
         }
 
-        internal void OnHierarchyChanged(object sender, Entity entity)
+        internal void OnHierarchyChanged(object? sender, Entity entity)
         {
             if (entity == null || entity.Id != Target?.Entity.Id) return;
             ValidityCheck();

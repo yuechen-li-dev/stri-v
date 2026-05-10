@@ -9,7 +9,7 @@ namespace Stride.Engine
     public class ModelNodeTransformLink : TransformLink
     {
         private readonly ModelComponent parentModelComponent;
-        private SkeletonUpdater skeleton;
+        private SkeletonUpdater? skeleton;
         private int nodesLength;
         private string nodeName;
         private int nodeIndex = int.MaxValue;
@@ -67,7 +67,7 @@ namespace Stride.Engine
             matrix = parentModelComponent.Entity.Transform.WorldMatrix;
         }
 
-        public bool NeedsRecreate(Entity parentEntity, string targetNodeName)
+        public bool NeedsRecreate(Entity? parentEntity, string targetNodeName)
         {
             return parentModelComponent.Entity != parentEntity
                 || !object.ReferenceEquals(nodeName, targetNodeName); // note: supposed to use same string instance so no need to compare content

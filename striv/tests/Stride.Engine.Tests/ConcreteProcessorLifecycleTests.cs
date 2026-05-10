@@ -34,4 +34,22 @@ public sealed class ConcreteProcessorLifecycleTests
         var processor = new LightShaftBoundingVolumeProcessor();
         Assert.NotNull(processor);
     }
+
+    [Fact]
+    public void ModelNodeLinkProcessor_DefaultConstruction_DoesNotRequireRuntimeServices()
+    {
+        var processor = new ModelNodeLinkProcessor();
+        Assert.NotNull(processor);
+    }
+
+    [Fact]
+    public void ModelNodeLinkComponent_DefaultConstruction_HasValidInertState()
+    {
+        var component = new ModelNodeLinkComponent();
+        component.ValidityCheck();
+        Assert.NotNull(component);
+        Assert.True(component.IsValid);
+        Assert.Null(component.Target);
+        Assert.Equal(string.Empty, component.NodeName);
+    }
 }
