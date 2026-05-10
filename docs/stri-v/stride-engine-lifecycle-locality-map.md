@@ -95,3 +95,25 @@ Move doctrine:
 * Do not split files by length.
 * Do not create tiny artificial modules.
 * Prefer files that own one discrete lifecycle/functionality surface end-to-end.
+
+## M22d physical organization status (Shared / NeedsAudit / Quarantine)
+
+Completed physical sorting pass after M22c:
+
+- Shared moves:
+  - `Engine/Events/*` -> `Engine/Shared/Events/*`
+  - `Engine/Gizmos/*` -> `Engine/Shared/Gizmos/*`
+  - `Engine/Lifecycle/IEntityLifecycleOrchestrator.cs` -> `Engine/Shared/Lifecycle/IEntityLifecycleOrchestrator.cs`
+  - `Internals/LambdaReadOnlyCollection.cs` -> `Engine/Shared/Internals/LambdaReadOnlyCollection.cs`
+  - design metadata/contract helpers moved from `Engine/Design/*` to `Engine/Shared/Design/*`.
+- NeedsAudit moves:
+  - `Engine/FlexibleProcessing/*` -> `Engine/NeedsAudit/FlexibleProcessing/*`
+  - `Engine/Design/EntityChildPropertyResolver.cs` -> `Engine/NeedsAudit/Design/EntityChildPropertyResolver.cs`
+- Quarantine moves:
+  - `Engine/Network/*` -> `Engine/Quarantine/Network/*` (strategic quarantine; still compile-included)
+  - `Rendering/Compositing/EditorTopLevelCompositor.cs` -> `Engine/Quarantine/RenderingEditor/EditorTopLevelCompositor.cs` (compile-excluded, `Compile Remove` path updated)
+
+Doctrine reinforcement:
+- Shared remains restricted to true cross-cutting primitives/contracts.
+- Ambiguous ownership is routed to NeedsAudit, not Shared.
+- Quarantine may be compile-included when used as strategic containment (as with Network), and compile-excluded where project policy already excludes paths.
