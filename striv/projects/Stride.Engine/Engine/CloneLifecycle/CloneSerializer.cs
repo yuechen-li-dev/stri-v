@@ -87,11 +87,12 @@ namespace Stride.Engine.Design
                 if (obj is EntityComponent)
                 {
                     // Serialize underlying Entity (needs to be part of the object graph)
-                    var entity = ((EntityComponent)(object)obj).Entity;
+                    var component = (EntityComponent)(object)obj;
+                    var entity = component.EntityOrNull;
                     //var entityDataSerializer = cloneContext.EntitySerializer.GetSerializer<Entity>();
                     stream.Serialize(ref entity, mode);
 
-                    ((EntityComponent)(object)obj).Entity = entity;
+                    component.SetEntity(entity);
                 }
             }
         }

@@ -22,8 +22,21 @@ namespace Stride.Engine
         /// <value>
         /// The owner entity.
         /// </value>
+        private Entity? entity;
+
         [DataMemberIgnore]
-        public Entity Entity { get; internal set; }
+        public Entity Entity => entity
+            ?? throw new InvalidOperationException($"Component [{GetType().Name}] is not attached to an entity.");
+
+        [DataMemberIgnore]
+        public bool IsAttached => entity is not null;
+
+        internal void SetEntity(Entity? value)
+        {
+            entity = value;
+        }
+
+        internal Entity? EntityOrNull => entity;
 
         /// <summary>
         /// The unique identifier of this component.
@@ -43,8 +56,6 @@ namespace Stride.Engine
         {
             get
             {
-                if (Entity == null)
-                    throw new InvalidOperationException($"Entity on this instance [{GetType().Name}] cannot be null");
                 return Entity;
             }
         }
@@ -61,7 +72,7 @@ namespace Stride.Engine
 
             public override void Serialize(ref EntityComponent obj, ArchiveMode mode, SerializationStream stream)
             {
-                var entity = obj.Entity;
+                var entity = obj.entity;
 
                 // Force containing Entity to be collected by serialization, no need to reassign it to EntityComponent.Entity
                 stream.SerializeExtended(ref entity, mode);

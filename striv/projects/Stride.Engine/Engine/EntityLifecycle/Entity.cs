@@ -32,6 +32,7 @@ namespace Stride.Engine
     {
         internal TransformComponent TransformValue;
         internal Scene? SceneValue;
+        private EntityManager? entityManager;
 
         /// <summary>
         /// Create a new <see cref="Entity"/> instance.
@@ -128,7 +129,16 @@ namespace Stride.Engine
         /// The entity manager which processes this entity.
         /// </summary>
         [DataMemberIgnore]
-        public EntityManager EntityManager { get; internal set; }
+        public EntityManager EntityManager => entityManager
+            ?? throw new InvalidOperationException($"Entity [{Name}] is not registered with an EntityManager.");
+
+        [DataMemberIgnore]
+        public bool IsManaged => entityManager is not null;
+
+        internal void SetEntityManager(EntityManager? value)
+        {
+            entityManager = value;
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="Transform"/> associated to this entity.
@@ -244,7 +254,7 @@ namespace Stride.Engine
         internal void OnComponentChanged(int index, EntityComponent oldComponent, EntityComponent newComponent)
         {
             // Don't use events but directly call the Owner
-            EntityManager?.NotifyComponentChanged(this, index, oldComponent, newComponent);
+            entityManager?.NotifyComponentChanged(this, index, oldComponent, newComponent);
         }
 
         public override string ToString()

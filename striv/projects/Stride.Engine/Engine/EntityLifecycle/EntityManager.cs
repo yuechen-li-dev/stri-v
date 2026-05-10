@@ -306,13 +306,13 @@ namespace Stride.Engine
             if (entities.Contains(entity))
                 return;
 
-            if (entity.EntityManager != null)
+            if (entity.IsManaged)
             {
                 throw new InvalidOperationException("Cannot add an entity to this entity manager when it is already used by another entity manager");
             }
 
             // Add this entity to our internal hashset
-            entity.EntityManager = this;
+            entity.SetEntityManager(this);
             entities.Add(entity);
             entity.AddReferenceInternal();
 
@@ -380,7 +380,7 @@ namespace Stride.Engine
 
             entity.ReleaseInternal();
 
-            entity.EntityManager = null;
+            entity.SetEntityManager(null);
 
             OnEntityRemoved(entity);
         }
@@ -452,8 +452,8 @@ namespace Stride.Engine
 
         private void OnProcessorAdded(EntityProcessor processor)
         {
-            processor.EntityManager = this;
-            processor.Services = Services;
+            processor.SetEntityManager(this);
+            processor.SetServices(Services);
             processor.OnSystemAdd();
 
             // Update processor per types and dependencies
@@ -503,8 +503,8 @@ namespace Stride.Engine
             processor.RemoveAllEntities();
 
             processor.OnSystemRemove();
-            processor.Services = null;
-            processor.EntityManager = null;
+            processor.SetServices(null);
+            processor.SetEntityManager(null);
         }
 
         internal void NotifyComponentChanged(Entity entity, int index, EntityComponent oldComponent, EntityComponent newComponent)

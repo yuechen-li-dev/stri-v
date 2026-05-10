@@ -177,7 +177,7 @@ namespace Stride.Engine
             {
                 entity.TransformValue = null;
             }
-            item.Entity = null;
+            item.SetEntity(null);
 
             base.RemoveItem(index);
 
@@ -192,7 +192,7 @@ namespace Stride.Engine
             if (item != oldItem)
             {
                 // Detach entity from previous item only when it's different from the new item.
-                oldItem.Entity = null;
+                oldItem.SetEntity(null);
             }
 
             base.SetItem(index, item);
@@ -235,7 +235,7 @@ namespace Stride.Engine
                 }
             }
 
-            if (!AllowReplaceForeignEntity && entity != null && item.Entity != null)
+            if (!AllowReplaceForeignEntity && entity != null && item.IsAttached)
             {
                 throw new InvalidOperationException($"This component is already attached to entity [{item.Entity}] and cannot be attached to [{entity}]");
             }
@@ -253,7 +253,7 @@ namespace Stride.Engine
                     entity.TransformValue = null;
                 }
 
-                item.Entity = entity;
+                item.SetEntity(entity);
             }
 
             return previousItem;
