@@ -25,9 +25,9 @@ namespace Stride.Rendering.Compositing
         /// </summary>
         /// <value>The camera.</value>
         /// <userdoc>The camera to use to render the scene.</userdoc>
-        public SceneCameraSlot Camera { get; set; }
+        public SceneCameraSlot? Camera { get; set; }
 
-        public ISceneRenderer Child { get; set; }
+        public ISceneRenderer? Child { get; set; }
 
         public RenderGroupMask RenderMask { get; set; } = RenderGroupMask.All;
 
@@ -76,7 +76,7 @@ namespace Stride.Rendering.Compositing
         /// <summary>
         /// Resolves camera to the one contained in slot <see cref="Camera"/>.
         /// </summary>
-        protected virtual CameraComponent ResolveCamera(RenderContext renderContext)
+        protected virtual CameraComponent? ResolveCamera(RenderContext renderContext)
         {
             if (Camera == null && !cameraSlotResolutionFailed)
                 Logger.Warning($"{nameof(SceneCameraRenderer)} [{Id}] has no camera set. Make sure to set camera to the renderer via the Graphic Compositor Editor.");
@@ -85,7 +85,7 @@ namespace Stride.Rendering.Compositing
             if (cameraSlotResolutionFailed)
                 return null;
 
-            var camera = Camera?.Camera;
+            var camera = Camera.Camera;
             if (camera == null && !cameraResolutionFailed)
                     Logger.Warning($"{nameof(SceneCameraRenderer)} [{Id}] has no camera assigned to its {nameof(CameraComponent.Slot)}[{Camera.Name}]. Make sure a camera is enabled and assigned to the corresponding {nameof(CameraComponent.Slot)}.");
 

@@ -12,7 +12,7 @@ namespace Stride.Rendering.Sprites
     /// </summary>
     internal class SpriteRenderProcessor : EntityProcessor<SpriteComponent, SpriteRenderProcessor.SpriteInfo>, IEntityComponentRenderProcessor
     {
-        public VisibilityGroup VisibilityGroup { get; set; }
+        public VisibilityGroup VisibilityGroup { get; set; } = null!;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SpriteRenderProcessor"/> class.
@@ -60,16 +60,16 @@ namespace Stride.Rendering.Sprites
                 {
                     spriteStateKeyPair.Value.Active = isActive;
                     if (isActive)
-                        VisibilityGroup.RenderObjects.Add(renderSprite);
+                        VisibilityGroup?.RenderObjects.Add(renderSprite);
                     else
-                        VisibilityGroup.RenderObjects.Remove(renderSprite);
+                        VisibilityGroup?.RenderObjects.Remove(renderSprite);
                 }
             }
         }
 
         protected override void OnEntityComponentRemoved(Entity entity, SpriteComponent component, SpriteInfo data)
         {
-            VisibilityGroup.RenderObjects.Remove(data.RenderSprite);
+            VisibilityGroup?.RenderObjects.Remove(data.RenderSprite);
         }
 
         protected override SpriteInfo GenerateComponentData(Entity entity, SpriteComponent spriteComponent)
@@ -85,7 +85,7 @@ namespace Stride.Rendering.Sprites
         public class SpriteInfo
         {
             public bool Active;
-            public RenderSprite RenderSprite;
+            public required RenderSprite RenderSprite;
         }
     }
 }

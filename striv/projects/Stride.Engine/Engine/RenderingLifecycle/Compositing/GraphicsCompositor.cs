@@ -97,22 +97,25 @@ namespace Stride.Rendering.Compositing
         /// <summary>
         /// The entry point for the game compositor.
         /// </summary>
-        public ISceneRenderer Game { get; set; }
+        public ISceneRenderer? Game { get; set; }
 
         /// <summary>
         /// The entry point for a compositor that can render a single view.
         /// </summary>
-        public ISceneRenderer SingleView { get; set; }
+        public ISceneRenderer? SingleView { get; set; }
 
         /// <summary>
         /// The entry point for a compositor used by the scene editor.
         /// </summary>
-        public ISceneRenderer Editor { get; set; }
+        public ISceneRenderer? Editor { get; set; }
 
         /// <inheritdoc/>
         protected override void InitializeCore()
         {
             base.InitializeCore();
+
+            if (Context is null)
+                throw new InvalidOperationException("GraphicsCompositor context is not initialized.");
 
             RenderSystem.Initialize(Context);
         }

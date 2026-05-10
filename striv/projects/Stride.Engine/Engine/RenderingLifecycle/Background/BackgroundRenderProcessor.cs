@@ -11,20 +11,20 @@ namespace Stride.Rendering.Background
     /// </summary>
     public class BackgroundRenderProcessor : EntityProcessor<BackgroundComponent, RenderBackground>, IEntityComponentRenderProcessor
     {
-        public VisibilityGroup VisibilityGroup { get; set; }
+        public VisibilityGroup VisibilityGroup { get; set; } = null!;
 
         /// <summary>
         /// Gets the active background.
         /// </summary>
         /// <value>The active background.</value>
-        public RenderBackground ActiveBackground { get; private set; }        
+        public RenderBackground? ActiveBackground { get; private set; }        
 
         /// <inheritdoc />
         protected internal override void OnSystemRemove()
         {
             if (ActiveBackground != null)
             {
-                VisibilityGroup.RenderObjects.Remove(ActiveBackground);
+                VisibilityGroup?.RenderObjects.Remove(ActiveBackground);
                 ActiveBackground = null;
             }
 
@@ -71,9 +71,9 @@ namespace Stride.Rendering.Background
             if (ActiveBackground != previousBackground)
             {
                 if (previousBackground != null)
-                    VisibilityGroup.RenderObjects.Remove(previousBackground);
+                    VisibilityGroup?.RenderObjects.Remove(previousBackground);
                 if (ActiveBackground != null)
-                    VisibilityGroup.RenderObjects.Add(ActiveBackground);
+                    VisibilityGroup?.RenderObjects.Add(ActiveBackground);
             }
         }
     }
