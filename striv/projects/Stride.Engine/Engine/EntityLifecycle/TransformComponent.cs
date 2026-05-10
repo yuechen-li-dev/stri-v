@@ -30,6 +30,7 @@ namespace Stride.Engine
         // This is useful for scenario such as binding a node to a bone, where it first need to run TransformProcessor for the hierarchy,
         // run MeshProcessor to update ModelViewHierarchy, copy Node/Bone transformation to another Entity with special root and then update its children transformations.
         private bool useTRS = true;
+        private static readonly ITransformHierarchyActuator hierarchyActuator = new TransformHierarchyActuator();
         private TransformComponent parent;
 
         internal bool IsMovingInsideRootScene;
@@ -245,8 +246,14 @@ namespace Stride.Engine
                     IsMovingInsideRootScene = true;
 
                 // Add/Remove
-                oldParent?.Children.Remove(this);
-                value?.Children.Add(this);
+                if (value == null)
+                {
+                    hierarchyActuator.DetachParent(this);
+                }
+                else
+                {
+                    hierarchyActuator.AttachParent(this, value);
+                }
 
                 if (moving)
                     IsMovingInsideRootScene = false;
@@ -337,6 +344,24 @@ namespace Stride.Engine
             foreach (var transformOperation in PostOperations)
             {
                 transformOperation.Process(this);
+            }
+        }
+
+        internal sealed class TransformHierarchyActuator : ITransformHierarchyActuator
+        {
+            public void AttachParent(TransformComponent child, TransformComponent parent)
+            {
+                if (child.Parent != null)
+                {
+                    child.Parent.Children.Remove(child);
+                }
+
+                parent.Children.Add(child);
+            }
+
+            public void DetachParent(TransformComponent child)
+            {
+                child.Parent?.Children.Remove(child);
             }
         }
 
