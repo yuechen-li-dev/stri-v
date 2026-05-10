@@ -13,7 +13,7 @@ namespace Stride.Animations
     public class AnimationUpdater
     {
         // Keep track of source channel (if changed, we should regenerate updateChannels)
-        private List<AnimationBlender.Channel> currentSourceChannels;
+        private List<AnimationBlender.Channel> currentSourceChannels = [];
         private int currentSourceChannelCount;
         private CompiledUpdate compiledUpdate;
 
