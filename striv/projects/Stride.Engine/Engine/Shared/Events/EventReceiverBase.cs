@@ -24,13 +24,13 @@ namespace Stride.Engine.Events
     /// <typeparam name="T">The type of data the EventKey will send</typeparam>
     public class EventReceiverBase<T> : EventReceiverBase, IDisposable
     {
-        private IDisposable link;
-        private string receivedDebugString;
-        private string receivedManyDebugString;
+        private IDisposable? link;
+        private string receivedDebugString = string.Empty;
+        private string receivedManyDebugString = string.Empty;
 
-        internal BufferBlock<T> BufferBlock;
+        internal BufferBlock<T> BufferBlock = null!;
 
-        public EventKeyBase<T> Key { get; private set; }
+        public EventKeyBase<T> Key { get; private set; } = null!;
 
         // ReSharper disable once StaticMemberInGenericType
         private static readonly DataflowBlockOptions CapacityOptions = new DataflowBlockOptions
@@ -93,8 +93,7 @@ namespace Stride.Engine.Events
 
         protected int InternalTryReceiveAll(ICollection<T> collection)
         {
-            IList<T> result;
-            if (!BufferBlock.TryReceiveAll(out result))
+            if (!BufferBlock.TryReceiveAll(out var result))
             {
                 return 0;
             }
@@ -117,8 +116,7 @@ namespace Stride.Engine.Events
         public void Reset()
         {
             //consume all in one go
-            IList<T> result;
-            BufferBlock.TryReceiveAll(out result);
+            BufferBlock.TryReceiveAll(out _);
         }
 
         ~EventReceiverBase()
@@ -140,10 +138,9 @@ namespace Stride.Engine.Events
 
         internal override bool TryReceiveOneInternal(out object obj)
         {
-            T res;
-            if (!InternalTryReceive(out res))
+            if (!InternalTryReceive(out var res))
             {
-                obj = null;
+                obj = default!;
                 return false;
             }
 

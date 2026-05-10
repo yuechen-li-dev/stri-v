@@ -1,6 +1,7 @@
 using Stride.Rendering.Background;
 using Stride.Rendering.Compositing;
 using Stride.Rendering.Sprites;
+using Stride.Engine;
 using Xunit;
 
 namespace Stride.Engine.Tests;
@@ -29,6 +30,32 @@ public class RenderingLifecycleConstructionTests
         Assert.NotNull(renderer.RenderView);
         Assert.Null(renderer.Camera);
         Assert.Null(renderer.Child);
+    }
+
+    [Fact]
+    public void SceneCameraSlot_DefaultConstruction_AllowsNoCamera()
+    {
+        var slot = new SceneCameraSlot();
+
+        Assert.Null(slot.Camera);
+        Assert.Equal("CameraSlot", slot.Name);
+    }
+
+    [Fact]
+    public void ModelComponent_DefaultConstruction_HasValidInertState()
+    {
+        var component = new ModelComponent();
+        Assert.Null(component.Model);
+        Assert.Equal(0, component.GetMaterialCount());
+    }
+
+    [Fact]
+    public void LightShaftBoundingVolumeComponent_DefaultConstruction_HasValidInertState()
+    {
+        var component = new LightShaftBoundingVolumeComponent();
+        Assert.Null(component.Model);
+        Assert.Null(component.LightShaft);
+        Assert.True(component.Enabled);
     }
 
     [Fact]
