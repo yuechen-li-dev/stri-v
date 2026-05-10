@@ -26,14 +26,14 @@
     <!-- Stri-V Core excludes editor-only compositor glue from the clean runtime graph. -->
     <Compile Remove="Rendering/Compositing/EditorTopLevelCompositor.cs" />
     <!-- Stri-V Core is desktop Vulkan-first and currently excludes VR-specific runtime helpers. -->
-    <Compile Remove="Rendering/Compositing/ForwardRenderer.VRUtils.cs" />
-    <Compile Remove="Shaders.Compiler/**/*.cs" />
-    <Compile Remove="Audio/*.cs" />
-    <Compile Remove="Engine/AudioEmitterComponent.cs" />
-    <Compile Remove="Engine/AudioListenerComponent.cs" />
-    <Compile Remove="Rendering/Compositing/VRDeviceDescription.cs" />
-    <Compile Remove="Rendering/Compositing/VROverlayRenderer.cs" />
-    <Compile Remove="Rendering/Compositing/VRRendererSettings.cs" />
+    <Compile Remove="Engine/Quarantine/RenderingVR/ForwardRenderer.VRUtils.cs" />
+    <Compile Remove="Engine/Quarantine/Shaders.Compiler/**/*.cs" />
+    <Compile Remove="Engine/Quarantine/Audio/*.cs" />
+    <Compile Remove="Engine/Quarantine/AudioEmitterComponent.cs" />
+    <Compile Remove="Engine/Quarantine/AudioListenerComponent.cs" />
+    <Compile Remove="Engine/Quarantine/RenderingVR/VRDeviceDescription.cs" />
+    <Compile Remove="Engine/Quarantine/RenderingVR/VROverlayRenderer.cs" />
+    <Compile Remove="Engine/Quarantine/RenderingVR/VRRendererSettings.cs" />
   </ItemGroup>
   <Import Project="../../build/StriV.AssemblyProcessor.targets" />
 </Project>
