@@ -60,7 +60,7 @@ namespace Stride.Animations
             return other.ticks == ticks;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (obj.GetType() != typeof(CompressedTimeSpan)) return false;
@@ -145,7 +145,7 @@ namespace Stride.Animations
             return 0;
         }
 
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             if (obj == null)
                 return 1;
