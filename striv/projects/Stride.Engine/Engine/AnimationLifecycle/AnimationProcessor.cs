@@ -41,19 +41,20 @@ namespace Stride.Animations
         protected override void OnEntityComponentRemoved(Entity entity, AnimationComponent component, AssociatedData data)
         {
             // Return AnimationClipEvaluators to pool
-            foreach (var playingAnimation in data.AnimationComponent.PlayingAnimations)
+            var animationComponent = data.AnimationComponent ?? throw new InvalidOperationException("Animation component lifecycle data is not bound.");
+            foreach (var playingAnimation in animationComponent.PlayingAnimations)
             {
                 var evaluator = playingAnimation.Evaluator;
                 if (evaluator != null)
                 {
-                    data.AnimationComponent.Blender.ReleaseEvaluator(evaluator);
+                    animationComponent.Blender.ReleaseEvaluator(evaluator);
                     playingAnimation.Evaluator = null;
                 }
             }
 
             // Return AnimationClipResult to pool
             if (data.AnimationClipResult != null)
-                data.AnimationComponent.Blender.FreeIntermediateResult(data.AnimationClipResult);
+                animationComponent.Blender.FreeIntermediateResult(data.AnimationClipResult);
         }
 
         public override void Draw(RenderContext context)
@@ -65,8 +66,8 @@ namespace Stride.Animations
             {
                 var associatedData = entity.Value;
 
-                var animationUpdater = associatedData.AnimationUpdater;
-                var animationComponent = associatedData.AnimationComponent;
+                var animationUpdater = associatedData.AnimationUpdater ?? throw new InvalidOperationException("Animation updater lifecycle data is not bound.");
+                var animationComponent = associatedData.AnimationComponent ?? throw new InvalidOperationException("Animation component lifecycle data is not bound.");
 
                 if (animationComponent.BlendTreeBuilder != null)
                 {
@@ -190,10 +191,13 @@ namespace Stride.Animations
 
         private AnimationOperation CreatePushOperation(PlayingAnimation playingAnimation)
         {
+            if (playingAnimation.Evaluator is null)
+                throw new InvalidOperationException("Animation evaluator must be created before push operation.");
+
             return AnimationOperation.NewPush(playingAnimation.Evaluator, playingAnimation.CurrentTime);
         }
 
-        public AnimationClipResult GetAnimationClipResult(AnimationComponent animationComponent)
+        public AnimationClipResult? GetAnimationClipResult(AnimationComponent animationComponent)
         {
             if (!ComponentDatas.ContainsKey(animationComponent))
                 return null;
@@ -203,9 +207,9 @@ namespace Stride.Animations
 
         public class AssociatedData
         {
-            public AnimationUpdater AnimationUpdater;
-            public AnimationComponent AnimationComponent;
-            public AnimationClipResult AnimationClipResult;
+            public AnimationUpdater? AnimationUpdater;
+            public AnimationComponent? AnimationComponent;
+            public AnimationClipResult? AnimationClipResult;
         }
     }
 }

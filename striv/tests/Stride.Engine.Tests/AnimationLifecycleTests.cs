@@ -6,6 +6,46 @@ namespace Stride.Engine.Tests;
 public class AnimationLifecycleTests
 {
     [Fact]
+    public void AnimationUpdater_DefaultConstruction_HasValidInertState()
+    {
+        var updater = new AnimationUpdater();
+        var entity = new Stride.Engine.Entity();
+        var clipResult = new AnimationClipResult
+        {
+            Channels = [],
+            Data = [],
+            Objects = [],
+        };
+
+        var exception = Record.Exception(() => updater.Update(entity, clipResult));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void AnimationClip_DefaultConstruction_HasValidEmptyCollections()
+    {
+        var clip = new AnimationClip();
+
+        Assert.NotNull(clip.Channels);
+        Assert.Empty(clip.Channels);
+        Assert.NotNull(clip.Curves);
+        Assert.Empty(clip.Curves);
+        Assert.NotNull(clip.OptimizedAnimationDatas);
+        Assert.Empty(clip.OptimizedAnimationDatas);
+        Assert.Null(clip.GetCurve("Missing"));
+    }
+
+    [Fact]
+    public void AnimationProcessor_DefaultConstruction_DoesNotRequireRuntimeServices()
+    {
+        var processor = new AnimationProcessor();
+
+        Assert.NotNull(processor);
+        Assert.Null(processor.GetAnimationClipResult(new AnimationComponent()));
+    }
+
+    [Fact]
     public void ComputeBinaryCurve_DefaultConstruction_AllowsMissingChildren()
     {
         var curve = new FloatBinaryCurve();

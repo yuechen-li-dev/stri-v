@@ -47,9 +47,9 @@ namespace Stride.Animations
 
         // TODO: The curve stored inside should be internal/private (it is public now to avoid implementing custom serialization before first release).
         [MemberCollection(NotNullItems = true)]
-        public List<AnimationCurve> Curves = new List<AnimationCurve>();
+        public List<AnimationCurve?> Curves = new List<AnimationCurve?>();
 
-        public AnimationData[] OptimizedAnimationDatas;
+        public AnimationData[] OptimizedAnimationDatas = [];
 
         /// <summary>
         /// Set this flag to true when the channel information of the clip have changed and need to be rescan by engine.
@@ -79,7 +79,7 @@ namespace Stride.Animations
             Curves.Add(curve);
         }
 
-        public AnimationCurve GetCurve(string propertyName)
+        public AnimationCurve? GetCurve(string propertyName)
         {
             Channel channel;
             if (!Channels.TryGetValue(propertyName, out channel))
@@ -111,8 +111,12 @@ namespace Stride.Animations
                 .GroupBy(x => x.Value.ElementType))
             {
                 // Create AnimationData
-                var firstCurve = Curves[curveByTypes.First().Value.CurveIndex];
-                var animationData = firstCurve.CreateOptimizedData(curveByTypes.Select(x => new KeyValuePair<string, AnimationCurve>(x.Key, Curves[x.Value.CurveIndex])));
+                var firstCurve = Curves[curveByTypes.First().Value.CurveIndex] ?? throw new InvalidOperationException("Animation channel points to a missing curve.");
+                var animationData = firstCurve.CreateOptimizedData(curveByTypes.Select(x =>
+                {
+                    var curve = Curves[x.Value.CurveIndex] ?? throw new InvalidOperationException($"Animation channel '{x.Key}' points to a missing curve.");
+                    return new KeyValuePair<string, AnimationCurve>(x.Key, curve);
+                }));
                 optimizedAnimationDatas.Add(animationData);
 
                 // Update channels
