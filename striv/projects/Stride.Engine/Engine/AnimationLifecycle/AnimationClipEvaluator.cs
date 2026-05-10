@@ -139,18 +139,32 @@ namespace Stride.Animations
 
                 if (clipChannel.CurveIndex != -1)
                 {
-                    curve = currentClip.Curves[clipChannel.CurveIndex];
-
-                    // TODO: Optimize this search?
-                    var curveEvaluatorGroup = curveEvaluatorGroups.OfType<AnimationCurveEvaluatorDirectGroup>().FirstOrDefault(x => x.ElementType == clipChannel.ElementType);
-                    if (curveEvaluatorGroup == null)
+                    if (clipChannel.CurveIndex < 0 || clipChannel.CurveIndex >= currentClip.Curves.Count)
                     {
-                        // First time, let's create it
-                        curveEvaluatorGroup = curve.CreateEvaluator();
-                        curveEvaluatorGroups.Add(curveEvaluatorGroup);
+                        itemFound = false;
+                    }
+                    else
+                    {
+                        curve = currentClip.Curves[clipChannel.CurveIndex];
                     }
 
-                    curveEvaluatorGroup.AddChannel(curve, offset);
+                    if (curve is not null)
+                    {
+                        // TODO: Optimize this search?
+                        var curveEvaluatorGroup = curveEvaluatorGroups.OfType<AnimationCurveEvaluatorDirectGroup>().FirstOrDefault(x => x.ElementType == clipChannel.ElementType);
+                        if (curveEvaluatorGroup == null)
+                        {
+                            // First time, let's create it
+                            curveEvaluatorGroup = curve.CreateEvaluator();
+                            curveEvaluatorGroups.Add(curveEvaluatorGroup);
+                        }
+
+                        curveEvaluatorGroup.AddChannel(curve, offset);
+                    }
+                    else
+                    {
+                        itemFound = false;
+                    }
                 }
                 else
                 {
@@ -168,7 +182,7 @@ namespace Stride.Animations
         {
             public int Offset;
             public AnimationBlender.BlendType BlendType;
-            public AnimationCurve Curve;
+            public AnimationCurve? Curve;
             public float Factor;
         }
     }

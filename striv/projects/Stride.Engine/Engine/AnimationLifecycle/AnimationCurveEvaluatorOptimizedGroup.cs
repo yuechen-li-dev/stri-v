@@ -47,7 +47,7 @@ namespace Stride.Animations
     public abstract class AnimationCurveEvaluatorOptimizedGroup<T> : AnimationCurveEvaluatorOptimizedGroup
     {
         private int animationSortedIndex;
-        protected AnimationData<T> animationData;
+        protected AnimationData<T>? animationData;
         private CompressedTimeSpan currentTime;
         protected FastListStruct<Channel> channels = new FastListStruct<Channel>(8);
 
@@ -79,7 +79,8 @@ namespace Stride.Animations
 
         public override void SetChannelOffset(string name, int offset)
         {
-            var targetKeys = animationData.TargetKeys;
+            var data = animationData ?? throw new InvalidOperationException("Animation evaluator group is not initialized.");
+            var targetKeys = data.TargetKeys;
             for (int i = 0; i < targetKeys.Length; ++i)
             {
                 if (targetKeys[i] == name)
@@ -98,17 +99,19 @@ namespace Stride.Animations
             // If user seek back, need to start from beginning
             if (timeSpan < currentTime)
             {
+                var initialData = animationData ?? throw new InvalidOperationException("Animation evaluator group is not initialized.");
                 // Always start from beginning after a reset
                 animationSortedIndex = 0;
-                for (int channelIndex = 0; channelIndex < animationData.AnimationInitialValues.Length; ++channelIndex)
+                for (int channelIndex = 0; channelIndex < initialData.AnimationInitialValues.Length; ++channelIndex)
                 {
-                    InitializeAnimation(ref channels.Items[channelIndex], ref animationData.AnimationInitialValues[channelIndex]);
+                    InitializeAnimation(ref channels.Items[channelIndex], ref initialData.AnimationInitialValues[channelIndex]);
                 }
             }
 
             currentTime = timeSpan;
-            var animationSortedValueCount = animationData.AnimationSortedValueCount;
-            var animationSortedValues = animationData.AnimationSortedValues;
+            var sortedData = animationData ?? throw new InvalidOperationException("Animation evaluator group is not initialized.");
+            var animationSortedValueCount = sortedData.AnimationSortedValueCount;
+            var animationSortedValues = sortedData.AnimationSortedValues;
 
             if (animationSortedValueCount == 0)
                 return;

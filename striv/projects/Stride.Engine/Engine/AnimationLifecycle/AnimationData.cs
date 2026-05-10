@@ -20,7 +20,7 @@ namespace Stride.Animations
         public const int AnimationSortedValueBlock = 4096;
 
         public int AnimationSortedValueCount { get; set; }
-        public string[] TargetKeys { get; set; }
+        public string[] TargetKeys { get; set; } = [];
 
         public abstract Type ElementType { get; }
         internal abstract AnimationCurveEvaluatorOptimizedGroup CreateEvaluator();
@@ -42,8 +42,8 @@ namespace Stride.Animations
     [DataSerializerGlobal(null, typeof(AnimationData<object>))]
     public class AnimationData<T> : AnimationData
     {
-        public AnimationInitialValues<T>[] AnimationInitialValues { get; set; }
-        public AnimationKeyValuePair<T>[][] AnimationSortedValues { get; set; }
+        public AnimationInitialValues<T>[] AnimationInitialValues { get; set; } = [];
+        public AnimationKeyValuePair<T>[][] AnimationSortedValues { get; set; } = [];
 
         public TimeSpan Duration
         {
