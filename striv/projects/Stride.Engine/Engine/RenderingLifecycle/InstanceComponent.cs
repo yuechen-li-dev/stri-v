@@ -17,8 +17,8 @@ namespace Stride.Engine
     [DefaultEntityComponentProcessor(typeof(InstanceProcessor))]
     public sealed class InstanceComponent : ActivableEntityComponent
     {
-        private InstancingComponent master;
-        private InstancingEntityTransform connectedInstancing;
+        private InstancingComponent? master;
+        private InstancingEntityTransform? connectedInstancing;
 
         /// <summary>
         /// Gets or sets the referenced <see cref="InstancingComponent"/> to instance.
@@ -30,7 +30,7 @@ namespace Stride.Engine
         [Display("Instancing", Expand = ExpandRule.Always)]
         public InstancingComponent Master
         {
-            get => master;
+            get => master ?? throw new InvalidOperationException("Master instancing component is not assigned.");
             set
             {
                 if (value != master)
@@ -52,7 +52,7 @@ namespace Stride.Engine
             }
         }
 
-        private void Master_InstancingChanged(object sender, IInstancing e)
+        private void Master_InstancingChanged(object? sender, IInstancing e)
         {
             DisconnectInstancing();
             ConnectInstancing();

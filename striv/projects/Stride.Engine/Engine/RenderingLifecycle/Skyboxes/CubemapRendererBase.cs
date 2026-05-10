@@ -9,13 +9,13 @@ namespace Stride.Rendering.Skyboxes
     public abstract class CubemapRendererBase : IDisposable
     {
         private Texture renderTarget;
-        private Texture depthStencil;
+        private Texture? depthStencil;
 
         protected readonly int OutputTextureSize;
         protected readonly PixelFormat OutputTextureFormat;
 
         public readonly CameraComponent Camera;
-        public RenderDrawContext DrawContext { get; protected set; }
+        public RenderDrawContext DrawContext { get; protected set; } = null!;
 
         public CubemapRendererBase(GraphicsDevice device, int outputSize, PixelFormat outputFormat, bool needDepthStencil)
         {

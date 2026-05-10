@@ -10,7 +10,7 @@ namespace Stride.Rendering.Skyboxes
     public class CubemapSceneRenderer : CubemapRendererBase
     {
         private readonly ISceneRendererContext context;
-        private readonly ISceneRenderer gameCompositor;
+        private readonly ISceneRenderer? gameCompositor;
 
         public CubemapSceneRenderer(ISceneRendererContext context, int textureSize)
             : base(context.GraphicsDevice, textureSize, PixelFormat.R16G16B16A16_Float, true)
