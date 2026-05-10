@@ -1,3 +1,4 @@
+using Stride.Core;
 using Stride.Engine;
 using Stride.Rendering.LightProbes;
 using Stride.Rendering.Lights;
@@ -17,6 +18,33 @@ public class RenderingLightLifecycleTests
         Assert.Null(processor.VisibilityGroup);
         Assert.NotNull(processor.Lights);
         Assert.Empty(processor.Lights);
+    }
+
+    [Fact]
+    public void LightRegistrationActuator_RegisterAndUnregisterLight_UpdatesRenderLightLookup()
+    {
+        var processor = new LightProcessor();
+        var component = new LightComponent();
+        var renderLight = new RenderLight();
+
+        ((ILightRegistrationActuator)processor).RegisterLight(component, renderLight);
+
+        Assert.Same(renderLight, processor.GetRenderLight(component));
+
+        ((ILightRegistrationActuator)processor).UnregisterLight(component);
+
+        Assert.Same(renderLight, processor.GetRenderLight(component));
+    }
+
+    [Fact]
+    public void LightRegistrationActuator_UnregisterMissingLight_DoesNotThrow()
+    {
+        var processor = new LightProcessor();
+        var component = new LightComponent();
+
+        var exception = Record.Exception(() => ((ILightRegistrationActuator)processor).UnregisterLight(component));
+
+        Assert.Null(exception);
     }
 
     [Fact]

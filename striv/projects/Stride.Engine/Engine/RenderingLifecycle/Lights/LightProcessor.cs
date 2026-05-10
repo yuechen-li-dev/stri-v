@@ -11,7 +11,7 @@ namespace Stride.Rendering.Lights
     /// <summary>
     /// Process <see cref="LightComponent"/> stored in an <see cref="EntityManager"/> by providing grouped lights per types/shadows.
     /// </summary>
-    public class LightProcessor : EntityProcessor<LightComponent, RenderLight>, IEntityComponentRenderProcessor
+    public class LightProcessor : EntityProcessor<LightComponent, RenderLight>, IEntityComponentRenderProcessor, ILightRegistrationActuator
     {
         /// <summary>
         /// The default direction of a light vector is (x,y,z) = (0,0,-1)
@@ -59,6 +59,42 @@ namespace Stride.Rendering.Lights
             base.OnSystemRemove();
         }
 
+
+        protected override void OnEntityComponentAdding(Entity entity, LightComponent component, RenderLight data)
+        {
+            RegisterLight(component, data);
+            base.OnEntityComponentAdding(entity, component, data);
+        }
+
+        protected override void OnEntityComponentRemoved(Entity entity, LightComponent component, RenderLight data)
+        {
+            UnregisterLight(component);
+            base.OnEntityComponentRemoved(entity, component, data);
+        }
+
+        public void RegisterLight(LightComponent component, RenderLight renderLight)
+        {
+            if (!ComponentDatas.ContainsKey(component))
+            {
+                ComponentDatas.Add(component, renderLight);
+            }
+        }
+
+        public void UpdateLight(LightComponent component, RenderLight renderLight)
+        {
+            renderLight.Type = component.Type;
+            renderLight.Intensity = component.Intensity;
+            renderLight.WorldMatrix = component.Entity.Transform.WorldMatrix;
+        }
+
+        public void UnregisterLight(LightComponent component)
+        {
+            if (ComponentDatas.TryGetValue(component, out var renderLight))
+            {
+                Lights.Remove(renderLight);
+            }
+        }
+
         public override void Draw(RenderContext context)
         {
             // 1) Clear the cache of current lights (without destroying collections but keeping previously allocated ones)
@@ -77,9 +113,7 @@ namespace Stride.Rendering.Lights
                     continue;
                 }
 
-                renderLight.Type = lightComponent.Type;
-                renderLight.Intensity = lightComponent.Intensity;
-                renderLight.WorldMatrix = lightComponent.Entity.Transform.WorldMatrix;
+                UpdateLight(lightComponent, renderLight);
 
                 // Update info specific to this light type
                 if (!renderLight.Type.Update(renderLight))
