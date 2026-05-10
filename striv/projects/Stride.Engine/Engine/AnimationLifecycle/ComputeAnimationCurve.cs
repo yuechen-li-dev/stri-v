@@ -59,7 +59,7 @@ namespace Stride.Animations
         }
 
         /// <inheritdoc/>
-        public override int Compare(AnimationKeyFrame<T> x, AnimationKeyFrame<T> y)
+        public override int Compare(AnimationKeyFrame<T>? x, AnimationKeyFrame<T>? y)
         {
             if (x == null && y == null) return 0;
             if (x == null) return -1;

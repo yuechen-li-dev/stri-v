@@ -53,8 +53,14 @@ namespace Stride.Engine
         {
             public static new readonly EntityProcessorComparer Default = new EntityProcessorComparer();
 
-            public override int Compare(EntityProcessor x, EntityProcessor y)
+            public override int Compare(EntityProcessor? x, EntityProcessor? y)
             {
+                if (ReferenceEquals(x, y))
+                    return 0;
+                if (x is null)
+                    return -1;
+                if (y is null)
+                    return 1;
                 return x.Order.CompareTo(y.Order);
             }
         }
