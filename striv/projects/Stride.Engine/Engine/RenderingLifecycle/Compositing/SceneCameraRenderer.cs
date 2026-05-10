@@ -85,9 +85,13 @@ namespace Stride.Rendering.Compositing
             if (cameraSlotResolutionFailed)
                 return null;
 
-            var camera = Camera.Camera;
+            var cameraSlot = Camera;
+            if (cameraSlot == null)
+                return null;
+
+            var camera = cameraSlot.Camera;
             if (camera == null && !cameraResolutionFailed)
-                    Logger.Warning($"{nameof(SceneCameraRenderer)} [{Id}] has no camera assigned to its {nameof(CameraComponent.Slot)}[{Camera.Name}]. Make sure a camera is enabled and assigned to the corresponding {nameof(CameraComponent.Slot)}.");
+                    Logger.Warning($"{nameof(SceneCameraRenderer)} [{Id}] has no camera assigned to its {nameof(CameraComponent.Slot)}[{cameraSlot.Name}]. Make sure a camera is enabled and assigned to the corresponding {nameof(CameraComponent.Slot)}.");
 
             cameraResolutionFailed = camera == null;
 

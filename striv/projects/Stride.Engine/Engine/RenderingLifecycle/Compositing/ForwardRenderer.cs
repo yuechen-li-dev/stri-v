@@ -137,6 +137,8 @@ namespace Stride.Rendering.Compositing
             base.InitializeCore();
 
             shadowMapRenderer = Context.RenderSystem.RenderFeatures.OfType<MeshRenderFeature>().FirstOrDefault()?.RenderFeatures.OfType<ForwardLightingRenderFeature>().FirstOrDefault()?.ShadowMapRenderer;
+            if (GraphicsDevice is null)
+                throw new InvalidOperationException("ForwardRenderer requires an initialized graphics device.");
 
             if (MSAALevel != MultisampleCount.None)
             {
@@ -505,8 +507,7 @@ namespace Stride.Rendering.Compositing
             PrepareVRConstantBuffer(context, eyeIndex, eyeCount);
 
             // Z Prepass
-            var lightProbes = LightProbes && GBufferRenderStage != null;
-            if (lightProbes)
+            if (LightProbes && GBufferRenderStage is RenderStage gbufferRenderStage)
             {
                 // Note: Baking lightprobe before GBuffer prepass because we are updating some cbuffer parameters needed by Opaque pass that GBuffer pass might upload early
                 PrepareLightprobeConstantBuffer(context);
@@ -519,7 +520,7 @@ namespace Stride.Rendering.Compositing
                     drawContext.CommandList.SetRenderTarget(drawContext.CommandList.DepthStencilBuffer, null);
 
                     // Draw [main view | z-prepass stage]
-                        renderSystem.Draw(drawContext, context.RenderView, GBufferRenderStage);
+                        renderSystem.Draw(drawContext, context.RenderView, gbufferRenderStage);
                 }
 
                 // Bake lightprobes against Z-buffer
@@ -552,6 +553,9 @@ namespace Stride.Rendering.Compositing
                             var renderTarget = drawContext.CommandList.RenderTargets[0];
                             var materialIndexRenderTarget = drawContext.CommandList.RenderTargets[materialIndex];
 
+                            if (depthStencilSRV is null)
+                                throw new InvalidOperationException("ForwardRenderer depth shader resource is unavailable for subsurface scattering.");
+
                             SubsurfaceScatteringBlurEffect.Draw(drawContext, renderTarget, materialIndexRenderTarget, depthStencilSRV, renderTarget);
                         }
                     }
@@ -571,7 +575,8 @@ namespace Stride.Rendering.Compositing
 
                         renderSystem.Draw(drawContext, context.RenderView, TransparentRenderStage);
 
-                        Context.Allocator.ReleaseReference(renderTargetSRV);
+                        if (renderTargetSRV != null)
+                            Context.Allocator.ReleaseReference(renderTargetSRV);
                     }
                 }
 
@@ -613,6 +618,9 @@ namespace Stride.Rendering.Compositing
                         throw new InvalidOperationException("ForwardRenderer depth stencil is unavailable before post effects.");
                     if (viewOutputTarget == null)
                         throw new InvalidOperationException("ForwardRenderer output render target is unavailable before post effects.");
+
+                    if (OpaqueRenderStage == null)
+                        throw new InvalidOperationException("ForwardRenderer opaque render stage is required before post effects.");
 
                     PostEffects.Draw(drawContext, OpaqueRenderStage.OutputValidator, CollectionsMarshal.AsSpan(renderTargets), depthStencil, viewOutputTarget);
                 }
@@ -827,7 +835,7 @@ namespace Stride.Rendering.Compositing
 
             commandList.SetRenderTargets(depthStencilView: null, commandList.RenderTargets);
 
-            var depthStencilROCached = context.Resolver.GetDepthStencilAsRenderTarget(depthStencil, this.depthStencilROCached);
+            var depthStencilROCached = context.Resolver.GetDepthStencilAsRenderTarget(depthStencil, this.depthStencilROCached ?? depthStencil);
             if (depthStencilROCached != this.depthStencilROCached)
             {
                 // Dispose cached view
@@ -846,6 +854,8 @@ namespace Stride.Rendering.Compositing
 
             // Create temporary texture and blit active render target to it
             var renderTarget = drawContext.CommandList.RenderTargets[0];
+            if (renderTarget is null)
+                throw new InvalidOperationException("ForwardRenderer opaque render target is unavailable for transparent pass resource binding.");
             var renderTargetTexture = Context.Allocator.GetTemporaryTexture2D(renderTarget.Description);
 
             drawContext.CommandList.Copy(renderTarget, renderTargetTexture);
