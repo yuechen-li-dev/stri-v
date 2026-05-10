@@ -24,13 +24,13 @@ namespace Stride.Engine.Design
             EffectCompilation = EffectCompilationMode.Local;
         }
 
-        public string PackageName { get; set; }
+        public string PackageName { get; set; } = string.Empty;
 
-        public string DefaultSceneUrl { get; set; }
+        public string DefaultSceneUrl { get; set; } = string.Empty;
 
-        public string DefaultGraphicsCompositorUrl { get; set; }
+        public string DefaultGraphicsCompositorUrl { get; set; } = string.Empty;
 
-        public string SplashScreenUrl { get; set; }
+        public string SplashScreenUrl { get; set; } = string.Empty;
 
         public Color4 SplashScreenColor { get; set; }
 
@@ -54,6 +54,6 @@ namespace Stride.Engine.Design
         /// <summary>
         /// Gets or sets configuration for the actual running platform as compiled during build
         /// </summary>
-        public PlatformConfigurations Configurations { get; set; }
+        public PlatformConfigurations Configurations { get; set; } = new PlatformConfigurations();
     }
 }

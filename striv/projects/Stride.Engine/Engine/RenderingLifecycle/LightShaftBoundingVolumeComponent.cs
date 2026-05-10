@@ -18,8 +18,8 @@ namespace Stride.Engine
     [ComponentCategory("Lights")]
     public class LightShaftBoundingVolumeComponent : ActivableEntityComponent
     {
-        private Model model;
-        private LightShaftComponent lightShaft;
+        private Model? model;
+        private LightShaftComponent? lightShaft;
         private bool enabled = true;
 
         public override bool Enabled
@@ -31,7 +31,7 @@ namespace Stride.Engine
         /// <summary>
         /// The model used to define the bounding volume
         /// </summary>
-        public Model Model
+        public Model? Model
         {
             get { return model; }
             set { model = value; ModelChanged?.Invoke(this, null); }
@@ -40,7 +40,7 @@ namespace Stride.Engine
         /// <summary>
         /// The light shaft to which the bounding volume applies
         /// </summary>
-        public LightShaftComponent LightShaft
+        public LightShaftComponent? LightShaft
         {
             get { return lightShaft; }
             set { lightShaft = value; LightShaftChanged?.Invoke(this, null); }

@@ -28,8 +28,8 @@ namespace Stride.Engine
     public sealed class ModelComponent : ActivableEntityComponent, IModelInstance
     {
         private readonly List<MeshInfo> meshInfos = new List<MeshInfo>();
-        private Model model;
-        private SkeletonUpdater skeleton;
+        private Model model = null!;
+        private SkeletonUpdater? skeleton;
         private bool modelViewHierarchyDirty = true;
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Stride.Engine
             /// <summary>
             /// The current blend matrices of a skinned meshes, transforming from mesh space to world space, for each bone.
             /// </summary>
-            public Matrix[] BlendMatrices;
+            public Matrix[]? BlendMatrices;
 
             /// <summary>
             /// The meshes current bounding box in world space.
@@ -56,7 +56,7 @@ namespace Stride.Engine
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelComponent"/> class.
         /// </summary>
-        public ModelComponent() : this(null)
+        public ModelComponent() : this(model: null!)
         {
         }
 

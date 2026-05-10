@@ -157,7 +157,10 @@ namespace Stride.Engine.Processors
                 if (slot.Id == camera.Slot.Id)
                 {
                     if (slot.Camera != camera)
-                        throw new InvalidOperationException($"Can'to detach camera [{camera.Entity.Name}] from the graphics compositor. Another camera, {slot.Camera.Entity.Name}, is attached to this slot.");
+                    {
+                        var attachedCameraName = slot.Camera?.Entity?.Name ?? "<none>";
+                        throw new InvalidOperationException($"Can'to detach camera [{camera.Entity.Name}] from the graphics compositor. Another camera, {attachedCameraName}, is attached to this slot.");
+                    }
 
                     slot.Camera = null;
                     break;

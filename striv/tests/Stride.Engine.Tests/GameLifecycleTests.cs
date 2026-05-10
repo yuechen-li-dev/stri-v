@@ -1,5 +1,6 @@
 using System;
 using Stride.Games;
+using Stride.Engine.Design;
 using Xunit;
 
 namespace Stride.Engine.Tests;
@@ -28,5 +29,17 @@ public class GameLifecycleTests
         var provider = Game.InitializeAssetDatabase();
         Assert.NotNull(provider);
         provider.Dispose();
+    }
+
+    [Fact]
+    public void GameSettings_DefaultConstruction_HasValidDefaults()
+    {
+        var settings = new GameSettings();
+
+        Assert.NotNull(settings.PackageName);
+        Assert.NotNull(settings.DefaultSceneUrl);
+        Assert.NotNull(settings.DefaultGraphicsCompositorUrl);
+        Assert.NotNull(settings.SplashScreenUrl);
+        Assert.NotNull(settings.Configurations);
     }
 }
