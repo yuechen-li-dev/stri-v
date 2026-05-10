@@ -14,7 +14,7 @@ namespace Stride.Engine.Processors
     /// </summary>
     public class CameraProcessor : EntityProcessor<CameraComponent>
     {
-        private GraphicsCompositor currentCompositor;
+        private GraphicsCompositor? currentCompositor;
         private bool cameraSlotsDirty = true;
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Stride.Engine.Processors
                 DetachCameraFromSlot(component);
         }
 
-        private void OnCameraSlotsChanged(object sender, ref FastTrackingCollectionChangedEventArgs e)
+        private void OnCameraSlotsChanged(object? sender, ref FastTrackingCollectionChangedEventArgs e)
         {
             cameraSlotsDirty = true;
         }

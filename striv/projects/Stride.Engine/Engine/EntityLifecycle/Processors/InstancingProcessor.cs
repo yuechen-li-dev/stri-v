@@ -1,5 +1,6 @@
 // Copyright (c) .NET Foundation and Contributors (https://dotnetfoundation.org/ & https://stride3d.net) and Tebjan Halm
 // Distributed under the MIT license. See the LICENSE.md file in the project root for more information.
+using System;
 using System.Collections.Generic;
 using Stride.Core.Annotations;
 using Stride.Core.Mathematics;
@@ -13,13 +14,13 @@ namespace Stride.Engine.Processors
     public class InstancingProcessor : EntityProcessor<InstancingComponent, InstancingProcessor.InstancingData>, IEntityComponentRenderProcessor
     {
         private readonly Dictionary<RenderModel, RenderInstancing> modelInstancingMap = new Dictionary<RenderModel, RenderInstancing>();
-        private ModelRenderProcessor modelRenderProcessor;
+        private ModelRenderProcessor? modelRenderProcessor;
 
         public class InstancingData
         {
-            public TransformComponent TransformComponent;
-            public ModelComponent ModelComponent;
-            public RenderModel RenderModel;
+            public TransformComponent? TransformComponent;
+            public ModelComponent? ModelComponent;
+            public RenderModel? RenderModel;
             public RenderInstancing RenderInstancing = new RenderInstancing();
         }
 
@@ -30,7 +31,13 @@ namespace Stride.Engine.Processors
             Order = -100;
         }
 
-        public VisibilityGroup VisibilityGroup { get; set; }
+        private VisibilityGroup? visibilityGroup;
+
+        public VisibilityGroup VisibilityGroup
+        {
+            get => visibilityGroup ?? throw new InvalidOperationException($"{nameof(VisibilityGroup)} is not set.");
+            set => visibilityGroup = value;
+        }
 
         public override void Draw(RenderContext context)
         {
@@ -157,6 +164,9 @@ namespace Stride.Engine.Processors
 
         private static void BoundingBoxPostMultiplyWorld(InstancingData instancingData, IInstancing instancing, ModelComponent.MeshInfo meshInfo, Mesh mesh)
         {
+            if (instancingData.TransformComponent == null)
+                return;
+
             var ibb = new BoundingBoxExt(instancing.BoundingBox);
             ibb.Transform(instancingData.TransformComponent.WorldMatrix);
             var center = meshInfo.BoundingBox.Center + ibb.Center - instancingData.TransformComponent.WorldMatrix.TranslationVector; // World translation was applied twice now
@@ -169,7 +179,7 @@ namespace Stride.Engine.Processors
             data.TransformComponent = component.Entity.Transform;
             data.ModelComponent = component.Entity.Get<ModelComponent>();
 
-            if (data.ModelComponent != null && modelRenderProcessor.RenderModels.TryGetValue(data.ModelComponent, out var renderModel))
+            if (data.ModelComponent != null && modelRenderProcessor != null && modelRenderProcessor.RenderModels.TryGetValue(data.ModelComponent, out var renderModel))
             {
                 modelInstancingMap[renderModel] = data.RenderInstancing;
                 data.RenderModel = renderModel;
@@ -216,7 +226,7 @@ namespace Stride.Engine.Processors
 
         protected internal override void OnSystemRemove()
         {
-            VisibilityGroup.Tags.Remove(InstancingRenderFeature.ModelToInstancingMap);
+            visibilityGroup?.Tags.Remove(InstancingRenderFeature.ModelToInstancingMap);
             base.OnSystemRemove();
         }
     }

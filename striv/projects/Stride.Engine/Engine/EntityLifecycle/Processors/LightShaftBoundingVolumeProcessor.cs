@@ -12,7 +12,7 @@ namespace Stride.Engine.Processors
 {
     public class LightShaftBoundingVolumeProcessor : EntityProcessor<LightShaftBoundingVolumeComponent>
     {
-        private Dictionary<LightShaftComponent, List<RenderLightShaftBoundingVolume>> volumesPerLightShaft = new Dictionary<LightShaftComponent, List<RenderLightShaftBoundingVolume>>();
+        private readonly Dictionary<LightShaftComponent, List<RenderLightShaftBoundingVolume>> volumesPerLightShaft = new();
         private bool isDirty;
 
         public override void Update(GameTime time)
@@ -20,7 +20,7 @@ namespace Stride.Engine.Processors
             RegenerateVolumesPerLightShaft();
         }
 
-        public IReadOnlyList<RenderLightShaftBoundingVolume> GetBoundingVolumesForComponent(LightShaftComponent component)
+        public IReadOnlyList<RenderLightShaftBoundingVolume>? GetBoundingVolumesForComponent(LightShaftComponent component)
         {
             if (!volumesPerLightShaft.TryGetValue(component, out var data))
                 return null;
@@ -43,17 +43,17 @@ namespace Stride.Engine.Processors
             isDirty = true;
         }
 
-        private void ComponentOnEnabledChanged(object sender, EventArgs eventArgs)
+        private void ComponentOnEnabledChanged(object? sender, EventArgs eventArgs)
         {
             isDirty = true;
         }
 
-        private void ComponentOnModelChanged(object sender, EventArgs eventArgs)
+        private void ComponentOnModelChanged(object? sender, EventArgs eventArgs)
         {
             isDirty = true;
         }
 
-        private void ComponentOnLightShaftChanged(object sender, EventArgs eventArgs)
+        private void ComponentOnLightShaftChanged(object? sender, EventArgs eventArgs)
         {
             isDirty = true;
         }
@@ -83,9 +83,11 @@ namespace Stride.Engine.Processors
                 if (lightShaft == null)
                     continue;
 
-                List<RenderLightShaftBoundingVolume> data;
-                if (!volumesPerLightShaft.TryGetValue(lightShaft, out data))
-                    volumesPerLightShaft.Add(lightShaft, data = new List<RenderLightShaftBoundingVolume>());
+                if (!volumesPerLightShaft.TryGetValue(lightShaft, out var data))
+                {
+                    data = new List<RenderLightShaftBoundingVolume>();
+                    volumesPerLightShaft.Add(lightShaft, data);
+                }
 
                 data.Add(new RenderLightShaftBoundingVolume
                 {
