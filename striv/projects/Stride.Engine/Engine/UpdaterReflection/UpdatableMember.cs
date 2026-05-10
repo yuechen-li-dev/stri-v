@@ -18,7 +18,7 @@ namespace Stride.Updater
         /// Called by <see cref="UpdateEngine.Compile"/> to generate additional checks when entering an object (typically out of bound checks).
         /// </summary>
         /// <returns>The created enter checker (or null if not needed).</returns>
-        public virtual EnterChecker CreateEnterChecker()
+        public virtual EnterChecker? CreateEnterChecker()
         {
             return null;
         }

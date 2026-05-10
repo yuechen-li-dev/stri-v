@@ -52,7 +52,7 @@ namespace Stride.Updater
             // Current offset in containing object
             public int ObjectStartOffset;
 
-            public UpdatableMember Member;
+            public UpdatableMember? Member;
 
             // What to do when poping this entry from stack
             public UpdateOperationType LeaveOperation;
@@ -739,7 +739,7 @@ namespace Stride.Updater
                 return Owner == other.Owner && Name == other.Name;
             }
 
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
             {
                 return obj is UpdateKey key && Equals(key);
             }

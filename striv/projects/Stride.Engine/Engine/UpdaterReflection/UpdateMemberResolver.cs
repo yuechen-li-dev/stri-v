@@ -20,7 +20,7 @@ namespace Stride.Updater
         /// </summary>
         /// <param name="memberName">The member name to resolve.</param>
         /// <returns>The resolved member if found, otherwise null.</returns>
-        public virtual UpdatableMember ResolveProperty(string memberName)
+        public virtual UpdatableMember? ResolveProperty(string memberName)
         {
             return null;
         }
@@ -30,7 +30,7 @@ namespace Stride.Updater
         /// </summary>
         /// <param name="indexerName">The indexer name to resolve.</param>
         /// <returns>The resolved indexer if found, otherwise null.</returns>
-        public virtual UpdatableMember ResolveIndexer(string indexerName)
+        public virtual UpdatableMember? ResolveIndexer(string indexerName)
         {
             return null;
         }
