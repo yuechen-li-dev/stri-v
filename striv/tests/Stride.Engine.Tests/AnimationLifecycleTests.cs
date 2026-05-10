@@ -46,6 +46,32 @@ public class AnimationLifecycleTests
     }
 
     [Fact]
+    public void AnimationClipResult_DefaultConstruction_HasValidEmptyState()
+    {
+        var result = new AnimationClipResult();
+
+        Assert.NotNull(result.Channels);
+        Assert.Empty(result.Channels);
+        Assert.NotNull(result.Data);
+        Assert.Empty(result.Data);
+        Assert.NotNull(result.Objects);
+        Assert.Empty(result.Objects);
+    }
+
+    [Fact]
+    public void AnimationData_DefaultConstruction_HasValidEmptyState()
+    {
+        var data = new AnimationData<float>();
+
+        Assert.NotNull(data.TargetKeys);
+        Assert.Empty(data.TargetKeys);
+        Assert.NotNull(data.AnimationInitialValues);
+        Assert.Empty(data.AnimationInitialValues);
+        Assert.NotNull(data.AnimationSortedValues);
+        Assert.Empty(data.AnimationSortedValues);
+    }
+
+    [Fact]
     public void ComputeBinaryCurve_DefaultConstruction_AllowsMissingChildren()
     {
         var curve = new FloatBinaryCurve();
