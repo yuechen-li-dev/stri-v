@@ -140,6 +140,33 @@ public class EntityLifecycleTests
         Assert.Contains("services are not available", servicesEx.Message);
     }
 
+
+    [Fact]
+    public void EntityProcessor_BoundLifecycleAccess_ReturnsManagerAndServices()
+    {
+        var instance = new SceneInstance(new ServiceRegistry()) { RootScene = new Scene() };
+        var processor = new TestProcessor();
+
+        instance.Processors.Add(processor);
+
+        Assert.Same(instance, processor.EntityManager);
+        Assert.Same(instance.Services, processor.ServicesAccessor);
+    }
+
+    [Fact]
+    public void EntityProcessor_RemovedLifecycleAccess_ThrowsInvalidOperationException()
+    {
+        var instance = new SceneInstance(new ServiceRegistry()) { RootScene = new Scene() };
+        var processor = new TestProcessor();
+
+        instance.Processors.Add(processor);
+        instance.Processors.Remove(processor);
+
+        var managerEx = Assert.Throws<InvalidOperationException>(() => _ = processor.EntityManager);
+        var servicesEx = Assert.Throws<InvalidOperationException>(() => _ = processor.ServicesAccessor);
+        Assert.Contains("not attached", managerEx.Message);
+        Assert.Contains("services are not available", servicesEx.Message);
+    }
     private sealed class TestComponent : EntityComponent;
 
     private sealed class TestProcessor : EntityProcessor
