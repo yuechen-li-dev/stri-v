@@ -12,9 +12,9 @@ namespace Stride.Rendering
         /// <summary>
         /// Property key to access the current collection of <see cref="CameraComponent"/> from <see cref="ComponentBase.Tags"/>.
         /// </summary>
-        public static readonly PropertyKey<CameraComponent> Current = new PropertyKey<CameraComponent>("CameraComponentRenderer.CurrentCamera", typeof(RenderContext));
+        public static readonly PropertyKey<CameraComponent?> Current = new PropertyKey<CameraComponent?>("CameraComponentRenderer.CurrentCamera", typeof(RenderContext));
 
-        public static CameraComponent GetCurrentCamera(this RenderContext context)
+        public static CameraComponent? GetCurrentCamera(this RenderContext context)
         {
             return context.Tags.Get(Current);
         }
