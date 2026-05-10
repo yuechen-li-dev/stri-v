@@ -54,14 +54,16 @@ public sealed class EngineLifecycleCompositionTests
 
         Assert.Same(processor, processorSystemRemoved.Processor);
         Assert.Same(sceneInstance, processorSystemRemoved.EntityManager);
-        Assert.Null(processor.EntityManager);
+        Assert.False(processor.IsAttached);
+        Assert.Throws<InvalidOperationException>(() => _ = processor.EntityManager);
         Assert.DoesNotContain(processor, sceneInstance.Processors);
 
         var rootCleared = await SceneLifecycleTransition.ClearRootSceneAsync(new RootSceneClearRequested(sceneInstance), sceneActuator);
 
         Assert.Same(sceneInstance, rootCleared.SceneInstance);
         Assert.Null(sceneInstance.RootScene);
-        Assert.Null(entity.EntityManager);
+        Assert.False(entity.IsManaged);
+        Assert.Throws<InvalidOperationException>(() => _ = entity.EntityManager);
     }
 
     [Fact]
@@ -101,7 +103,8 @@ public sealed class EngineLifecycleCompositionTests
 
         Assert.Same(sceneInstance, rootCleared.SceneInstance);
         Assert.Null(sceneInstance.RootScene);
-        Assert.Null(entity.EntityManager);
+        Assert.False(entity.IsManaged);
+        Assert.Throws<InvalidOperationException>(() => _ = entity.EntityManager);
 
         // Observed Stride behavior: clearing root scene removes existing processor/entity matches.
         Assert.Equal(1, processor.RemovedCount);

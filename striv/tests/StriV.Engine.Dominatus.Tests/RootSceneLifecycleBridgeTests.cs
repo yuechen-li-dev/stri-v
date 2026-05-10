@@ -42,7 +42,8 @@ public sealed class RootSceneLifecycleBridgeTests
 
         Assert.Same(sceneInstance, completed.SceneInstance);
         Assert.Null(sceneInstance.RootScene);
-        Assert.Null(rootEntity.EntityManager);
+        Assert.False(rootEntity.IsManaged);
+        Assert.Throws<InvalidOperationException>(() => _ = rootEntity.EntityManager);
     }
 
     [Fact]
