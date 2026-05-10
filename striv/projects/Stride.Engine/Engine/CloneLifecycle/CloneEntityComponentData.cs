@@ -17,8 +17,8 @@ namespace Stride.Engine.Design
         public static PropertyKey<CloneEntityComponentData> Key = new PropertyKey<CloneEntityComponentData>("Key", typeof(CloneEntityComponentData));
 
         [DataMemberCustomSerializer]
-        public Entity Entity;
-        public List<EntityComponentProperty> Properties;
+        public Entity? Entity;
+        public List<EntityComponentProperty> Properties = new List<EntityComponentProperty>();
         //public List<EntityComponentProperty> Properties;
 
         public static void RestoreEntityComponentData(EntityComponent entityComponent, CloneEntityComponentData data)
@@ -54,7 +54,7 @@ namespace Stride.Engine.Design
 
         public static CloneEntityComponentData GenerateEntityComponentData(EntityComponent entityComponent)
         {
-            var data = new CloneEntityComponentData { Properties = new List<EntityComponentProperty>() };
+            var data = new CloneEntityComponentData();
             foreach (var field in entityComponent.GetType().GetTypeInfo().DeclaredFields)
             {
                 //if (!field.GetCustomAttributes(typeof(DataMemberConvertAttribute), true).Any())
@@ -73,23 +73,23 @@ namespace Stride.Engine.Design
             return data;
         }
 
-        private static object MergeObject(object oldValue, object newValue)
+        private static object? MergeObject(object? oldValue, object? newValue)
         {
-            if (oldValue is IList)
+            if (oldValue is IList && newValue is IEnumerable enumerable)
             {
                 var oldList = (IList)oldValue;
                 oldList.Clear();
-                foreach (var item in (IEnumerable)newValue)
+                foreach (var item in enumerable)
                 {
                     oldList.Add(item);
                 }
                 return oldList;
             }
-            if (oldValue is IDictionary)
+            if (oldValue is IDictionary && newValue is IDictionary dictionary)
             {
                 var oldDictionary = (IDictionary)oldValue;
                 oldDictionary.Clear();
-                foreach (DictionaryEntry item in (IDictionary)newValue)
+                foreach (DictionaryEntry item in dictionary)
                 {
                     oldDictionary.Add(item.Key, item.Value);
                 }
