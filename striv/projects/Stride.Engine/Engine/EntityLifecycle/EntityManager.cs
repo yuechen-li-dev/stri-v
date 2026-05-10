@@ -610,7 +610,7 @@ namespace Stride.Engine
                 var component = components[i];
                 if (processor.Accept(component.GetType().GetTypeInfo()))
                 {
-                    processor.ProcessEntityComponent(entity, component, false);
+                    ApplyProcessorMembershipChange(EntityProcessorMembershipChange.Added(processor, entity, component));
                 }
             }
         }
@@ -624,7 +624,9 @@ namespace Stride.Engine
             {
                 for (int i = 0; i < processorsForComponent.Count; i++)
                 {
-                    processorsForComponent[i].ProcessEntityComponent(entity, component, forceRemove);
+                    ApplyProcessorMembershipChange(forceRemove
+                        ? EntityProcessorMembershipChange.Removed(processorsForComponent[i], entity, component)
+                        : EntityProcessorMembershipChange.Revalidated(processorsForComponent[i], entity, component));
                 }
             }
             else
@@ -636,7 +638,9 @@ namespace Stride.Engine
                     if (processor.Accept(componentType))
                     {
                         processorsForComponent.Add(processor);
-                        processor.ProcessEntityComponent(entity, component, forceRemove);
+                        ApplyProcessorMembershipChange(forceRemove
+                            ? EntityProcessorMembershipChange.Removed(processor, entity, component)
+                            : EntityProcessorMembershipChange.Added(processor, entity, component));
                     }
 
                     if (processor.IsDependentOnComponentType(componentType))
@@ -660,6 +664,12 @@ namespace Stride.Engine
                     }
                 }
             }
+        }
+
+        private static void ApplyProcessorMembershipChange(in EntityProcessorMembershipChange change)
+        {
+            var forceRemove = change.Kind == EntityProcessorMembershipChangeKind.Removed;
+            change.Processor.ProcessEntityComponent(change.Entity, change.Component, forceRemove);
         }
 
         IEnumerator<Entity> IEnumerable<Entity>.GetEnumerator()
