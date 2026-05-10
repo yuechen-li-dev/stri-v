@@ -47,8 +47,8 @@ namespace Stride.Engine
 
         public override void Update(GameTime gameTime) => Manager.Update(gameTime);
 
-        private void OnApplicationPaused(object sender, EventArgs e) => Manager.Pause();
+        private void OnApplicationPaused(object? sender, EventArgs e) => Manager.Pause();
 
-        private void OnApplicationResumed(object sender, EventArgs e) => Manager.Resume();
+        private void OnApplicationResumed(object? sender, EventArgs e) => Manager.Resume();
     }
 }
