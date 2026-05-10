@@ -24,7 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- Stri-V Core excludes editor-only compositor glue from the clean runtime graph. -->
-    <Compile Remove="Rendering/Compositing/EditorTopLevelCompositor.cs" />
+    <Compile Remove="Engine/Quarantine/RenderingEditor/EditorTopLevelCompositor.cs" />
     <!-- Stri-V Core is desktop Vulkan-first and currently excludes VR-specific runtime helpers. -->
     <Compile Remove="Engine/Quarantine/RenderingVR/ForwardRenderer.VRUtils.cs" />
     <Compile Remove="Engine/Quarantine/Shaders.Compiler/**/*.cs" />
