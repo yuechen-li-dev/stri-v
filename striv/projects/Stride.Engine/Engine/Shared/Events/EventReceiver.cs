@@ -124,7 +124,7 @@ namespace Stride.Engine.Events
         /// <returns></returns>
         public int TryReceiveAll()
         {
-            return InternalTryReceiveAll(null);
+            return InternalTryReceiveAll(collection: null!);
         }
 
         /// <summary>

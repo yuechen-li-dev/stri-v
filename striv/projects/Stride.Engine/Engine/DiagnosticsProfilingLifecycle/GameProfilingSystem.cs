@@ -146,7 +146,12 @@ namespace Stride.Profiling
             {
                 // Can't be null because we skip those events without values
                 // ReSharper disable PossibleInvalidOperationException
-                profilingResults.Sort((x1, x2) => string.Compare(x1.Event.Value.Key.Name, x2.Event.Value.Key.Name, StringComparison.Ordinal));
+                profilingResults.Sort((x1, x2) =>
+                {
+                    var xName = x1.Event?.Key.Name ?? string.Empty;
+                    var yName = x2.Event?.Key.Name ?? string.Empty;
+                    return string.Compare(xName, yName, StringComparison.Ordinal);
+                });
                 // ReSharper restore PossibleInvalidOperationException
             }
 
@@ -418,7 +423,7 @@ namespace Stride.Profiling
             }
 
             // Backup current PresentInterval state
-            userPresentInterval = GraphicsDevice.Tags.Get(GraphicsPresenter.ForcedPresentInterval)!;
+            userPresentInterval = GraphicsDevice.Tags.Get(GraphicsPresenter.ForcedPresentInterval);
 
             // Disable VSync (otherwise GPU results might be incorrect)
             GraphicsDevice.Tags.Set(GraphicsPresenter.ForcedPresentInterval, PresentInterval.Immediate);
