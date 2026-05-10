@@ -131,7 +131,7 @@ namespace Stride.Updater
         public static CompiledUpdate Compile(Type rootObjectType, List<UpdateMemberInfo> animationPaths)
         {
             var currentPath = string.Empty;
-            var temporaryObjectsList = new List<object>();
+            var temporaryObjectsList = new List<object?>();
 
             var state = new ComputeUpdateOperationState();
             state.UpdateOperations = new List<UpdateOperation>();
@@ -195,8 +195,7 @@ namespace Stride.Updater
                         var parentType = containerType;
                         while (parentType != null)
                         {
-                            UpdateMemberResolver resolver;
-                            if (MemberResolvers.TryGetValue(parentType, out resolver))
+                            if (MemberResolvers.TryGetValue(parentType, out var resolver))
                             {
                                 updatableMember = resolver.ResolveIndexer(indexerString);
                                 if (updatableMember != null)
@@ -211,8 +210,7 @@ namespace Stride.Updater
                         {
                             foreach (var implementedInterface in containerType.GetTypeInfo().ImplementedInterfaces)
                             {
-                                UpdateMemberResolver resolver;
-                                if (MemberResolvers.TryGetValue(implementedInterface, out resolver))
+                                if (MemberResolvers.TryGetValue(implementedInterface, out var resolver))
                                 {
                                     updatableMember = resolver.ResolveIndexer(indexerString);
                                     if (updatableMember != null)
@@ -284,8 +282,7 @@ namespace Stride.Updater
                             parentType = containerType;
                             while (updatableMember == null && parentType != null)
                             {
-                                UpdateMemberResolver resolver;
-                                if (MemberResolvers.TryGetValue(parentType, out resolver))
+                                if (MemberResolvers.TryGetValue(parentType, out var resolver))
                                 {
                                     updatableMember = resolver.ResolveProperty(propertyName);
                                     if (updatableMember != null)
@@ -364,7 +361,7 @@ namespace Stride.Updater
             }
         }
 
-        private static void ProcessMember(ref ComputeUpdateOperationState state, UpdateMemberInfo animationPath, UpdatableMember updatableMember, List<object> temporaryObjectsList)
+        private static void ProcessMember(ref ComputeUpdateOperationState state, UpdateMemberInfo animationPath, UpdatableMember updatableMember, List<object?> temporaryObjectsList)
         {
             int leaveOffset = 0;
             var leaveOperation = UpdateOperationType.Invalid;
@@ -433,7 +430,7 @@ namespace Stride.Updater
                             // Struct properties need a storage area so that we can later set the updated value back into the property
                             leaveOperation = UpdateOperationType.LeaveAndCopyStructPropertyBase;
                             temporaryObjectIndex = temporaryObjectsList.Count;
-                            temporaryObjectsList.Add(Activator.CreateInstance(updatableProperty.MemberType));
+                            temporaryObjectsList.Add(CreateTemporaryStructStorage(updatableProperty.MemberType));
                         }
                         else
                         {
@@ -466,6 +463,16 @@ namespace Stride.Updater
                     ObjectStartOffset = state.NewOffset,
                 });
             }
+        }
+
+
+        private static object CreateTemporaryStructStorage(Type memberType)
+        {
+            var temporaryStorage = Activator.CreateInstance(memberType);
+            if (temporaryStorage is not null)
+                return temporaryStorage;
+
+            throw new InvalidOperationException($"Update compile frame expected non-null temporary storage for struct member type [{memberType}].");
         }
 
         /// <summary>
@@ -530,7 +537,7 @@ namespace Stride.Updater
                             parentObject,
                             (int)((byte*)currentPtr - (byte*)UpdateEngineHelper.ObjectToPointer(parentObject))));
 
-                        currentObj = temporaryObjects[operation.DataOffset];
+                        currentObj = RequireObject(temporaryObjects[operation.DataOffset], operation, "temporary struct");
                         currentPtr = ((UpdatablePropertyBase)operation.Member).GetStructAndUnbox(currentPtr, RequireObject(currentObj, operation, "temporary struct"));
 
                         break;
