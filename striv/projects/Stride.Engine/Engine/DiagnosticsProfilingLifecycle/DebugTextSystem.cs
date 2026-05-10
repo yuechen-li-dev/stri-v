@@ -84,9 +84,13 @@ namespace Stride.Profiling
                 return;
             }
 
+            var game = Game;
+            if (game == null)
+                return;
+
             if (fastTextRenderer == null)
             {
-                fastTextRenderer = new FastTextRenderer(Game.GraphicsContext)
+                fastTextRenderer = new FastTextRenderer(game.GraphicsContext)
                 {
                     DebugSpriteFont = Content.Load<Texture>("StrideDebugSpriteFont"),
                     TextColor = TextColor,
@@ -94,10 +98,10 @@ namespace Stride.Profiling
             }
 
             // TODO GRAPHICS REFACTOR where to get command list from?
-            Game.GraphicsContext.CommandList.SetRenderTargetAndViewport(null, Game.GraphicsDevice.Presenter.BackBuffer);
+            game.GraphicsContext.CommandList.SetRenderTargetAndViewport(null!, game.GraphicsDevice.Presenter.BackBuffer);
 
             var currentColor = TextColor;
-            fastTextRenderer.Begin(Game.GraphicsContext);
+            fastTextRenderer.Begin(game.GraphicsContext);
 
             // the loop is done backwards so when removing elements from the list you don't change the index of elements that weren't processed already
             for (int index = overlayMessages.Count - 1; index >= 0; index--)
@@ -106,9 +110,9 @@ namespace Stride.Profiling
                 if (msg.TextColor != currentColor)
                 {
                     currentColor = msg.TextColor;
-                    fastTextRenderer.End(Game.GraphicsContext);
+                    fastTextRenderer.End(game.GraphicsContext);
                     fastTextRenderer.TextColor = currentColor;
-                    fastTextRenderer.Begin(Game.GraphicsContext);
+                    fastTextRenderer.Begin(game.GraphicsContext);
                 }
 
                 msg.RemainingTime -= gameTime.Elapsed;
@@ -118,9 +122,9 @@ namespace Stride.Profiling
                     overlayMessages.RemoveAt(index);
                 }
 
-                fastTextRenderer.DrawString(Game.GraphicsContext, msg.Message, msg.Position.X, msg.Position.Y);
+                fastTextRenderer.DrawString(game.GraphicsContext, msg.Message, msg.Position.X, msg.Position.Y);
             }
-            fastTextRenderer.End(Game.GraphicsContext);
+            fastTextRenderer.End(game.GraphicsContext);
         }
     }
 }

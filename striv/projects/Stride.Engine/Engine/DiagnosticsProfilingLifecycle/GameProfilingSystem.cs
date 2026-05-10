@@ -369,7 +369,7 @@ namespace Stride.Profiling
 
             using (renderDrawContext.PushRenderTargetsAndRestore())
             {
-                renderDrawContext.CommandList.SetRenderTargetAndViewport(null, renderTarget);
+                renderDrawContext.CommandList.SetRenderTargetAndViewport(null!, renderTarget);
                 viewportHeight = renderDrawContext.CommandList.Viewport.Height;
                 fastTextRenderer.Begin(renderDrawContext.GraphicsContext);
                 lock (stringLock)
@@ -418,7 +418,7 @@ namespace Stride.Profiling
             }
 
             // Backup current PresentInterval state
-            userPresentInterval = GraphicsDevice.Tags.Get(GraphicsPresenter.ForcedPresentInterval);
+            userPresentInterval = GraphicsDevice.Tags.Get(GraphicsPresenter.ForcedPresentInterval)!;
 
             // Disable VSync (otherwise GPU results might be incorrect)
             GraphicsDevice.Tags.Set(GraphicsPresenter.ForcedPresentInterval, PresentInterval.Immediate);

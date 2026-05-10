@@ -19,7 +19,7 @@ namespace Stride.Engine
     [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
     public sealed class EntityComponentCollection : FastCollection<EntityComponent>
     {
-        private readonly Entity entity;
+        private readonly Entity? entity;
 
         public EntityComponentCollection()
         {
@@ -44,7 +44,7 @@ namespace Stride.Engine
         /// <typeparam name="T">Type of the component</typeparam>
         /// <returns>The first component or null if it was not found</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Get<T>() where T : EntityComponent
+        public T? Get<T>() where T : EntityComponent
         {
             for (int i = 0; i < Count; i++)
             {
@@ -71,7 +71,7 @@ namespace Stride.Engine
         /// </ul>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Get<T>(int index) where T : EntityComponent
+        public T? Get<T>(int index) where T : EntityComponent
         {
             if (index < 0)
             {
