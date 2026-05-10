@@ -20,7 +20,7 @@ namespace Stride.Engine
         internal ProfilingKey UpdateProfilingKey;
         internal ProfilingKey DrawProfilingKey;
         private readonly TypeInfo mainTypeInfo;
-        private readonly Dictionary<TypeInfo, bool> componentTypesSupportedAsRequired;
+        private readonly Dictionary<TypeInfo, bool>? componentTypesSupportedAsRequired;
         private EntityManager? entityManager;
         private IServiceRegistry? services;
 
@@ -296,20 +296,23 @@ namespace Stride.Engine
             }
             else if (entityAdded && !entityMatch)
             {
+                var data = ComponentDatas[entityComponent];
+
                 // Notify component being removed
-                OnEntityComponentRemoved(entity, entityComponent, entityData);
+                OnEntityComponentRemoved(entity, entityComponent, data);
 
                 // Removes it from the component => data map
                 ComponentDatas.Remove(entityComponent);
             }
-            else if (entityMatch) // && entityMatch
+            else if (entityMatch && entityAdded)
             {
-                if (!IsAssociatedDataValid(entity, entityComponent, entityData))
+                var data = ComponentDatas[entityComponent];
+                if (!IsAssociatedDataValid(entity, entityComponent, data))
                 {
-                    OnEntityComponentRemoved(entity, entityComponent, entityData);
-                    entityData = GenerateComponentData(entity, entityComponent);
-                    OnEntityComponentAdding(entity, entityComponent, entityData);
-                    ComponentDatas[entityComponent] = entityData;
+                    OnEntityComponentRemoved(entity, entityComponent, data);
+                    data = GenerateComponentData(entity, entityComponent);
+                    OnEntityComponentAdding(entity, entityComponent, data);
+                    ComponentDatas[entityComponent] = data;
                 }
             }
         }
